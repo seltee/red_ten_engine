@@ -7,12 +7,13 @@ ResourceController::ResourceController()
 {
 }
 
-Texture *ResourceController::addTexture(std::string path)
+Texture *ResourceController::addTexture(std::string path, TextureFilter filter)
 {
     Texture *texture = getTextureByPath(path);
     if (!texture)
     {
         texture = new Texture(path);
+        texture->setTextureFilter(filter);
         textures.push_back(texture);
     }
     return texture;

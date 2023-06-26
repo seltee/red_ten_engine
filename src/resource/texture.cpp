@@ -24,14 +24,15 @@ void Texture::bind()
 {
     if (!bIsLoaded)
         reload();
+    glActiveTexture((unsigned int)TextureSlot::TEXTURE_0);
     glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
-void Texture::bind(int slot)
+void Texture::bind(TextureSlot slot)
 {
     if (!bIsLoaded)
         reload();
-    glActiveTexture(slot);
+    glActiveTexture((unsigned int)slot);
     glBindTexture(GL_TEXTURE_2D, textureID);
 }
 
@@ -49,8 +50,16 @@ void Texture::reload()
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (filter == TextureFilter::Nearest)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -209,4 +218,14 @@ const unsigned char *Texture::getBytemapAlphaData()
 const unsigned char *Texture::getBytemapFullData()
 {
     return bytemapFullData;
+}
+
+void Texture::setTextureFilter(TextureFilter filter)
+{
+    this->filter = filter;
+}
+
+TextureFilter Texture::getTextureFilter()
+{
+    return filter;
 }

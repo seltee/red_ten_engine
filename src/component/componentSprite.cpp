@@ -4,13 +4,14 @@
 #include "component/componentSprite.h"
 #include "common/commonShaders.h"
 #include "math/glm/gtc/type_ptr.hpp"
+#include "opengl/glew.h"
 #include <math.h>
 
 ComponentSprite::ComponentSprite() : Component()
 {
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
-    shader = CommonShaders::spriteShader;
+    shader = CommonShaders::getSpriteShader();
     colorMode = ComponentColorMode::Alpha;
 }
 
@@ -29,7 +30,7 @@ bool ComponentSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, boo
         texture->bind();
     }
 
-    CommonShaders::spriteMesh->use();
+    CommonShaders::getSpriteMesh()->use();
     prepareColorMode();
 
     return true;
@@ -92,6 +93,11 @@ void ComponentSprite::setTexture(Texture *texture)
     if (texture && !texture->isLoaded())
         texture->reload();
     setRelativeScale(1.0f, 1.0f);
+}
+
+Texture *ComponentSprite::getTexture()
+{
+    return texture;
 }
 
 void ComponentSprite::setShader(Shader *shader)

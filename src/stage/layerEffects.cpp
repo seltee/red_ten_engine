@@ -54,7 +54,7 @@ void LayerEffects::render(View *view)
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 
-        RawShader *effectShader = CommonShaders::effectShader;
+        RawShader *effectShader = CommonShaders::getEffectShader();
         Matrix4 m;
 
         for (auto it = effects.begin(); it != effects.end(); it++)
@@ -69,7 +69,7 @@ void LayerEffects::render(View *view)
                 effect->use(m, m);
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, view->getTexture());
-                CommonShaders::screenMesh->use();
+                CommonShaders::getScreenMesh()->use();
                 glDrawArrays(GL_QUADS, 0, 4);
 
                 view->useFrameBuffer();
@@ -77,7 +77,7 @@ void LayerEffects::render(View *view)
                 effectShader->setOpacity(effect->getOpacity());
 
                 glBindTexture(GL_TEXTURE_2D, renderedTexture);
-                CommonShaders::screenMesh->use();
+                CommonShaders::getScreenMesh()->use();
                 glDrawArrays(GL_QUADS, 0, 4);
             }
         }

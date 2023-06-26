@@ -158,3 +158,8 @@ void RawShader::provideInt4Value(int uniform, int amount, int *value)
     if (programm != -1)
         glUniform4iv(uniform, amount, value);
 }
+
+void RawShader::setTextureIndex(int uniform, int textureIndex)
+{
+    glUniform1i(uniform, textureIndex);
+}

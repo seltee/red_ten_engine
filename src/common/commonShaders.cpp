@@ -85,9 +85,54 @@ void CommonShaders::build()
     logController->logff("shaders compiled\n");
 }
 
+Shader *CommonShaders::getSpriteShader()
+{
+    return spriteShader;
+}
+
+Shader *CommonShaders::getSpriteFrameShader()
+{
+    return spriteFrameShader;
+}
+
+Shader *CommonShaders::getScreenShader()
+{
+    return screenShader;
+}
+
+RawShader *CommonShaders::getEffectShader()
+{
+    return effectShader;
+}
+
+RawShader *CommonShaders::getInitialLightningShader()
+{
+    return initialLightningShader;
+}
+
+LightningShader *CommonShaders::getSunShader()
+{
+    return sunShader;
+}
+
+LightningShader *CommonShaders::getSunWithShadowShader()
+{
+    return sunWithShadowShader;
+}
+
+LightningShader *CommonShaders::getOmniShader()
+{
+    return omniShader;
+}
+
+Mesh *CommonShaders::getScreenMesh()
+{
+    return screenMesh;
+}
+
 Mesh *CommonShaders::getSpriteMesh()
 {
-    return CommonShaders::spriteMesh;
+    return spriteMesh;
 }
 
 float spriteData[] = {

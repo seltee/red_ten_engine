@@ -22,6 +22,7 @@ public:
     EXPORT void setRelativeScale(float x, float y);
     EXPORT void setRelativeScale(Vector2 &size);
     EXPORT void setTexture(Texture *texture);
+    EXPORT Texture *getTexture();
     EXPORT void setShader(Shader *shader);
 
     EXPORT Matrix4 getLocalspaceMatrix();

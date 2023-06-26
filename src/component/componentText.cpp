@@ -34,12 +34,12 @@ bool ComponentText::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool 
 
         Matrix4 mOut = mModelTransform * mAnchor;
 
-        auto shader = CommonShaders::spriteShader;
+        auto shader = CommonShaders::getSpriteShader();
         shader->use(vpMatrix, mOut);
         shader->setOpacity(opacity);
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        CommonShaders::spriteMesh->use();
+        CommonShaders::getSpriteMesh()->use();
         prepareColorMode();
         return true;
     }

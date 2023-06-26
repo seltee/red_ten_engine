@@ -14,7 +14,7 @@ class ResourceController
 public:
     ResourceController();
 
-    EXPORT Texture *addTexture(std::string path);
+    EXPORT Texture *addTexture(std::string path, TextureFilter filter = TextureFilter::Linear);
     EXPORT Texture *getTextureByPath(std::string path);
 
     EXPORT Sound *addSound(std::string path);

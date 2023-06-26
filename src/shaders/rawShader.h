@@ -28,6 +28,8 @@ public:
     EXPORT void provideInt3Value(int uniform, int amount, int *value);
     EXPORT void provideInt4Value(int uniform, int amount, int *value);
 
+    EXPORT void setTextureIndex(int uniform, int textureIndex);
+
     unsigned int locMViewProjection;
     unsigned int locMTransform;
     unsigned int locV2TexCoordShift;

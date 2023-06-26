@@ -59,12 +59,12 @@ void Stage::present(View *view)
     glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
 
-    auto screenShader = CommonShaders::screenShader;
+    auto screenShader = CommonShaders::getScreenShader();
     screenShader->use(m, m);
 
     glBindTexture(GL_TEXTURE_2D, view->getTexture());
 
-    CommonShaders::screenMesh->use();
+    CommonShaders::getScreenMesh()->use();
     glDrawArrays(GL_QUADS, 0, 4);
 
     view->swapBuffers();

@@ -138,14 +138,14 @@ void LayerActors::render(View *view)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 
-    auto initialLightningShader = CommonShaders::initialLightningShader;
+    auto initialLightningShader = CommonShaders::getInitialLightningShader();
     renderer->setupLightning(false);
     initialLightningShader->use(m1, m2);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, renderer->getAlbedoTexture());
     glUniform3fv(initialLightningShader->locV3AmbientColor, 1, ambientColor);
-    CommonShaders::screenMesh->use();
+    CommonShaders::getScreenMesh()->use();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -224,8 +224,8 @@ void LayerActors::render(View *view)
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, renderer->getLightningTexture());
-    CommonShaders::screenShader->use(m1, m2);
-    CommonShaders::screenMesh->use();
+    CommonShaders::getScreenShader()->use(m1, m2);
+    CommonShaders::getScreenMesh()->use();
 
     glDrawArrays(GL_QUADS, 0, 4);
 }

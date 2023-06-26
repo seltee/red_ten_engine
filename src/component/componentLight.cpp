@@ -88,7 +88,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
 {
     if (type == LightType::Sun)
     {
-        auto lightShader = bUseShadowPhase ? CommonShaders::sunWithShadowShader : CommonShaders::sunShader;
+        auto lightShader = bUseShadowPhase ? CommonShaders::getSunWithShadowShader() : CommonShaders::getSunShader();
         lightShader->use(m1, m1);
 
         if (bUseShadowPhase)
@@ -101,7 +101,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
         lightShader->setLightDirection(normal);
         lightShader->setLightColor(color);
 
-        CommonShaders::screenMesh->use();
+        CommonShaders::getScreenMesh()->use();
         glBlendFunc(GL_ONE, GL_ONE);
         glDrawArrays(GL_QUADS, 0, 4);
     }
@@ -109,13 +109,13 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
     if (type == LightType::Omni)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        auto lightShader = CommonShaders::omniShader;
+        auto lightShader = CommonShaders::getOmniShader();
         lightShader->use(mModelTransform, mModelTransform);
 
         lightShader->setAffectDistance(affectDistance);
         lightShader->setLightColor(color);
 
-        CommonShaders::screenMesh->use();
+        CommonShaders::getScreenMesh()->use();
         glBlendFunc(GL_ONE, GL_ONE);
         glDrawArrays(GL_QUADS, 0, 4);
     }

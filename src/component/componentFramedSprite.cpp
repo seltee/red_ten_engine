@@ -12,7 +12,7 @@ ComponentFramedSprite::ComponentFramedSprite() : Component()
 {
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
-    shader = CommonShaders::spriteFrameShader;
+    shader = CommonShaders::getSpriteFrameShader();
     colorMode = ComponentColorMode::Alpha;
 }
 
@@ -29,7 +29,7 @@ bool ComponentFramedSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *t
         shader->setFrameSize(frameRenderSize);
 
         texture->bind();
-        CommonShaders::spriteMesh->use();
+        CommonShaders::getSpriteMesh()->use();
         prepareColorMode();
         return true;
     }
@@ -93,6 +93,11 @@ void ComponentFramedSprite::setTexture(Texture *texture)
     if (texture)
         texture->reload();
     calcFrameRenderSize();
+}
+
+
+Texture *ComponentFramedSprite::getTexture(){
+    return texture;
 }
 
 void ComponentFramedSprite::setShader(Shader *shader)

@@ -56,7 +56,6 @@ std::string LogController::formatString(const char *format, va_list arg)
 {
 
     std::string out = "";
-    bool error = false;
     const char *iterator = format;
     char *s;
     unsigned int i;
@@ -108,14 +107,8 @@ std::string LogController::formatString(const char *format, va_list arg)
 
                 default:
                     printf("Unknown format argument %c%c", '%', *iterator);
-                    error = true;
                     break;
                 }
-            }
-            else
-            {
-                error = true;
-                break;
             }
         }
         else
