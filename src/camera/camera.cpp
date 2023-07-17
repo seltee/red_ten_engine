@@ -88,6 +88,11 @@ bool Camera::isListenerCamera()
     return this == soundController->getListenerCamera();
 }
 
+float Camera::getLineThickness()
+{
+    return 0.01f;
+}
+
 void Camera::setSoundController(SoundController *soundController)
 {
     Camera::soundController = soundController;

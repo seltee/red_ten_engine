@@ -12,12 +12,15 @@ public:
     CratePlayer() : ActorPawn()
     {
         registerClassName("CratePlayer");
+    }
 
+    void onSpawned()
+    {
         setPhysicsMotionType(MotionType::Dynamic);
         transform.setScale(0.5f);
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(crateTexture);
-        sprite->addPhysics2dBox(256.0f, 256.0f);
+        sprite->addShape2dBox({256.0f, 256.0f});
         setFrictionAndRestitution(0.9f, 0.1f);
 
         setZAxisLocked(true);
@@ -50,12 +53,12 @@ public:
 
     void onProcess(float delta)
     {
-        addLinearVelocity(Vector3(moveX * delta * 2.0f, moveY * delta * 2.0f, 0.0f));
+        getPhysicsBody()->addLinearVelocity(Vector3(moveX * delta * 2.0f, moveY * delta * 2.0f, 0.0f));
         counter += delta;
         while (counter > 0.10f)
         {
             counter -= 0.10f;
-            setLinearVelocity(getLinearVelocity() * 0.8f);
+            getPhysicsBody()->setLinearVelocity(getPhysicsBody()->getLinearVelocity() * 0.8f);
         }
     }
 
@@ -103,7 +106,7 @@ public:
     void setup(float x, float y)
     {
         transform.setPosition(x, y);
-        sprite->addPhysics2dBox(256.0f, 256.0f);
+        sprite->addShape2dBox({256.0f, 256.0f});
     }
 
     static Texture *crateTexture;
@@ -128,7 +131,7 @@ public:
     {
         transform.setPosition(x, y);
         auto emptyComponent = createComponent<ComponentSprite>();
-        emptyComponent->addPhysics2dBox(width, height);
+        emptyComponent->addShape2dBox({width, height});
         setFrictionAndRestitution(1.0f, 0.1f);
     }
 };

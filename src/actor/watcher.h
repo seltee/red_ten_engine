@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
+#include "connector/withLogger.h"
 
 template <class T>
 class Watcher : public WithLogger

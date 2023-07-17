@@ -119,3 +119,8 @@ PointWithDirection CameraPerspective::screenToWorld(float x, float y)
 
     return out;
 }
+
+float CameraPerspective::getLineThickness()
+{
+    return 0.02f;
+}

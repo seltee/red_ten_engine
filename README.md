@@ -5,13 +5,12 @@ Personal 2d/3d game engine I'm creating for development of my indie projects. Cu
 ### Features
 * Modern deffered rendering allowing hundreds of light sources to be rendered without fps drops. Shadows supported
 * Layers system allowing to separate actors, effects, sprites and UI by using different layers and managing them separately. Additional libraries like UI may exist on their own layer without collisions with your 3d objects/sprites and other UI implementations. Same for the effect libraries
-* 2d/3d Physics are managed by Jolt game physics engine released under MIT license
 * Free for commercial and none commercial usage (MIT license)
+* Own physics (under development)
 
 ### Compilation
 1. Clone the repo, install make if you don't have it, install clang++
 2. Download and install following libraries: 
-* Jolt physics engine - https://github.com/jrouwe/JoltPhysics
 * SDL 2 - https://github.com/libsdl-org/SDL/releases/tag/release-2.24.0
 * SDL 2 ttf - https://github.com/libsdl-org/SDL_ttf/releases
 * OpenAL - https://www.openal.org/downloads/

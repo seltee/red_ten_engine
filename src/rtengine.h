@@ -3,12 +3,15 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
-#include "common/withDebug.h"
 #include "common/soundPlayer.h"
 #include "common/mesh.h"
 #include "common/pawn.h"
 #include "common/keyboard.h"
+#include "common/meshMaker.h"
+#include "connector/withLogger.h"
+#include "connector/withDebug.h"
+#include "connector/withRepository.h"
+#include "connector/withMeshMaker.h"
 #include "resource/resourceMesh.h"
 #include "resource/resourceFont.h"
 #include "resource/sound.h"
@@ -16,13 +19,17 @@
 #include "actor/actor.h"
 #include "actor/actorPawn.h"
 #include "actor/actorGUIElement.h"
+#include "physics/shapes/shape.h"
+#include "physics/shapes/shapeBox.h"
+#include "physics/shapes/shapeGeometry.h"
+#include "physics/shapes/shapePlain.h"
+#include "physics/shapes/shapeSphere.h"
 #include "camera/camera.h"
 #include "camera/cameraOrto.h"
 #include "camera/cameraPerspective.h"
 #include "controller/viewController.h"
 #include "controller/stageController.h"
 #include "controller/resourceController.h"
-#include "controller/physicsController.h"
 #include "controller/inputController.h"
 #include "controller/soundController.h"
 #include "controller/logController.h"
@@ -51,12 +58,13 @@ protected:
     static ViewController *viewController;
     static StageController *stageController;
     static ResourceController *resourceController;
-    static PhysicsController *physicsController;
     static InputController *inputController;
     static SoundController *soundController;
     static LogController *logController;
     static ConfigController *configController;
     static DebugController *debugController;
+
+    static MeshMaker *meshMaker;
 
     static bool isSDLInitDone;
 
@@ -72,11 +80,12 @@ public:
     EXPORT static ViewController *getViewController();
     EXPORT static StageController *getStageController();
     EXPORT static ResourceController *getResourceController();
-    EXPORT static PhysicsController *getPhysicsController();
     EXPORT static InputController *getInputController();
     EXPORT static LogController *getLogController();
     EXPORT static ConfigController *getConfigController();
     EXPORT static DebugController *getDebugController();
+
+    EXPORT static MeshMaker *getMeshMaker();
 
     EXPORT void openUrl(const char *url);
 

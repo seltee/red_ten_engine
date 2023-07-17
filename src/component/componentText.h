@@ -4,7 +4,7 @@
 #pragma once
 
 #include "common/utils.h"
-#include "common/withLogger.h"
+#include "connector/withLogger.h"
 #include "component/component.h"
 #include "resource/texture.h"
 #include "resource/resourceFont.h"

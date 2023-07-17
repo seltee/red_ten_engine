@@ -29,6 +29,8 @@ public:
 
     EXPORT void setAsListenerCamera();
     EXPORT bool isListenerCamera();
+    
+    EXPORT virtual float getLineThickness();
 
     static void setSoundController(SoundController *soundController);
 

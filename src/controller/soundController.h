@@ -3,9 +3,9 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
 #include "common/childProcess.h"
 #include "common/config.h"
+#include "connector/withLogger.h"
 #include <vector>
 
 struct AudioDevice

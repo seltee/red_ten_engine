@@ -1,20 +1,19 @@
 CC = clang++
 LD = clang++
 
-JOLT_LIB_PATH = "../JoltPhysics"
 OPENAL_LIB_PATH = "../openal"
 SDL_LIB_PATH = "../SDL2-2.0.14"
 SDL_TTF_LIB_PATH = "../SDL2_ttf-2.0.15"
 
-CFLAGS = -I${JOLT_LIB_PATH} -I${OPENAL_LIB_PATH}/include -Isrc \
+CFLAGS = -I${OPENAL_LIB_PATH}/include -Isrc \
 	     -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
 		 -Wall -c  -std=c++17 -mfpmath=sse -mavx -g
 
 LFLAGS = -shared -Wall -g 
-LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${OPENAL_LIB_PATH}/libs/Win64 -L${JOLT_LIB_PATH}/Build/VS2019_CL/Release \
+LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${OPENAL_LIB_PATH}/libs/Win64 \
 			-L${SDL_TTF_LIB_PATH}/lib/x64 \
 			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
-			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lJolt.lib -lOpenAL32.lib
+			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lOpenAL32.lib
 
 # The build target 
 TARGET = rtengine
@@ -27,9 +26,9 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
 			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o  \
 			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o  \
-			${OBJDIR}/physicsController.o ${OBJDIR}/soundController.o ${OBJDIR}/resourceController.o \
+			${OBJDIR}/soundController.o ${OBJDIR}/resourceController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
-			${OBJDIR}/physicsEntity.o ${OBJDIR}/physicsEntityBox.o ${OBJDIR}/physicsEntitySphere.o ${OBJDIR}/physicsEntityGeometry.o \
+			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o ${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o \
 			${OBJDIR}/sound.o ${OBJDIR}/texture.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
@@ -37,15 +36,20 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderer.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/fbx_loader.o ${OBJDIR}/stb_vorbis.o \
-			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o \
+			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
 			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o \
-			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
-			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o
+			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o \
+			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
+			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
+			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
+			${OBJDIR}/collisionSolver.o ${OBJDIR}/collisionMesh.o \
+			${OBJDIR}/meshMaker.o ${OBJDIR}/motion.o ${OBJDIR}/collisionDispatcher.o ${OBJDIR}/collisionCollector.o \
+			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o
 
 EXAMPLES = 	${BINDIR}/1-helloWorld.exe ${BINDIR}/2-helloActors.exe ${BINDIR}/3-helloPhysics.exe ${BINDIR}/4-helloSorting.exe \
 			${BINDIR}/5-helloInput.exe ${BINDIR}/6-helloBytemap.exe ${BINDIR}/7-helloSound.exe ${BINDIR}/8-helloGUI.exe \
 			${BINDIR}/9-helloEffects.exe ${BINDIR}/10-helloAnimation.exe ${BINDIR}/11-helloMusic.exe ${BINDIR}/12-hello3d.exe \
-			${BINDIR}/13-hello3dPhysics.exe ${BINDIR}/14-helloMushrooms.exe
+			${BINDIR}/13-hello3dPhysics.exe ${BINDIR}/14-helloMushrooms.exe ${BINDIR}/15-helloPlainsAndRays.exe
 
 all: engine examples
 
@@ -62,9 +66,6 @@ ${OBJDIR}/stageController.o: ${SRCDIR}/controller/stageController.cpp
 ${OBJDIR}/resourceController.o: ${SRCDIR}/controller/resourceController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceController.o ${SRCDIR}/controller/resourceController.cpp
 
-${OBJDIR}/physicsController.o: ${SRCDIR}/controller/physicsController.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsController.o ${SRCDIR}/controller/physicsController.cpp
-	
 ${OBJDIR}/soundController.o: ${SRCDIR}/controller/soundController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundController.o ${SRCDIR}/controller/soundController.cpp
 
@@ -127,6 +128,9 @@ ${OBJDIR}/vector4.o: ${SRCDIR}/math/vector4.cpp
 	
 ${OBJDIR}/transformation.o: ${SRCDIR}/math/transformation.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/transformation.o ${SRCDIR}/math/transformation.cpp
+	
+${OBJDIR}/hullCliping.o: ${SRCDIR}/math/hullCliping.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/hullCliping.o ${SRCDIR}/math/hullCliping.cpp
 
 ${OBJDIR}/stb_image.o: ${SRCDIR}/loaders/stb_image.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/stb_image.o ${SRCDIR}/loaders/stb_image.cpp
@@ -176,17 +180,32 @@ ${OBJDIR}/componentMesh.o: ${SRCDIR}/component/componentMesh.cpp
 ${OBJDIR}/componentLight.o: ${SRCDIR}/component/componentLight.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentLight.o ${SRCDIR}/component/componentLight.cpp
 
-${OBJDIR}/physicsEntityGeometry.o: ${SRCDIR}/physics/physicsEntityGeometry.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsEntityGeometry.o ${SRCDIR}/physics/physicsEntityGeometry.cpp
+${OBJDIR}/shapeGeometry.o: ${SRCDIR}/physics/shapes/shapeGeometry.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeGeometry.o ${SRCDIR}/physics/shapes/shapeGeometry.cpp
 
-${OBJDIR}/physicsEntitySphere.o: ${SRCDIR}/physics/physicsEntitySphere.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsEntitySphere.o ${SRCDIR}/physics/physicsEntitySphere.cpp
+${OBJDIR}/shapeSphere.o: ${SRCDIR}/physics/shapes/shapeSphere.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeSphere.o ${SRCDIR}/physics/shapes/shapeSphere.cpp
 
-${OBJDIR}/physicsEntityBox.o: ${SRCDIR}/physics/physicsEntityBox.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsEntityBox.o ${SRCDIR}/physics/physicsEntityBox.cpp
+${OBJDIR}/shapeBox.o: ${SRCDIR}/physics/shapes/shapeBox.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeBox.o ${SRCDIR}/physics/shapes/shapeBox.cpp
 
-${OBJDIR}/physicsEntity.o: ${SRCDIR}/physics/physicsEntity.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsEntity.o ${SRCDIR}/physics/physicsEntity.cpp
+${OBJDIR}/shapePlain.o: ${SRCDIR}/physics/shapes/shapePlain.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapePlain.o ${SRCDIR}/physics/shapes/shapePlain.cpp
+
+${OBJDIR}/shapeConvex.o: ${SRCDIR}/physics/shapes/shapeConvex.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeConvex.o ${SRCDIR}/physics/shapes/shapeConvex.cpp
+
+${OBJDIR}/shape.o: ${SRCDIR}/physics/shapes/shape.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shape.o ${SRCDIR}/physics/shapes/shape.cpp
+
+${OBJDIR}/collisionDispatcher.o: ${SRCDIR}/physics/collisionDispatcher.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/collisionDispatcher.o ${SRCDIR}/physics/collisionDispatcher.cpp
+
+${OBJDIR}/collisionCollector.o: ${SRCDIR}/physics/collisionCollector.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/collisionCollector.o ${SRCDIR}/physics/collisionCollector.cpp
+
+${OBJDIR}/hull.o: ${SRCDIR}/physics/hull.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/hull.o ${SRCDIR}/physics/hull.cpp
 
 ${OBJDIR}/entity.o: ${SRCDIR}/common/entity.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/entity.o ${SRCDIR}/common/entity.cpp
@@ -212,11 +231,17 @@ ${OBJDIR}/meshDescriptor.o: ${SRCDIR}/common/meshDescriptor.cpp
 ${OBJDIR}/renderer.o: ${SRCDIR}/common/renderer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/renderer.o ${SRCDIR}/common/renderer.cpp
 
-${OBJDIR}/withLogger.o: ${SRCDIR}/common/withLogger.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/withLogger.o ${SRCDIR}/common/withLogger.cpp
+${OBJDIR}/withLogger.o: ${SRCDIR}/connector/withLogger.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withLogger.o ${SRCDIR}/connector/withLogger.cpp
 
-${OBJDIR}/withDebug.o: ${SRCDIR}/common/withDebug.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/withDebug.o ${SRCDIR}/common/withDebug.cpp
+${OBJDIR}/withDebug.o: ${SRCDIR}/connector/withDebug.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withDebug.o ${SRCDIR}/connector/withDebug.cpp
+
+${OBJDIR}/withRepository.o: ${SRCDIR}/connector/withRepository.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withRepository.o ${SRCDIR}/connector/withRepository.cpp
+	
+${OBJDIR}/withMeshMaker.o: ${SRCDIR}/connector/withMeshMaker.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withMeshMaker.o ${SRCDIR}/connector/withMeshMaker.cpp
 
 ${OBJDIR}/soundPlayer.o: ${SRCDIR}/common/soundPlayer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundPlayer.o ${SRCDIR}/common/soundPlayer.cpp
@@ -254,8 +279,35 @@ ${OBJDIR}/glew.o: ${SRCDIR}/opengl/glew.c
 ${OBJDIR}/dm_sans.o: ${SRCDIR}/static/dm_sans.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/dm_sans.o ${SRCDIR}/static/dm_sans.cpp
 
+${OBJDIR}/physicsWorld.o: ${SRCDIR}/physics/physicsWorld.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsWorld.o ${SRCDIR}/physics/physicsWorld.cpp
+
+${OBJDIR}/physicsBody.o: ${SRCDIR}/physics/physicsBody.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/physicsBody.o ${SRCDIR}/physics/physicsBody.cpp
+
+${OBJDIR}/collisionSolver.o: ${SRCDIR}/physics/collisionSolver.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/collisionSolver.o ${SRCDIR}/physics/collisionSolver.cpp
+
+${OBJDIR}/collisionMesh.o: ${SRCDIR}/physics/collisionMesh.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/collisionMesh.o ${SRCDIR}/physics/collisionMesh.cpp
+
+${OBJDIR}/motion.o: ${SRCDIR}/physics/motion.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/motion.o ${SRCDIR}/physics/motion.cpp
+
+${OBJDIR}/constraint.o: ${SRCDIR}/physics/constraint.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/constraint.o ${SRCDIR}/physics/constraint.cpp
+
+${OBJDIR}/constraint6DOF.o: ${SRCDIR}/physics/constraint6DOF.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/constraint6DOF.o ${SRCDIR}/physics/constraint6DOF.cpp
+
+${OBJDIR}/meshMaker.o: ${SRCDIR}/common/meshMaker.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/meshMaker.o ${SRCDIR}/common/meshMaker.cpp
+
+
 $(BINDIR)/$(TARGET).dll: ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(BINDIR)/$(TARGET).dll
+
+
 
 
 examples: ${EXAMPLES} engine
@@ -342,6 +394,13 @@ ${OBJDIR}/14-helloMushrooms.o: ${EXMDIR}/14-helloMushrooms.cpp
 
 ${BINDIR}/14-helloMushrooms.exe: ${OBJDIR}/14-helloMushrooms.o
 	$(LD) -Wl ${OBJDIR}/14-helloMushrooms.o -o ${BINDIR}/14-helloMushrooms.exe
+
+${OBJDIR}/15-helloPlainsAndRays.o: ${EXMDIR}/15-helloPlainsAndRays.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/15-helloPlainsAndRays.o ${EXMDIR}/15-helloPlainsAndRays.cpp
+
+${BINDIR}/15-helloPlainsAndRays.exe: ${OBJDIR}/15-helloPlainsAndRays.o
+	$(LD) -Wl ${OBJDIR}/15-helloPlainsAndRays.o -o ${BINDIR}/15-helloPlainsAndRays.exe
+
 
 
 # llvm-objcopy

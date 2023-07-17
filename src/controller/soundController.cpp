@@ -10,13 +10,13 @@
 SoundController::SoundController(Config *config)
 {
     std::string prefferedDevice = config->getCurrentAudioDevice();
-    ALboolean enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
+    ALboolean enumeration = alcIsExtensionPresent(nullptr, "ALC_ENUMERATION_EXT");
     bool deviceFound = false;
     bSoundEnabled = false;
 
     if (enumeration != AL_FALSE)
     {
-        const ALCchar *devices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+        const ALCchar *devices = alcGetString(nullptr, ALC_DEVICE_SPECIFIER);
         const ALCchar *device = devices, *next = devices + 1;
 
         size_t len = 0;
@@ -24,7 +24,7 @@ SoundController::SoundController(Config *config)
         logger->logf("Audio Devices:");
         while (device && *device != '\0' && next && *next != '\0')
         {
-            logger->logf("- %s", device);
+            logger->logff("- %s", device);
             devicesList.push_back(new AudioDevice({_strdup(device)}));
             if (strcmp(prefferedDevice.c_str(), device) == 0)
                 deviceFound = true;
@@ -33,12 +33,18 @@ SoundController::SoundController(Config *config)
             device += (len + 1);
             next += (len + 2);
         }
-        logger->logff("");
+        logger->logf("");
+    }
+    else
+    {
+        logger->logff("No ALC_ENUMERATION_EXT extension");
+        return;
     }
 
     if (devicesList.size() == 0)
     {
         logger->logff("No sound devices found");
+        logger->logff("Installation of OpenAL libraries might be required");
         return;
     }
 
@@ -56,7 +62,7 @@ SoundController::SoundController(Config *config)
         return;
     }
 
-    ALCcontext *context = alcCreateContext(device, NULL);
+    ALCcontext *context = alcCreateContext(device, nullptr);
     if (!alcMakeContextCurrent(context))
     {
         logger->logff("Unable to create audio context");
@@ -74,7 +80,6 @@ SoundController::SoundController(Config *config)
 
 void SoundController::update()
 {
-    
 }
 
 void SoundController::process(float delta)

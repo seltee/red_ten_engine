@@ -24,8 +24,10 @@ public:
     EXPORT void setFarDistance(float farDistance);
     EXPORT void setNearDistance(float nearDistance);
     EXPORT void setFov(float fov);
-    
+
     EXPORT PointWithDirection screenToWorld(float x, float y);
+
+    EXPORT float getLineThickness();
 
     View *view = nullptr;
 

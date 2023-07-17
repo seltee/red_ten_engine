@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include "common/utils.h"
-#include "common/withLogger.h"
+#include "connector/withLogger.h"
 
 enum class TextureSlot
 {

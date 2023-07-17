@@ -3,8 +3,8 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
 #include "common/config.h"
+#include "connector/withLogger.h"
 #include "os/view.h"
 #include "controller/inputController.h"
 #include <list>

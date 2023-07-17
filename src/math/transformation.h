@@ -5,7 +5,6 @@
 #include "common/utils.h"
 #include "math/math.h"
 
-
 class Transformation
 {
 public:
@@ -19,13 +18,14 @@ public:
     EXPORT void translate(Vector2 v);
     EXPORT Vector3 getPosition();
 
-    EXPORT void setRotation(Vector3 v);
-    EXPORT void setRotation(float x, float y, float z);
+    EXPORT void setRotation(Vector3 r);
+    EXPORT void setRotation(Quat r);
     EXPORT void setRotation(float z);
     EXPORT void rotate(float z);
-    EXPORT void rotate(float x, float y, float z);
-    EXPORT void rotate(Vector3 v);
-    EXPORT Vector3 getRotation();
+    EXPORT void rotate(Vector3 r);
+    EXPORT void rotate(Quat r);
+    EXPORT Quat getRotation();
+    EXPORT Vector3 getRotationEuler();
     EXPORT float getZRotation();
 
     EXPORT void setScale(Vector3 v);
@@ -41,7 +41,7 @@ public:
 
 protected:
     Vector3 position = {0.0f, 0.0f, 0.0f};
-    Vector3 rotation = {0.0f, 0.0f, 0.0f};
+    Quat rotation = Quat(1.0f, 0.0f, 0.0f, 0.0f);
     Vector3 scale = {1.0f, 1.0f, 1.0f};
     Matrix4 mModel;
     bool bIsDirty = true;

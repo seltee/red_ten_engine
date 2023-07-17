@@ -9,46 +9,14 @@
 #include "common/commonShaders.h"
 #include "component/componentLight.h"
 #include <math.h>
-
-#define JPH_FLOATING_POINT_EXCEPTIONS_ENABLED
-#define JPH_USE_SSE4_1
-#define JPH_USE_SSE4_2
-#define NDEBUG
-#define JPH_PROFILE_ENABLED
-#define JPH_DEBUG_RENDERER
-
-#include <Jolt/Jolt.h>
-#include <Jolt/RegisterTypes.h>
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Physics/PhysicsSettings.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
-#include <Jolt/Physics/Collision/RayCast.h>
-#include <Jolt/Physics/Collision/CastResult.h>
-#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
-#include <Jolt/Physics/Body/BodyManager.h>
-#include <Jolt/Physics/Collision/BroadPhase/BroadPhase.h>
-#include <Jolt/Physics/Collision/ObjectLayer.h>
-#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
-#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseQuadTree.h>
-#include <Jolt/Physics/Body/BodyLock.h>
-#include <Jolt/Physics/Body/BodyLockInterface.h>
-
-// Disable common warnings triggered by Jolt, you can use JPH_SUPPRESS_WARNING_PUSH / JPH_SUPPRESS_WARNING_POP to store and restore the warning state
-JPH_SUPPRESS_WARNINGS
-
-// All Jolt symbols are in the JPH namespace
-using namespace JPH;
-
-// We're also using STL classes in this examAllHitCollisionCollectorple
-using namespace std;
+#include <algorithm>
 
 LayerActors::LayerActors(std::string name, int index) : Layer(name, index) {}
+
+bool compareBodyPoints(PhysicsBodyPoint a, PhysicsBodyPoint b)
+{
+    return (a.distance < b.distance);
+}
 
 void LayerActors::process(float delta)
 {
@@ -56,28 +24,10 @@ void LayerActors::process(float delta)
         return;
 
     for (auto actor = actors.begin(); actor != actors.end(); ++actor)
-    {
         (*actor)->process(delta);
-        (*actor)->preSyncPhysics();
-    }
 
-    if (physicsSystem)
-    {
-        const int cCollisionSteps = 1;
-        const int cIntegrationSubSteps = 1;
-
-        PhysicsSystem *pSystem = (PhysicsSystem *)physicsSystem->system;
-
-        TempAllocatorImpl *temAllocator = (TempAllocatorImpl *)physicsSystem->tempAllocator;
-        JobSystemThreadPool *JobSystem = (JobSystemThreadPool *)physicsSystem->JobSystem;
-
-        // Step the world
-        pSystem->Update(delta, cCollisionSteps, cIntegrationSubSteps, temAllocator, JobSystem);
-
-        for (auto actor = actors.begin(); actor != actors.end(); ++actor)
-            (*actor)->afterSyncPhysics();
-
-    }
+    if (physicsWorld)
+        physicsWorld->process(delta);
 
     auto actor = actors.begin();
     while (actor != actors.end())
@@ -88,6 +38,9 @@ void LayerActors::process(float delta)
         }
         else
             ++actor;
+
+    if (physicsWorld)
+        physicsWorld->removeDestroyed();
 
     if (bUseSorting)
     {
@@ -109,6 +62,7 @@ void LayerActors::render(View *view)
     std::vector<Component *> sceneLights;
     std::vector<Actor *> blends;
     std::vector<Actor *> shadowCasters;
+    std::vector<Actor *> debugView;
 
     if (!activeCamera || !bIsVisible)
         return;
@@ -127,6 +81,10 @@ void LayerActors::render(View *view)
             if ((*actor)->hasBlended())
                 blends.push_back(*actor);
             shadowCasters.push_back(*actor);
+        }
+        if ((*actor)->hasDebugView())
+        {
+            debugView.push_back(*actor);
         }
     }
     activeCamera->finishRender();
@@ -217,6 +175,25 @@ void LayerActors::render(View *view)
         }
     }
 
+    // Debug render
+    if (debugView.size() > 0 && physicsWorld && activeCamera)
+    {
+        for (auto actor = debugView.begin(); actor != debugView.end(); ++actor)
+        {
+            auto body = (*actor)->getPhysicsBody();
+            if (body)
+            {
+                debug->renderBoundingBox(body->getAABB(), &mProjectionView, physicsWorld->getSimScale(), activeCamera->getLineThickness(), Vector3(0.2f, 0.2f, 0.2f));
+                Shape *shape = body->getShape();
+                if (shape)
+                {
+                    shape->renderDebug(&mProjectionView, (*actor)->transform.getModelMatrix(), 1.0f / physicsWorld->getSimScale(), activeCamera->getLineThickness());
+                }
+            }
+        }
+    }
+    debug->renderAll(&mProjectionView);
+
     // Final phase
     view->useFrameBuffer();
     glEnable(GL_BLEND);
@@ -232,40 +209,29 @@ void LayerActors::render(View *view)
 
 void LayerActors::prepareNewActor(Actor *actor)
 {
-    if (physicsSystem)
-        actor->providePhysicsSystem(physicsSystem);
+    if (physicsWorld)
+        actor->setPhysicsWorld(physicsWorld);
 
     actors.push_back(actor);
     actor->setCurrentLayer(this);
     actor->onSpawned();
 
     if (!activeCamera && actor->implements("Camera"))
-    {
         activeCamera = (Camera *)actor;
-    }
 }
 
-void LayerActors::enableCollisions()
+void LayerActors::enablePhisics(Vector3 gravity, float simScale, int stepsPerSecond)
 {
-    enablePhisics(Vector3(0.0f, 0.0f, 0.0f));
-}
-
-void LayerActors::enablePhisics(Vector3 gravity)
-{
-    if (!physicsSystem)
+    if (!physicsWorld)
     {
-        this->gravity = gravity;
-        auto newPhysicsSystem = physicsController->createSystem(gravity, 20 * 1024 * 1024);
-
+        physicsWorld = new PhysicsWorld(gravity, simScale, stepsPerSecond);
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
-            (*actor)->providePhysicsSystem(newPhysicsSystem);
-
-        this->physicsSystem = newPhysicsSystem;
+            (*actor)->setPhysicsWorld(physicsWorld);
     }
-}
-
-void LayerActors::disablePhysics()
-{
+    else
+    {
+        physicsWorld->setBasicParameters(gravity, simScale, stepsPerSecond);
+    }
 }
 
 void LayerActors::enableSorting()
@@ -278,108 +244,66 @@ void LayerActors::disableSorting()
     bUseSorting = false;
 }
 
-RayCollision LayerActors::castSingleRayCollision(Vector3 v1, Vector3 v2, int channelId)
+bool LayerActors::castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine, float showTime)
 {
-    if (physicsSystem)
+    if (viewDebugLine)
     {
-        PhysicsSystem *pSystem = (PhysicsSystem *)physicsSystem->system;
-        const NarrowPhaseQuery *mNarrowPhase = &pSystem->GetNarrowPhaseQuery();
-
-        // Create ray
-        RRayCast ray{
-            Vec3(v1.x * SIZE_MULTIPLIER, v1.y * SIZE_MULTIPLIER, v1.z * SIZE_MULTIPLIER),
-            Vec3(v2.x * SIZE_MULTIPLIER, v2.y * SIZE_MULTIPLIER, v2.z * SIZE_MULTIPLIER)};
-
-        RayCastSettings ray_settings;
-        ClosestHitCollisionCollector<CastRayCollector> collector;
-        IgnoreMultipleBodiesFilter body_filter;
-
-        // Raycast before update
-        mNarrowPhase->CastRay(ray, ray_settings, collector, {}, {}, body_filter);
-
-        if (collector.HadHit())
-        {
-            BodyLockRead lock(pSystem->GetBodyLockInterface(), collector.mHit.mBodyID);
-            const Body &body = lock.GetBody();
-            Actor *actor = (Actor *)body.GetUserData();
-            if (actor && actor->hasCollisionChannel(channelId))
-            {
-                auto v = ray.GetPointOnRay(collector.mHit.mFraction);
-                RayCollision collision({Vector3(v.GetX() / SIZE_MULTIPLIER, v.GetY() / SIZE_MULTIPLIER, v.GetZ() / SIZE_MULTIPLIER), (Actor *)body.GetUserData(), true});
-                lock.ReleaseLock();
-                return collision;
-            }
-            lock.ReleaseLock();
-        }
+        showDebugLine(ray, Vector3({0.0f, 1.0f, 0.0f}), showTime);
     }
-    return RayCollision({Vector3(0), nullptr, false});
+
+    if (physicsWorld)
+    {
+        auto result = physicsWorld->castRay(ray);
+        resultPoint.distance = 99999.9f;
+
+        for (auto point = result.begin(); point != result.end(); ++point)
+        {
+            if (viewDebugLine)
+                showDebugBox(point->point, 4.0f, Vector3({1.0f, 0.0f, 0.0f}), showTime);
+            if (point->distance < resultPoint.distance)
+                resultPoint = *point;
+        }
+        return true;
+    }
+
+    return false;
 }
 
-std::list<RayCollision> LayerActors::castSphereCollision(Vector3 p, float radius, int channelId)
+std::vector<PhysicsBodyPoint> LayerActors::castRayCollision(Line ray, bool viewDebugLine, float showTime)
 {
-    std::list<RayCollision> list;
-    if (physicsSystem && physicsSystem->system)
+    if (viewDebugLine)
     {
-        PhysicsSystem *pSystem = (PhysicsSystem *)physicsSystem->system;
-
-        float radiusSQ = Square(radius * SIZE_MULTIPLIER);
-
-        BodyIDVector outBodyIDs;
-        pSystem->GetBodies(outBodyIDs);
-
-        Vec3 mPosition = Vec3(p.x * SIZE_MULTIPLIER, p.y * SIZE_MULTIPLIER, p.z * SIZE_MULTIPLIER);
-
-        for (BodyID b : outBodyIDs)
-        {
-            BodyLockRead lock(pSystem->GetBodyLockInterface(), b);
-            if (lock.Succeeded())
-            {
-                const Body &body = lock.GetBody();
-                const AABox &bounds = body.GetWorldSpaceBounds();
-
-                if (bounds.GetSqDistanceTo(mPosition) < radiusSQ)
-                {
-                    Actor *actor = (Actor *)body.GetUserData();
-                    if (actor && actor->hasCollisionChannel(channelId))
-                    {
-                        RayCollision collision({p, (Actor *)body.GetUserData()});
-                        if ((Actor *)body.GetUserData())
-                            list.push_back(collision);
-                        lock.ReleaseLock();
-                    }
-                }
-            }
-        }
+        showDebugLine(ray, Vector3({0.0f, 1.0f, 0.0f}), showTime);
     }
+
+    if (physicsWorld)
+    {
+        auto result = physicsWorld->castRay(ray);
+        if (result.size() > 0)
+        {
+            std::sort(result.begin(), result.end(), compareBodyPoints);
+
+            if (viewDebugLine)
+                for (auto point = result.begin(); point != result.end(); ++point)
+                    showDebugBox(point->point, 4.0f, Vector3({1.0f, 0.0f, 0.0f}), showTime);
+        }
+
+        return result;
+    }
+
+    std::vector<PhysicsBodyPoint> list;
     return list;
 }
 
-std::list<RayCollision> LayerActors::castPointCollision(Vector3 v1, int channelId)
+std::list<PhysicsBodyPoint> LayerActors::castSphereCollision(Vector3 p, float radius)
 {
-    std::list<RayCollision> list;
-    if (physicsSystem)
-    {
-        PhysicsSystem *pSystem = (PhysicsSystem *)physicsSystem->system;
-        const BroadPhaseQuery *mBroadPhase = &pSystem->GetBroadPhaseQuery();
+    std::list<PhysicsBodyPoint> list;
+    return list;
+}
 
-        // Raycast before update
-        AllHitCollisionCollector<CollideShapeBodyCollector> ioCollector;
-        mBroadPhase->CollidePoint(Vec3(v1.x * SIZE_MULTIPLIER, v1.y * SIZE_MULTIPLIER, v1.z * SIZE_MULTIPLIER), ioCollector);
-        if (ioCollector.mHits.size())
-            for (auto item = ioCollector.mHits.begin(); item != ioCollector.mHits.end(); ++item)
-            {
-                BodyLockRead lock(pSystem->GetBodyLockInterface(), *item);
-                const Body &body = lock.GetBody();
-
-                Actor *actor = (Actor *)body.GetUserData();
-                if (actor && actor->hasCollisionChannel(channelId))
-                {
-                    RayCollision collision({v1, (Actor *)body.GetUserData()});
-                    list.push_back(collision);
-                    lock.ReleaseLock();
-                }
-            }
-    }
+std::list<PhysicsBodyPoint> LayerActors::castPointCollision(Vector3 p)
+{
+    std::list<PhysicsBodyPoint> list;
     return list;
 }
 
@@ -396,7 +320,7 @@ std::list<Actor *> LayerActors::getActorsByName(std::string name)
     {
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
         {
-            if (*(*actor)->getActorName() == name)
+            if ((*actor)->getActorName() == name)
             {
                 list.push_back(*actor);
             }
@@ -414,7 +338,7 @@ std::list<Actor *> LayerActors::getActorsByPartName(std::string partOfName)
     {
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
         {
-            if ((*actor)->getActorName()->find(name) != std::string::npos)
+            if ((*actor)->getActorName().find(name) != std::string::npos)
             {
                 list.push_back(*actor);
             }
@@ -472,4 +396,21 @@ void LayerActors::setAmbientColor(float r, float g, float b)
     ambientColor[0] = r;
     ambientColor[1] = g;
     ambientColor[2] = b;
+}
+
+PhysicsWorld *LayerActors::getPhysicsWorld()
+{
+    return physicsWorld;
+}
+
+void LayerActors::showDebugLine(Line ray, Vector3 color, float showTime)
+{
+    float thickness = activeCamera->getLineThickness();
+    debug->addDebugLine(ray.a, ray.b, showTime, thickness, color);
+}
+
+void LayerActors::showDebugBox(Vector3 p, float size, Vector3 color, float showTime)
+{
+    size *= activeCamera->getLineThickness();
+    debug->addDebugBox(p, size, showTime, color);
 }

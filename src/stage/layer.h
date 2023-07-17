@@ -4,7 +4,6 @@
 #pragma once
 #include "common/utils.h"
 #include "os/view.h"
-#include "controller/physicsController.h"
 
 class Layer
 {
@@ -13,13 +12,9 @@ protected:
     int index = 0;
     std::string name;
 
-    static PhysicsController *physicsController;
-
 public:
     virtual void process(float delta);
     virtual void render(View *view);
 
     int getIndex();
-
-    static void setPhysicsController(PhysicsController *physicsController);
 };

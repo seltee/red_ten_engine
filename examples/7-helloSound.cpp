@@ -51,7 +51,7 @@ public:
 
     float counter = 0.0f;
     float moveX = 0.0f;
-    const float frontDistance = -600;
+    const float frontDistance = -90;
     LayerActors *layerActors = nullptr;
 
 protected:

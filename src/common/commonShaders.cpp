@@ -5,6 +5,7 @@
 
 extern float spriteData[];
 extern float screenData[];
+extern float cubeData[];
 
 extern const char *spriteVertexShader;
 extern const char *spriteFramedVertexShader;
@@ -21,7 +22,11 @@ extern const char *sunFragmentCode;
 extern const char *sunWithShadowFragmentCode;
 extern const char *omniFragmentCode;
 
+extern const char *debugCubeVertexCode;
+extern const char *debugCubeFragmentCode;
+
 Mesh *CommonShaders::spriteMesh = nullptr;
+Mesh *CommonShaders::cubeMesh = nullptr;
 Mesh *CommonShaders::screenMesh = nullptr;
 
 Shader *CommonShaders::spriteShader = nullptr;
@@ -34,55 +39,66 @@ LightningShader *CommonShaders::sunShader = nullptr;
 LightningShader *CommonShaders::sunWithShadowShader = nullptr;
 LightningShader *CommonShaders::omniShader = nullptr;
 
+RawShader *CommonShaders::debugCubeShader = nullptr;
+
 void CommonShaders::build()
 {
-    logController->logff("compiling base meshes ...");
+    logger->logff("compiling base meshes ...");
 
     // 3 - position, 2 - UV
-    int attributeSizes[2] = {3, 2};
+    int fullAttributeSizes[2] = {3, 2};
     spriteMesh = new Mesh();
-    spriteMesh->setupFloatsArray(spriteData, 4, 2, attributeSizes);
+    spriteMesh->setupFloatsArray(spriteData, 4, 2, fullAttributeSizes);
 
     screenMesh = new Mesh();
-    screenMesh->setupFloatsArray(screenData, 4, 2, attributeSizes);
+    screenMesh->setupFloatsArray(screenData, 4, 2, fullAttributeSizes);
 
-    logController->logff("base meshes compiled\n");
+    // 3 - position
+    int triAttributeSizes[1] = {3};
+    cubeMesh = new Mesh();
+    cubeMesh->setupFloatsArray(cubeData, 36, 1, triAttributeSizes);
 
-    logController->logff("compiling shaders ...");
+    logger->logff("base meshes compiled\n");
 
-    logController->logff("compiling sprite shader ...");
+    logger->logff("compiling shaders ...");
+
+    logger->logff("compiling sprite shader ...");
     spriteShader = new RawShader(spriteVertexShader, spriteFragmentShader);
     spriteShader->build();
 
-    logController->logff("compiling framed sprite shader ...");
+    logger->logff("compiling framed sprite shader ...");
     spriteFrameShader = new RawShader(spriteFramedVertexShader, spriteFragmentShader);
     spriteFrameShader->build();
 
-    logController->logff("compiling sun shader ...");
+    logger->logff("compiling sun shader ...");
     sunShader = new LightningShader(screenVertexShader, sunFragmentCode);
     sunShader->build();
 
-    logController->logff("compiling sun with shadow shader ...");
+    logger->logff("compiling sun with shadow shader ...");
     sunWithShadowShader = new LightningShader(screenVertexShader, sunWithShadowFragmentCode);
     sunWithShadowShader->build();
 
-    logController->logff("compiling omni shader ...");
+    logger->logff("compiling omni shader ...");
     omniShader = new LightningShader(screenVertexShader, omniFragmentCode);
     sunShader->build();
 
-    logController->logff("compiling screen shader ...");
+    logger->logff("compiling screen shader ...");
     screenShader = new RawShader(screenVertexShader, screenFragmentShader);
     screenShader->build();
 
-    logController->logff("compiling effect shader ...");
+    logger->logff("compiling effect shader ...");
     effectShader = new RawShader(screenVertexShader, spriteFragmentShader);
     effectShader->build();
 
-    logController->logff("compiling initial lightning shader ...");
+    logger->logff("compiling initial lightning shader ...");
     initialLightningShader = new RawShader(screenVertexShader, initialLightningFragmentCode);
     initialLightningShader->build();
 
-    logController->logff("shaders compiled\n");
+    logger->logff("compiling debug cube shader ...");
+    debugCubeShader = new RawShader(debugCubeVertexCode, debugCubeFragmentCode);
+    debugCubeShader->build();
+
+    logger->logff("shaders compiled\n");
 }
 
 Shader *CommonShaders::getSpriteShader()
@@ -125,6 +141,11 @@ LightningShader *CommonShaders::getOmniShader()
     return omniShader;
 }
 
+RawShader *CommonShaders::getDebugCubeShader()
+{
+    return debugCubeShader;
+}
+
 Mesh *CommonShaders::getScreenMesh()
 {
     return screenMesh;
@@ -133,6 +154,11 @@ Mesh *CommonShaders::getScreenMesh()
 Mesh *CommonShaders::getSpriteMesh()
 {
     return spriteMesh;
+}
+
+Mesh *CommonShaders::getCubeMesh()
+{
+    return cubeMesh;
 }
 
 float spriteData[] = {
@@ -146,6 +172,44 @@ float screenData[] = {
     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 0.0f, 0.0f, 1.0f};
+
+float cubeData[] = {
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    -0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, 0.5f, -0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    -0.5f, -0.5f, -0.5f,
+    0.5f, -0.5f, -0.5f,
+    -0.5f, 0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, 0.5f,
+    -0.5f, 0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,
+    -0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, 0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, 0.5f, -0.5f,
+    0.5f, -0.5f, 0.5f,
+    0.5f, -0.5f, -0.5f};
 
 const char *spriteVertexShader =
     "#version 400\n"
@@ -299,4 +363,21 @@ const char *omniFragmentCode =
     "   float distPower = max(1.0 - (length(dif) /  affectDistance), 0.0);\n"
     "   vec3 light = max(dot(Normal, lightDir), 0.0) * Albedo * lightColor * distPower;\n"
     "   FragColor = vec4(light, 0.0);\n"
+    "}\n";
+
+const char *debugCubeVertexCode =
+    "#version 400\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "uniform mat4 mTransform;\n"
+    "uniform mat4 mViewProjection;\n"
+    "void main() {\n"
+    "   gl_Position = mViewProjection * mTransform * vec4(aPos, 1.0);\n"
+    "}\n";
+
+const char *debugCubeFragmentCode =
+    "#version 400\n"
+    "out vec4 fragColor;\n"
+    "uniform vec3 color;\n"
+    "void main() {\n"
+    "   fragColor = vec4(color, 1.0);\n"
     "}\n";

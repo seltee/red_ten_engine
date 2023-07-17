@@ -7,7 +7,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
+#include "connector/withLogger.h"
 #include <string>
 
 #define SOUND_BUFFER_SIZE (1024 * 128)

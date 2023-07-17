@@ -12,13 +12,16 @@ public:
     Ball() : Actor()
     {
         registerClassName("Ball");
+    }
+    void onSpawned()
+    {
         setPhysicsMotionType(MotionType::Dynamic);
         transform.setScale(0.1f);
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(ballTexture);
 
         // Phisics shapes are added to components and then built in overall complex shape for actor
-        sprite->addPhysics2dCircle(120.0f);
+        sprite->addShapeSphere(12.0f);
         // Friction and restitution should be in range of 0 to 1
         setFrictionAndRestitution(0.85f, 0.4f);
         // Since we're in 2d space this command blocks Z movement leaving only X(left-right) and Y(top-bottom) movement
@@ -45,11 +48,16 @@ public:
     Crate() : Actor()
     {
         registerClassName("Crate");
+        setActorName("Crate");
+    }
+
+    void onSpawned()
+    {
         setPhysicsMotionType(MotionType::Dynamic);
         transform.setScale(0.1f);
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(crateTexture);
-        sprite->addPhysics2dBox(256.0f, 256.0f);
+        sprite->addShape2dBox({25.6f, 25.6f});
         setFrictionAndRestitution(0.9f, 0.1f);
         setZAxisLocked(true);
     }
@@ -73,6 +81,10 @@ public:
     DoubleCrate() : Actor()
     {
         registerClassName("DoubleCrate");
+    }
+
+    void onSpawned()
+    {
         setPhysicsMotionType(MotionType::Dynamic);
         transform.setScale(0.1f);
         spriteLeft = createComponent<ComponentSprite>();
@@ -82,8 +94,8 @@ public:
         spriteRight->setTexture(crateTexture);
         spriteRight->transform.setPosition(256.0f, 0.0f, 0.0f);
 
-        spriteLeft->addPhysics2dBox(256.0f, 256.0f);
-        spriteRight->addPhysics2dBox(256.0f, 256.0f);
+        spriteLeft->addShape2dBox({256.0f, 256.0f});
+        spriteRight->addShape2dBox({256.0f, 256.0f});
 
         setFrictionAndRestitution(1.0f, 0.1f);
         setZAxisLocked(true);
@@ -109,6 +121,11 @@ public:
     Wall() : Actor()
     {
         registerClassName("Wall");
+        setActorName("Wall");
+    }
+
+    void onSpawned()
+    {
         // Wall is static, it can't be moved, neither checked for collisions with other walls. By default actors are dynamic but not this one
         setPhysicsMotionType(MotionType::Static);
         setZAxisLocked(true);
@@ -119,8 +136,9 @@ public:
         transform.setPosition(x, y);
 
         auto emptyComponent = createComponent<ComponentSprite>();
-        emptyComponent->addPhysics2dBox(width, height);
+        emptyComponent->addShape3dBox({width, height, 2.0f});
         setFrictionAndRestitution(1.0f, 0.1f);
+        bPhysicsNeedsToBeRebuild = true;
     }
 };
 
@@ -152,7 +170,7 @@ int main()
     // We need to enable phisics on layer and provide gravity level.
     // That's enough to make physics work - layer will provide all nessary data to existing actors
     // All new actors will be created with initialized physics
-    layerActors->enablePhisics(Vector3(0.0f, -20.0f, 0.0f));
+    layerActors->enablePhisics(Vector3(0.0f, -80.0f, 0.0f), 0.01f, 200);
 
     // Textures setup
     auto resourceController = engine->getResourceController();
