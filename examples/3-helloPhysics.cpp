@@ -210,11 +210,11 @@ int main()
                 spawn = layerActors->createActor<Ball>();
             else if (sp > 1)
                 spawn = layerActors->createActor<Crate>();
-            else
-                spawn = layerActors->createActor<DoubleCrate>();
+            // else
+            //    spawn = layerActors->createActor<DoubleCrate>();
 
             if (spawn)
-                spawn->transform.setPosition((float)((rand() % 200) - 100), 200.0f);
+                spawn->transform.setPosition((float)((rand() % 200) - 100), 120.0f);
         }
         viewController->processEvents();
         stage->process(delta);

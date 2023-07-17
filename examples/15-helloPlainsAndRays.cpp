@@ -67,7 +67,6 @@ int main()
     componentMesh->setMesh(plainMesh);
     componentMesh->setShader(plainShader);
     plain->transform.setPosition(plainNormal * plainDistance + Vector3(0.0f, 0.0f, -4.0f));
-    // plain->transform.setRotation(Vector3(0.0f, 0.0f, -CONST_PI / 30.0f));
 
     // Rotating boxes
     auto boxMesh = engine->getMeshMaker()->createBox({0.4f, 0.4f, 0.4f});
@@ -87,41 +86,28 @@ int main()
 
     auto platform = layerActors->createActor<Platform>();
     platform->transform.setPosition(Vector3(0.0f, -3.0f, 0.0f));
-    // platform->showBoundingBox(true);
 
     auto sphere = layerActors->createActor<Sphere>();
     sphere->transform.setPosition(-10.0f, 4.0f, 0.0f);
-    // sphere->getPhysicsBody()->addLinearVelocity(Vector3(0.18f, 0.0f, -0.05f));
-    // sphere->getPhysicsBody()->addAngularVelocity(Vector3(0.0f, 0.015f, 0.0f));
-    //  sphere->showBoundingBox(true);
+    sphere->getPhysicsBody()->addLinearVelocity(Vector3(0.18f, 0.0f, -0.05f));
+    sphere->getPhysicsBody()->addAngularVelocity(Vector3(0.0f, 0.015f, 0.0f));
 
     auto box = layerActors->createActor<Crate>();
     box->transform.setPosition(-1.8f, 0.0f, 1.8f);
-    //box->transform.setRotation(glm::angleAxis(-0.6f, Vector3(1.0f, 0.01f, 0.0f)));
+    box->transform.setRotation(glm::angleAxis(-0.6f, Vector3(1.0f, 0.01f, 0.0f)));
     box->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
 
-    /*
-        auto box3 = layerActors->createActor<Crate>();
-        box3->transform.setPosition(1.8f, 6.0f, -4.8f);
-        box3->transform.setRotation(glm::angleAxis(-0.6f, Vector3(0.4f, 1.0f, 0.0f)));
-        box3->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
-        */
+    auto box3 = layerActors->createActor<Crate>();
+    box3->transform.setPosition(-1.8f, 2.0f, 1.8f);
+    box3->transform.setRotation(glm::angleAxis(-0.6f, Vector3(0.4f, 1.0f, 0.0f)));
+    box3->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
 
-    // sphere->transform.setRotation(Vector3(1.0f, 0.0f, 0.0f));
-    // Quat quat = glm::angleAxis(-0.3f, Vector3(0.0f, 0.0f, 1.0f));
-    // sphere->getPhysicsBody()->setAngularVelocity(quat);
-
-    //float spawnCounter = (float)spawnPerSecond;
-    float spawnCounter = -1000.0;
+    float spawnCounter = (float)spawnPerSecond;
     float rotationCounter = 0.0f;
     float impulseCounter = 0.0f;
     while (!engine->isTerminationIntended())
     {
         float delta = engine->syncFrame();
-
-        // sphere->getPhysicsBody()->setAngularVelocity(Vector3(-CONST_PI * 2, 0.0f, 0.0f));
-        // sphere->getPhysicsBody()->addLinearVelocity(Vector3(0.18f * delta, 0.0f, -0.1f* delta));
-
         viewController->processEvents();
 
         // Spawn new spheres
@@ -155,11 +141,6 @@ int main()
         {
             impulseCounter -= 1.0f;
             auto result = layerActors->castRayCollision(Line(p1, p2), true);
-            // for (auto it = result.begin(); it != result.end(); it++)
-            //{
-            //  if (it->actor)
-            //      it->actor->destroy();
-            //}
         }
 
         stage->process(delta);

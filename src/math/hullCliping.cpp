@@ -88,12 +88,10 @@ int HullCliping::clipFaceAgainstHull(
         const Vector3 a = hullA->absoluteVerticies[closestFaceA->points[e0]];
         const Vector3 b = hullA->absoluteVerticies[closestFaceA->points[(e0 + 1) % numVerticesA]];
 
-        debugController->addDebugLine(a * 10.0f, b * 10.0f, 0.5f, 0.02f, Vector3(0.1f, 1.0f, 0.1f));
+        const Vector3 worldEdge = a - b;
+        const Vector3 worldPlaneAnormal = closestFaceA->absoluteNormal;
 
-        const Vector3 worldEdge0 = a - b;
-        const Vector3 worldPlaneAnormal1 = closestFaceA->absoluteNormal;
-
-        Vector3 planeNormalWS = -glm::cross(worldEdge0, worldPlaneAnormal1);
+        Vector3 planeNormalWS = -glm::cross(worldEdge, worldPlaneAnormal);
         float planeEqWS = -glm::dot(a, planeNormalWS);
 
         numVertsOut = clipFace(pVtxIn, numVertsIn, planeNormalWS, planeEqWS, pVtxOut);
@@ -107,14 +105,11 @@ int HullCliping::clipFaceAgainstHull(
 
     // Keep points that are behind the witness face
     Vector3 planeNormalWS = closestFaceA->absoluteNormal;
-    float planeEqWS = glm::dot(planeNormalWS, hullA->absoluteVerticies[closestFaceA->points[0]]);
+    float planeEqWS = -glm::dot(planeNormalWS, hullA->absoluteVerticies[closestFaceA->points[0]]);
 
     for (int i = 0; i < numVertsIn; i++)
     {
-        // debugController->addDebugLine(pVtxIn[i] * 10.0f, pVtxIn[(i + 1) % numVertsIn] * 10.0f, 2.5f, 0.02f, Vector3(1.0f, 1.0f, 0.1f));
-
-        float depth = 0.5f + (glm::dot(planeNormalWS, pVtxIn[i]) + planeEqWS);
-        // printf("VERT %i : %f, %f\n", i, depth, planeEqWS);
+        float depth = glm::dot(planeNormalWS, pVtxIn[i]) + planeEqWS;
 
         if (depth <= minDist)
         {
@@ -167,13 +162,6 @@ int HullCliping::clipHullAgainstHull(const Vector3 &separatingNormal,
         for (int i = 0; i < verticiesAmount; i++)
         {
             verticies[i] = hullB->absoluteVerticies[closestFaceB->points[i]];
-
-            debugController->addDebugLine(
-                hullB->absoluteVerticies[closestFaceB->points[i]] * 10.0f,
-                hullB->absoluteVerticies[closestFaceB->points[(i + 1) % verticiesAmount]] * 10.0f,
-                0.5f,
-                0.02f,
-                Vector3(0.1f, 1.0f, 0.1f));
         }
 
         numContactsOut = clipFaceAgainstHull(separatingNormal,
@@ -195,8 +183,6 @@ void HullCliping::clipHullAgainstHull(
     Vector3 sepNormal,
     CollisionManifold *manifold)
 {
-    // printf("SEPARATION %f %f %f\n", sepNormal.x, sepNormal.y, sepNormal.z);
-
     Vector4 contactsOut[MAX_POINTS];
     const int contactCapacity = MAX_POINTS;
 
@@ -222,7 +208,5 @@ void HullCliping::clipHullAgainstHull(
         }
         manifold->depth = -depth;
         manifold->addCollisionPoint(middle, middle);
-
-        // debugController->addDebugLine(middle * 10.0f, middle * 10.0f + manifold->normal, 2.0f, 0.02f, Vector3(1.0f, 1.0f, 1.0f));
     }
 }

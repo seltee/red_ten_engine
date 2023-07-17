@@ -20,7 +20,7 @@ public:
         transform.setScale(0.5f);
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(crateTexture);
-        sprite->addShape2dBox({256.0f, 256.0f});
+        sprite->addShape2dBox({128.0f, 128.0f});
         setFrictionAndRestitution(0.9f, 0.1f);
 
         setZAxisLocked(true);
@@ -106,7 +106,7 @@ public:
     void setup(float x, float y)
     {
         transform.setPosition(x, y);
-        sprite->addShape2dBox({256.0f, 256.0f});
+        sprite->addShape2dBox({128.0f, 128.0f});
     }
 
     static Texture *crateTexture;
