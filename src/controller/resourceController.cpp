@@ -84,8 +84,12 @@ ResourceFont *ResourceController::getFontByPath(std::string path, int size)
 
 ResourceMesh *ResourceController::addMesh(std::string path)
 {
-    auto mesh = new ResourceMesh(path);
-    meshes.push_back(mesh);
+    ResourceMesh *mesh = getMeshByPath(path);
+    if (!mesh)
+    {
+        mesh = new ResourceMesh(path);
+        meshes.push_back(mesh);
+    }
     return mesh;
 }
 

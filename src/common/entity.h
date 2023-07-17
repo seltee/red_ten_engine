@@ -10,6 +10,8 @@
 #include <list>
 #include <vector>
 
+class LayerActors;
+
 class Entity
 {
 public:
@@ -26,8 +28,8 @@ public:
     EXPORT const std::string getClass();
     EXPORT bool is(const std::string name);
     EXPORT bool implements(const std::string name);
-    EXPORT Layer *getCurrentLayer();
-    EXPORT void setCurrentLayer(Layer *layer);
+    EXPORT LayerActors *getCurrentLayer();
+    EXPORT void setCurrentLayer(LayerActors *layer);
 
     EXPORT virtual void childUpdated();
 
@@ -38,7 +40,7 @@ protected:
     EXPORT void registerClassName(std::string name);
 
     bool bIsVisible = true;
-    Layer *layer = nullptr;
+    LayerActors *layer = nullptr;
 
     float restitution = 0.5f;
     float friction = 1.0f;

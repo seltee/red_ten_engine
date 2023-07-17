@@ -19,6 +19,8 @@ public:
 
     EXPORT void setWidthBasedResolution(float width);
     EXPORT void setHeightBasedResolution(float height);
+    
+    EXPORT float getLineThickness();
 
     View *view = nullptr;
 

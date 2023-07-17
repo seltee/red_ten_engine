@@ -27,14 +27,14 @@ public:
         towerComponent->setShader(towerShader);
         towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
         towerComponent->transform.setPosition(0.0f, 0.0f, 0.8f);
-        towerComponent->transform.setRotation(0.0f, CONST_PI, 0.0f);
+        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
 
         towerComponent = createComponent<ComponentMesh>();
         towerComponent->setMesh(towerMesh);
         towerComponent->setShader(towerShader);
         towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
         towerComponent->transform.setPosition(0.0f, 0.0f, -0.8f);
-        towerComponent->transform.setRotation(0.0f, CONST_PI, 0.0f);
+        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
 
         for (int i = 0; i < LIGHT_COUNT; i++)
         {

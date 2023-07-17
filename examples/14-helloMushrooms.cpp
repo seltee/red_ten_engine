@@ -16,7 +16,7 @@ public:
         landComponent->setMesh(landMesh);
         landComponent->setShader(landShader);
 
-        landComponent->addPhysicsGeometry(landMesh->getGeometry());
+        landComponent->addShapeGeometry(landMesh->getGeometry());
     }
 
     static ResourceMesh *landMesh;
@@ -35,7 +35,7 @@ public:
         mushroomComponent->setMesh(mushroomMesh);
         mushroomComponent->setShader(mushroomShader);
 
-        mushroomComponent->addPhysicsGeometry(mushroomMesh->getGeometry());
+        mushroomComponent->addShapeGeometry(mushroomMesh->getGeometry());
     }
 
     void onProcess(float delta)
@@ -92,20 +92,18 @@ public:
             PointWithDirection pointWithDirection = camera->screenToWorld(mouseX, mouseY);
 
             Vector3 v(pointWithDirection.vDirection.x * 100.0f, pointWithDirection.vDirection.y * 100.0f, pointWithDirection.vDirection.z * 100.0f);
-
-            RayCollision r = ((LayerActors *)layer)->castSingleRayCollision(pointWithDirection.vPosition, v);
-
-            if (r.hadHit && r.actor)
+            PhysicsBodyPoint point;
+            if (((LayerActors *)layer)->castRaySingleCollision(Line(pointWithDirection.vPosition, v), point))
             {
-                if (r.actor->implements("Land"))
+                if (point.actor->implements("Land"))
                 {
                     auto mushroom = ((LayerActors *)layer)->createActor<Mushroom>();
-                    mushroom->transform.setPosition(r.point.x, r.point.y, r.point.z);
-                    mushroom->transform.setRotation(0.0f, randf(0.0f, CONST_PI * 4.0f), 0.0f);
+                    mushroom->transform.setPosition(point.point.x, point.point.y, point.point.z);
+                    mushroom->transform.setRotation(Vector3(0.0f, randf(0.0f, CONST_PI * 4.0f), 0.0f));
                 }
-                if (r.actor->implements("Mushroom"))
+                if (point.actor->implements("Mushroom"))
                 {
-                    ((Mushroom *)r.actor)->shootIt();
+                    ((Mushroom *)point.actor)->shootIt();
                 }
             }
         }
@@ -152,7 +150,7 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Mushroom", 0);
-    layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f));
+    layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f), 0.1f, 200);
 
     auto camera = layerActors->createActor<CameraPerspective>();
     camera->setWidthBasedResolution(1280);
@@ -201,14 +199,14 @@ int main()
         float x = sin(angle) * radius;
         float z = cos(angle) * radius;
 
-        auto collision = layerActors->castSingleRayCollision(Vector3(x, 10.0f, z), Vector3(0, -20.0f, 0));
-        if (collision.hadHit)
+        PhysicsBodyPoint point;
+        if (layerActors->castRaySingleCollision(Line(Vector3(x, 10.0f, z), Vector3(0, -20.0f, 0)), point))
         {
-            if (collision.actor->implements("Land"))
+            if (point.actor->implements("Land"))
             {
                 auto mushroom = layerActors->createActor<Mushroom>();
-                mushroom->transform.setPosition(x, collision.point.y, z);
-                mushroom->transform.setRotation(0.0f, randf(0.0f, CONST_PI * 4.0f), 0.0f);
+                mushroom->transform.setPosition(x, point.point.y, z);
+                mushroom->transform.setRotation(Vector3(0.0f, randf(0.0f, CONST_PI * 4.0f), 0.0f));
             }
         }
         created++;

@@ -6,10 +6,10 @@
 #include "common/entity.h"
 #include "math/math.h"
 #include "math/transformation.h"
-#include "physics/physicsEntity.h"
-#include "physics/physicsEntityBox.h"
-#include "physics/physicsEntitySphere.h"
-#include "physics/physicsEntityGeometry.h"
+#include "physics/shapes/shape.h"
+#include "physics/shapes/shapeBox.h"
+#include "physics/shapes/shapeSphere.h"
+#include "physics/shapes/shapeGeometry.h"
 #include "common/destroyable.h"
 #include "common/renderer.h"
 #include <list>
@@ -38,16 +38,15 @@ public:
     EXPORT void prepareColorMode();
     EXPORT virtual int getVertexAmount();
 
-    EXPORT PhysicsEntitySphere *addPhysics2dCircle(float radius);
-    EXPORT PhysicsEntitySphere *addPhysics2dCircle(float radius, float px, float py, float pz);
-    EXPORT PhysicsEntitySphere *addPhysicsSphere(float radius);
-    EXPORT PhysicsEntitySphere *addPhysicsSphere(float radius, float px, float py, float pz);
-    EXPORT PhysicsEntityBox *addPhysics2dBox(float width, float height);
-    EXPORT PhysicsEntityBox *addPhysics2dBox(float width, float height, float px, float py, float pz);
-    EXPORT PhysicsEntityBox *addPhysics3dBox(float width, float height, float depth);
-    EXPORT PhysicsEntityBox *addPhysics3dBox(float width, float height, float depth, float px, float py, float pz);
+    EXPORT ShapeSphere *addShapeSphere(float radius);
+    EXPORT ShapeSphere *addShapeSphere(Vector3 center, float radius);
+    EXPORT ShapeBox *addShape2dBox(Vector2 size);
+    EXPORT ShapeBox *addShape2dBox(Vector2 center, Vector2 size);
+    EXPORT ShapeBox *addShape3dBox(Vector3 size);
+    EXPORT ShapeBox *addShape3dBox(Vector3 center, Vector3 size);
 
-    EXPORT PhysicsEntityGeometry *addPhysicsGeometry(Geometry *geometry);
+    EXPORT ShapeGeometry *addShapeGeometry(Geometry *geometry);
+    EXPORT ShapeGeometry *addShapeGeometry(Vector3 center, Geometry *geometry);
 
     EXPORT virtual Matrix4 getLocalspaceMatrix();
 
@@ -58,7 +57,7 @@ public:
     EXPORT inline void setVisibility(bool state) { bIsVisible = state; }
     EXPORT inline bool isVisible() { return bIsVisible; }
 
-    std::list<PhysicsEntity *> physicsEntities;
+    std::list<Shape *> shapes;
     Transformation transform;
 
     ComponentColorMode colorMode = ComponentColorMode::Lit;
@@ -66,6 +65,5 @@ protected:
     bool bUseLightPhase = false;
     bool bUseShadowPhase = false;
     bool bIsVisible = true;
-
     Entity *owner = nullptr;
 };

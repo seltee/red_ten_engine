@@ -16,12 +16,13 @@
 ViewController *RTEngine::viewController = nullptr;
 StageController *RTEngine::stageController = nullptr;
 ResourceController *RTEngine::resourceController = nullptr;
-PhysicsController *RTEngine::physicsController = nullptr;
 InputController *RTEngine::inputController = nullptr;
 SoundController *RTEngine::soundController = nullptr;
 LogController *RTEngine::logController = nullptr;
 ConfigController *RTEngine::configController = nullptr;
 DebugController *RTEngine::debugController = nullptr;
+
+MeshMaker *RTEngine::meshMaker = nullptr;
 
 bool RTEngine::isSDLInitDone = false;
 
@@ -71,6 +72,7 @@ RTEngine::RTEngine(std::string configFilePath)
     {
         resourceController = new ResourceController();
         LayerDebug::setFont(resourceController->addFont(28));
+        WithRepository::setResourceController(resourceController);
     }
 
     if (!soundController)
@@ -81,12 +83,10 @@ RTEngine::RTEngine(std::string configFilePath)
         SoundPlayer::setSoundController(soundController);
     }
 
-    if (!physicsController)
+    if (!meshMaker)
     {
-        physicsController = new PhysicsController();
-        physicsController->setupPhysics();
-        Layer::setPhysicsController(physicsController);
-        Actor::setPhysicsController(physicsController);
+        meshMaker = new MeshMaker();
+        WithMeshMaker::setMeshMaker(meshMaker);
     }
 
     tick = SDL_GetTicks();
@@ -127,11 +127,6 @@ ResourceController *RTEngine::getResourceController()
     return resourceController;
 }
 
-PhysicsController *RTEngine::getPhysicsController()
-{
-    return physicsController;
-}
-
 InputController *RTEngine::getInputController()
 {
     return inputController;
@@ -145,6 +140,11 @@ ConfigController *RTEngine::getConfigController()
 DebugController *RTEngine::getDebugController()
 {
     return debugController;
+}
+
+MeshMaker *RTEngine::getMeshMaker()
+{
+    return meshMaker;
 }
 
 void RTEngine::openUrl(const char *url)

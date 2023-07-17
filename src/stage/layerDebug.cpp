@@ -19,28 +19,28 @@ public:
         text->setText(str);
         text->setColor(10, 10, 10);
         text->setAnchor(0.0f, 1.0f);
-        text->transform.setPosition(-1.0f, -1.0f);
+        text->transform.setPosition(Vector2(-1.0f, -1.0f));
 
         text = createComponent<ComponentText>();
         text->setFont(font);
         text->setText(str);
         text->setColor(10, 10, 10);
         text->setAnchor(0.0f, 1.0f);
-        text->transform.setPosition(1.0f, 1.0f);
+        text->transform.setPosition(Vector2(1.0f, 1.0f));
 
         text = createComponent<ComponentText>();
         text->setFont(font);
         text->setText(str);
         text->setColor(10, 10, 10);
         text->setAnchor(0.0f, 1.0f);
-        text->transform.setPosition(-1.0f, 1.0f);
+        text->transform.setPosition(Vector2(-1.0f, 1.0f));
 
         text = createComponent<ComponentText>();
         text->setFont(font);
         text->setText(str);
         text->setColor(10, 10, 10);
         text->setAnchor(0.0f, 1.0f);
-        text->transform.setPosition(1.0f, -1.0f);
+        text->transform.setPosition(Vector2(1.0f, -1.0f));
 
         text = createComponent<ComponentText>();
         text->setFont(font);
@@ -88,7 +88,7 @@ void LayerDebug::process(float delta)
         while (it != debugActors.end())
         {
             LayerDebugActor *actor = (LayerDebugActor *)(*it);
-            actor->transform.setPosition(sPositionX, sPositionY - shift);
+            actor->transform.setPosition(Vector2(sPositionX, sPositionY - shift));
             shift += 32.0f;
             if (!debugController->hasIndex(actor->entryIndex))
             {

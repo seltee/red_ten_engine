@@ -43,7 +43,8 @@ bool View::makeWindow()
         SDL_GL_CreateContext(newWindow);
         glewInit();
 
-        CommonShaders::build();
+        CommonShaders commonShaders;
+        commonShaders.build();
 
         window = newWindow;
 

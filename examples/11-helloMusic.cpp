@@ -16,6 +16,10 @@ public:
     JoJo() : ActorPawn()
     {
         registerClassName("JoJo");
+    }
+
+    void onSpawned()
+    {
         transform.setScale(0.8);
         transform.setPosition(0.0f, -50.0f);
 
@@ -23,15 +27,7 @@ public:
         sprite->setTexture(jojoTexture);
     }
 
-    void controlX(InputType type, int deviceIndex, int index, float axis)
-    {
-        moveX = axis;
-    }
-
     static Texture *jojoTexture;
-
-    float counter = 0.0f;
-    float moveX = 0.0f;
 
 protected:
     ComponentSprite *sprite;

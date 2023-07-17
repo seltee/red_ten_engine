@@ -4,7 +4,7 @@
 #pragma once
 #include "math/math.h"
 #include "common/utils.h"
-#include "common/withLogger.h"
+#include "connector/withLogger.h"
 
 class Shader : public WithLogger
 {

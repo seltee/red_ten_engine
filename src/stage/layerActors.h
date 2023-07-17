@@ -7,18 +7,12 @@
 #include "actor/actor.h"
 #include "os/view.h"
 #include "camera/camera.h"
-#include "controller/physicsController.h"
 #include "math/math.h"
+#include "physics/physicsWorld.h"
 #include <list>
 
-struct RayCollision
-{
-    Vector3 point;
-    Actor *actor;
-    bool hadHit;
-};
-
-class LayerActors : public Layer
+class LayerActors : public Layer,
+                    public WithDebug
 {
 public:
     LayerActors(std::string name, int index);
@@ -34,15 +28,14 @@ public:
     EXPORT void process(float delta);
     EXPORT void render(View *view);
     EXPORT void prepareNewActor(Actor *actor);
-    EXPORT void enableCollisions();
-    EXPORT void enablePhisics(Vector3 gravity);
-    EXPORT void disablePhysics();
+    EXPORT void enablePhisics(Vector3 gravity, float simScale = 1.0f, int stepsPerSecond = 100);
     EXPORT void enableSorting();
     EXPORT void disableSorting();
 
-    EXPORT RayCollision castSingleRayCollision(Vector3 v1, Vector3 v2, int channelId = 0);
-    EXPORT std::list<RayCollision> castSphereCollision(Vector3 v1, float radius, int channelId = 0);
-    EXPORT std::list<RayCollision> castPointCollision(Vector3 v1, int channelId = 0);
+    EXPORT bool castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine = false, float showTime = 1.6f);
+    EXPORT std::vector<PhysicsBodyPoint> castRayCollision(Line ray, bool viewDebugLine = false, float showTime = 1.6f);
+    EXPORT std::list<PhysicsBodyPoint> castSphereCollision(Vector3 p, float radius);
+    EXPORT std::list<PhysicsBodyPoint> castPointCollision(Vector3 p);
 
     EXPORT std::list<Actor *> *getActorsList();
     EXPORT std::list<Actor *> getActorsByName(std::string name);
@@ -60,14 +53,19 @@ public:
 
     EXPORT void setAmbientColor(float r, float g, float b);
 
+    EXPORT PhysicsWorld *getPhysicsWorld();
+
+    EXPORT void showDebugLine(Line ray, Vector3 color, float showTime);
+    EXPORT void showDebugBox(Vector3 p, float size, Vector3 color, float showTime);
+
 protected:
+
     bool bIsVisible = true;
     bool bProcessingEnabled = true;
     float ambientColor[3] = {1.0f, 1.0f, 1.0f};
 
     std::list<Actor *> actors;
-    PhysicsDescriptor *physicsSystem = nullptr;
-    Vector3 gravity;
+    PhysicsWorld *physicsWorld = nullptr;
     bool bUseSorting = false;
     Camera *activeCamera = nullptr;
 };

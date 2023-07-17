@@ -48,11 +48,12 @@ public:
         auto sphereComponent = sphere->createComponent<ComponentMesh>();
         sphereComponent->setMesh(sphereMesh);
         sphereComponent->setShader(sphereShader);
-        sphereComponent->addPhysicsSphere(0.4f);
+        sphereComponent->addShapeSphere(0.4f);
 
         sphere->setFrictionAndRestitution(0.8f, 0.1f);
         sphere->setPhysicsMotionType(MotionType::Dynamic);
         sphere->transform.setPosition(x, y, z);
+        sphere->showBoundingBox(true);
 
         return sphere;
     }
@@ -64,7 +65,7 @@ public:
         auto platformComponent = platform->createComponent<ComponentMesh>();
         platformComponent->setMesh(platformMesh);
         platformComponent->setShader(platformShader);
-        platformComponent->addPhysicsGeometry(platformMesh->getGeometry());
+        platformComponent->addShapeGeometry(platformMesh->getGeometry());
 
         platform->setFrictionAndRestitution(0.6f, 0.1f);
         platform->setPhysicsMotionType(MotionType::Static);
@@ -124,7 +125,7 @@ int main()
     sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(0.9f, 0.9f, 0.9f), true);
 
     float spawnCounter = (float)spawnPerSecond;
-
+    
     while (!engine->isTerminationIntended())
     {
         float delta = engine->syncFrame();

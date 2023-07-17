@@ -26,8 +26,8 @@ void CameraOrto::prepareToRender(View *view)
     float l = -r;
     float b = -targetHeight / 2.0f;
     float t = -b;
-    float f = 5000.0f;
-    float n = -1.0f;
+    float f = 100.0f;
+    float n = -100.0f;
 
     projectionMatrix = glm::ortho(l, r, b, t, n, f);
     this->view = view;
@@ -85,4 +85,9 @@ void CameraOrto::setHeightBasedResolution(float height)
 {
     useWidthBasedProportion = false;
     mainLine = height;
+}
+
+float CameraOrto::getLineThickness()
+{
+    return 0.6f;
 }

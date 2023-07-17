@@ -10,16 +10,19 @@ void Transformation::setPosition(Vector3 v)
     this->position = v;
     bIsDirty = true;
 }
+
 void Transformation::setPosition(Vector2 v)
 {
     this->position = Vector3(v.x, v.y, 0.0f);
     bIsDirty = true;
 }
+
 void Transformation::setPosition(float x, float y, float z)
 {
     this->position = Vector3(x, y, z);
     bIsDirty = true;
 }
+
 void Transformation::setPosition(float x, float y)
 {
     this->position = Vector3(x, y, 0.0f);
@@ -31,16 +34,19 @@ void Transformation::translate(float x, float y, float z)
     this->position += Vector3(x, y, z);
     bIsDirty = true;
 }
+
 void Transformation::translate(float x, float y)
 {
     this->position += Vector3(x, y, 0.0f);
     bIsDirty = true;
 }
+
 void Transformation::translate(Vector3 v)
 {
     this->position += v;
     bIsDirty = true;
 }
+
 void Transformation::translate(Vector2 v)
 {
     this->position += Vector3(v.x, v.y, 0.0f);
@@ -52,42 +58,53 @@ Vector3 Transformation::getPosition()
     return position;
 }
 
-void Transformation::setRotation(Vector3 v)
+void Transformation::setRotation(Vector3 r)
 {
-    this->rotation = v;
+    this->rotation = Quat(r);
     bIsDirty = true;
 }
-void Transformation::setRotation(float x, float y, float z)
+
+void Transformation::setRotation(Quat r)
 {
-    this->rotation = Vector3(x, y, z);
+    this->rotation = r;
     bIsDirty = true;
 }
+
 void Transformation::setRotation(float z)
 {
-    this->rotation = Vector3(0.0f, 0.0f, z);
+
+    this->rotation = Quat(Vector3(0.0f, 0.0f, z));
     bIsDirty = true;
 }
 
 void Transformation::rotate(float z)
 {
-    this->rotation.z += z;
+    this->rotation *= Quat(Vector3(0.0f, 0.0f, z));
     bIsDirty = true;
 }
 
-void Transformation::rotate(float x, float y, float z)
+void Transformation::rotate(Vector3 r)
 {
-    this->rotation += Vector3(x, y, z);
+    this->rotation *= Quat(r);
     bIsDirty = true;
 }
-void Transformation::rotate(Vector3 v)
+
+void Transformation::rotate(Quat r)
 {
-    this->rotation += v;
+    this->rotation *= r;
     bIsDirty = true;
 }
-Vector3 Transformation::getRotation()
+
+Quat Transformation::getRotation()
 {
     return rotation;
 }
+
+Vector3 Transformation::getRotationEuler()
+{
+    return glm::eulerAngles(rotation);
+}
+
 float Transformation::getZRotation()
 {
     return rotation.z;
@@ -103,21 +120,25 @@ void Transformation::setScale(Vector2 v)
     this->scale = Vector3(v.x, v.y, 1.0f);
     bIsDirty = true;
 }
+
 void Transformation::setScale(float x, float y, float z)
 {
     this->scale = Vector3(x, y, z);
     bIsDirty = true;
 }
+
 void Transformation::setScale(float x, float y)
 {
     this->scale = Vector3(x, y, 1.0f);
     bIsDirty = true;
 }
+
 void Transformation::setScale(float xy)
 {
     this->scale = Vector3(xy, xy, 1.0f);
     bIsDirty = true;
 }
+
 Vector3 Transformation::getScale()
 {
     return scale;
@@ -128,21 +149,10 @@ void Transformation::update()
     bIsDirty = false;
 
     mModel = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+    mModel *= glm::toMat4(rotation);
     if (scale.x != 1.0f || scale.y != 1.0f || scale.z != 1.0f)
     {
         mModel *= glm::scale(Matrix4(1.0f), Vector3(scale.x, scale.y, scale.z));
-    }
-    if (rotation.z != 0.0f)
-    {
-        mModel *= glm::rotate(Matrix4(1.0f), rotation.z, glm::vec3(0, 0, 1.0f));
-    }
-    if (rotation.y != 0.0f)
-    {
-        mModel *= glm::rotate(Matrix4(1.0f), rotation.y, glm::vec3(0, 1.0f, 0));
-    }
-    if (rotation.x != 0.0f)
-    {
-        mModel *= glm::rotate(Matrix4(1.0f), rotation.x, glm::vec3(1.0f, 0, 0));
     }
 }
 

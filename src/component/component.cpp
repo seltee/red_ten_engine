@@ -5,6 +5,7 @@
 #include "math/glm/gtc/type_ptr.hpp"
 #include "common/commonShaders.h"
 #include "opengl/glew.h"
+#include "stage/layerActors.h"
 #include <math.h>
 
 Component::Component()
@@ -78,69 +79,91 @@ int Component::getVertexAmount()
     return 0;
 }
 
-PhysicsEntitySphere *Component::addPhysics2dCircle(float radius)
+ShapeSphere *Component::addShapeSphere(float radius)
 {
-    return addPhysics2dCircle(radius, 0, 0, 0);
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeSphere(Vector3(0.0f), radius, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+
+    return nullptr;
 }
 
-PhysicsEntitySphere *Component::addPhysics2dCircle(float radius, float px, float py, float pz)
+ShapeSphere *Component::addShapeSphere(Vector3 center, float radius)
 {
-    auto newPhysicsEntity = new PhysicsEntitySphere(radius * SIZE_MULTIPLIER, px, py, pz);
-    physicsEntities.push_back(newPhysicsEntity);
-    if (owner)
-        owner->childUpdated();
-    return newPhysicsEntity;
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeSphere(center, radius, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+    return nullptr;
 }
 
-PhysicsEntitySphere *Component::addPhysicsSphere(float radius)
+ShapeBox *Component::addShape2dBox(Vector2 size)
 {
-    return addPhysicsSphere(radius, 0, 0, 0);
+    return addShape2dBox(Vector2(0.0f), size);
 }
 
-PhysicsEntitySphere *Component::addPhysicsSphere(float radius, float px, float py, float pz)
+ShapeBox *Component::addShape2dBox(Vector2 center, Vector2 size)
 {
-    auto newPhysicsEntity = new PhysicsEntitySphere(radius * SIZE_MULTIPLIER, px, py, pz);
-    physicsEntities.push_back(newPhysicsEntity);
-    if (owner)
-        owner->childUpdated();
-    return newPhysicsEntity;
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeBox(center, size, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+
+        return newPhysicsEntity;
+    }
+    return nullptr;
 }
 
-PhysicsEntityBox *Component::addPhysics2dBox(float width, float height)
+ShapeBox *Component::addShape3dBox(Vector3 size)
 {
-    return addPhysics2dBox(width, height, 0, 0, 0);
+    return addShape3dBox(Vector3(0.0f), size);
 }
 
-PhysicsEntityBox *Component::addPhysics2dBox(float width, float height, float px, float py, float pz)
+ShapeBox *Component::addShape3dBox(Vector3 center, Vector3 size)
 {
-    auto newPhysicsEntity = new PhysicsEntityBox(width * SIZE_MULTIPLIER, height * SIZE_MULTIPLIER, px, py, pz);
-    physicsEntities.push_back(newPhysicsEntity);
-    if (owner)
-        owner->childUpdated();
-    return newPhysicsEntity;
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeBox(center, size, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+    return nullptr;
 }
 
-PhysicsEntityBox *Component::addPhysics3dBox(float width, float height, float depth)
+ShapeGeometry *Component::addShapeGeometry(Geometry *geometry)
 {
-    return addPhysics3dBox(width, height, depth, 0, 0, 0);
+    return addShapeGeometry(Vector3(0.0f), geometry);
 }
 
-PhysicsEntityBox *Component::addPhysics3dBox(float width, float height, float depth, float px, float py, float pz)
+ShapeGeometry *Component::addShapeGeometry(Vector3 center, Geometry *geometry)
 {
-    auto newPhysicsEntity = new PhysicsEntityBox(width * SIZE_MULTIPLIER, height * SIZE_MULTIPLIER, depth * SIZE_MULTIPLIER, px, py, pz);
-    physicsEntities.push_back(newPhysicsEntity);
-    if (owner)
-        owner->childUpdated();
-    return newPhysicsEntity;
-}
-
-PhysicsEntityGeometry *Component::addPhysicsGeometry(Geometry *geometry)
-{
-    auto newPhysicsEntity = new PhysicsEntityGeometry(geometry);
-    physicsEntities.push_back(newPhysicsEntity);
-    if (owner)
-        owner->childUpdated();
-    return newPhysicsEntity;
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeGeometry(center, geometry, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+    return nullptr;
 }
 
 Matrix4 Component::getLocalspaceMatrix()

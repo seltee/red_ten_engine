@@ -3,8 +3,8 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/withLogger.h"
 #include "common/mesh.h"
+#include "connector/withLogger.h"
 #include <string>
 
 class ResourceMesh : public Mesh, public WithLogger

@@ -1,4 +1,5 @@
 #include "entity.h"
+#include "stage/layerActors.h"
 
 Entity::Entity()
 {
@@ -13,13 +14,7 @@ void Entity::lookAt(Vector3 v)
 {
     Vector3 position = transform.getPosition();
     Vector3 dif = glm::normalize(Vector3(v.x - position.x, v.y - position.y, v.z - position.z));
-
-    float y = atan2f(dif.z, dif.x);
-
-    float len = sqrtf(dif.x * dif.x + dif.z * dif.z);
-    float x = atan2(len, dif.y);
-
-    transform.setRotation(CONST_PI / 2 - x, -y - CONST_PI / 2.0f, 0.0f);
+    transform.setRotation(glm::quatLookAt(dif, Vector3(0.0f, 1.0f, 0.0f)));
 }
 
 void Entity::lookAt(float x, float y, float z)
@@ -59,12 +54,12 @@ bool Entity::implements(const std::string name)
             return true;
     return false;
 }
-Layer *Entity::getCurrentLayer()
+LayerActors *Entity::getCurrentLayer()
 {
     return this->layer;
 }
 
-void Entity::setCurrentLayer(Layer *layer)
+void Entity::setCurrentLayer(LayerActors *layer)
 {
     this->layer = layer;
 }
