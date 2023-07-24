@@ -3,7 +3,6 @@
 
 #include "renderer.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include "common/commonShaders.h"
 
 Renderer::Renderer(int width, int height, Config *config)

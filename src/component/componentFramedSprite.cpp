@@ -5,7 +5,6 @@
 #include "common/commonShaders.h"
 #include "math/glm/gtc/type_ptr.hpp"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include <math.h>
 
 ComponentFramedSprite::ComponentFramedSprite() : Component()
@@ -38,7 +37,7 @@ bool ComponentFramedSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *t
 
 int ComponentFramedSprite::getVertexAmount()
 {
-    return 4;
+    return 6;
 }
 
 void ComponentFramedSprite::setOpacity(float opacity)

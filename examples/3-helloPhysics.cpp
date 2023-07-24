@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // This actor represents circle in physics
 class Ball : public Actor

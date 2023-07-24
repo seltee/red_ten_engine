@@ -1,6 +1,5 @@
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 class Sphere : public Actor, public WithRepository
 {

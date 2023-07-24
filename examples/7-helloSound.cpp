@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // Sound player could be component for an actor, same is sprite component
 // It allows sound to be panned depending on actor's position
@@ -29,6 +28,11 @@ public:
         inputX->addKeyboardBinding(KeyboardCodes::A, -400.0f);
         inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 400.0f);
         inputX->addKeyboardBinding(KeyboardCodes::LEFT, -400.0f);
+
+        // This is our sound player that playes the song
+        ComponentSoundPlayer *player = createComponent<ComponentSoundPlayer>();
+        player->setSound(jojoSong);
+        player->playLoop();
     }
 
     void onProcess(float delta)
@@ -48,16 +52,17 @@ public:
     }
 
     static Texture *jojoTexture;
+    static Sound *jojoSong;
 
     float counter = 0.0f;
     float moveX = 0.0f;
     const float frontDistance = -90;
-    LayerActors *layerActors = nullptr;
 
 protected:
     ComponentSprite *sprite;
 };
 Texture *JoJo::jojoTexture = nullptr;
+Sound *JoJo::jojoSong = nullptr;
 
 int main()
 {
@@ -89,15 +94,10 @@ int main()
     JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
     auto background = resourceController->addTexture("./data/background.jpg");
 
-    Sound *jojoSong = resourceController->addSound("./data/sound.wav");
+    JoJo::jojoSong = resourceController->addSound("./data/sound.wav");
     // Note that only mono sounds can be panned. Stereo sounds always being played as is
     // But we can force mono
-    jojoSong->setForceMono(true);
-
-    // This is our sound player that playes the song
-    SoundPlayer *player = new SoundPlayer();
-    player->setSound(jojoSong);
-    player->playLoop();
+    JoJo::jojoSong->setForceMono(true);
 
     // Just a background for better look
     auto backgroundActor = layerActors->createActor<Actor>();
@@ -106,7 +106,6 @@ int main()
     backgroundActorSprite->setTexture(background);
 
     auto jojo = layerActors->createActor<JoJo>();
-    jojo->layerActors = layerActors;
 
     while (!engine->isTerminationIntended())
     {

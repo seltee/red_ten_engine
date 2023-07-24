@@ -80,7 +80,7 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
 
 void InputBase::processGamepadAxis(int deviceId, int code, float value)
 {
-    value = fabsf(value) < deadZone ? 0.0f : value;
+    value = abs(value) < deadZone ? 0.0f : value;
 
     if (states.size() > 0)
     {
@@ -137,7 +137,7 @@ void InputBase::updateRelativeOutput()
 
     if (states.size() > 0)
         for (auto it = states.begin(); it != states.end(); it++)
-            if (fabsf(it->state) > fabsf(output))
+            if (abs(it->state) > abs(output))
             {
                 type = it->type;
                 output = it->state;

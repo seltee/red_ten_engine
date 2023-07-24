@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // This enum values will be sent upon button press from gui controller
 enum GUI_BUTTON

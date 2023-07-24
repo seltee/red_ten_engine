@@ -4,7 +4,6 @@
 #include "common/commonShaders.h"
 #include "stage/stage.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include <SDL.h>
 #include <math.h>
 
@@ -56,7 +55,6 @@ void Stage::present(View *view)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
     glDisable(GL_BLEND);
 
     auto screenShader = CommonShaders::getScreenShader();
@@ -65,7 +63,7 @@ void Stage::present(View *view)
     glBindTexture(GL_TEXTURE_2D, view->getTexture());
 
     CommonShaders::getScreenMesh()->use();
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     view->swapBuffers();
 }

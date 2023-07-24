@@ -7,10 +7,9 @@ bool Config::loadConfig()
 {
     std::vector<ConfigPair> configPairs;
     char buffer[BUFFER_SIZE];
-    FILE *cfgFile;
-    errno_t err = fopen_s(&cfgFile, configFilePath.c_str(), "r");
+    FILE *cfgFile = fopen(configFilePath.c_str(), "r");
 
-    if (err == 0)
+    if (cfgFile != nullptr)
     {
         while (fgets(buffer, BUFFER_SIZE, cfgFile) != NULL)
         {
@@ -45,7 +44,7 @@ bool Config::loadConfig()
         fclose(cfgFile);
         return true;
     }
-    logger->logff("Error %i happend on conf file open\n", err);
+    logger->logff("Error happend on conf file open\n");
     return false;
 }
 
@@ -53,10 +52,9 @@ bool Config::saveConfig()
 {
     std::vector<ConfigPair> configPairs;
     char buffer[2048];
-    FILE *cfgFile;
-    errno_t err = fopen_s(&cfgFile, configFilePath.c_str(), "w");
+    FILE *cfgFile = fopen(configFilePath.c_str(), "w");
 
-    if (err == 0)
+    if (cfgFile != nullptr)
     {
         sprintf(buffer, "%s=%d\n", "windowWidth", windowWidth);
         fputs(buffer, cfgFile);
@@ -74,8 +72,9 @@ bool Config::saveConfig()
         fclose(cfgFile);
         return true;
     }
-    else if (err != 2)
-        logger->logff("Error %i happend on conf file open\n", err);
+    else
+        logger->logff("Error happend on conf file open\n");
+
     return false;
 }
 

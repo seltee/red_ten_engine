@@ -1,22 +1,60 @@
 CC = clang++
 LD = clang++
 
-OPENAL_LIB_PATH = "../openal"
+ifeq ($(OS),Windows_NT)
 SDL_LIB_PATH = "../SDL2-2.0.14"
 SDL_TTF_LIB_PATH = "../SDL2_ttf-2.0.15"
+OPENAL_LIB_PATH = "../OpenAL"
+else
+SDL_LIB_PATH = "/opt/homebrew/Cellar/sdl2/2.28.1/"
+SDL_TTF_LIB_PATH = "/opt/homebrew/Cellar/sdl2_ttf/2.20.2/"
+OPENAL_LIB_PATH = "/opt/homebrew/opt/openal-soft/"
+endif
 
-CFLAGS = -I${OPENAL_LIB_PATH}/include -Isrc \
-	     -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
-		 -Wall -c  -std=c++17 -mfpmath=sse -mavx -g
+ifeq ($(OS),Windows_NT)
+CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
+		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
+		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
+		-Wall -c  -std=c++17 -mfpmath=sse -mavx -fdeclspec -g
+else
+CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
+		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
+		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
+		-Wall -c  -std=c++17 -fdeclspec -g
+endif
+
+ifeq ($(OS),Windows_NT)
+LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64 \
+			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
+			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32
+else
+LIBRARIES = -L${SDL_LIB_PATH}/lib -L${SDL_TTF_LIB_PATH}/lib \
+			-lSDL2 -lSDL2main -lSDL2_ttf -framework OpenGL -framework OpenAL
+endif
+
+ifeq ($(OS),Windows_NT)
+EXT = ".exe"
+else
+EXT = ""
+endif
 
 LFLAGS = -shared -Wall -g 
-LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${OPENAL_LIB_PATH}/libs/Win64 \
-			-L${SDL_TTF_LIB_PATH}/lib/x64 \
-			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
-			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lOpenAL32.lib
 
 # The build target 
-TARGET = rtengine
+ifeq ($(OS),Windows_NT)
+TARGET = librtengine.dll
+COPY = copy
+MOVE = move
+else
+TARGET = librtengine.so
+COPY = cp -f
+MOVE = mv -f
+endif
+
+
+
+EFLAGS = -L./ -lrtengine
+
 SRCDIR = src
 EXMDIR = examples
 OBJDIR = objects
@@ -24,8 +62,8 @@ BINDIR = bin
  
 OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/glew.o ${OBJDIR}/effect.o ${OBJDIR}/transformation.o \
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
-			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o  \
-			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o  \
+			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o \
+			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o \
 			${OBJDIR}/soundController.o ${OBJDIR}/resourceController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o ${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o \
@@ -44,16 +82,17 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
 			${OBJDIR}/collisionSolver.o ${OBJDIR}/collisionMesh.o \
 			${OBJDIR}/meshMaker.o ${OBJDIR}/motion.o ${OBJDIR}/collisionDispatcher.o ${OBJDIR}/collisionCollector.o \
-			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o
+			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o \
+			${OBJDIR}/audioBase.o ${OBJDIR}/audioCreator.o ${OBJDIR}/audioSource.o
 
-EXAMPLES = 	${BINDIR}/1-helloWorld.exe ${BINDIR}/2-helloActors.exe ${BINDIR}/3-helloPhysics.exe ${BINDIR}/4-helloSorting.exe \
-			${BINDIR}/5-helloInput.exe ${BINDIR}/6-helloBytemap.exe ${BINDIR}/7-helloSound.exe ${BINDIR}/8-helloGUI.exe \
-			${BINDIR}/9-helloEffects.exe ${BINDIR}/10-helloAnimation.exe ${BINDIR}/11-helloMusic.exe ${BINDIR}/12-hello3d.exe \
-			${BINDIR}/13-hello3dPhysics.exe ${BINDIR}/14-helloMushrooms.exe ${BINDIR}/15-helloPlainsAndRays.exe
+EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
+			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
+			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
+			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT}
 
 all: engine examples
 
-engine: $(BINDIR)/$(TARGET).dll
+engine: $(TARGET)
 ${OBJDIR}/rtengine.o: ${SRCDIR}/rtengine.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/rtengine.o ${SRCDIR}/rtengine.cpp
 
@@ -303,103 +342,125 @@ ${OBJDIR}/constraint6DOF.o: ${SRCDIR}/physics/constraint6DOF.cpp
 ${OBJDIR}/meshMaker.o: ${SRCDIR}/common/meshMaker.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/meshMaker.o ${SRCDIR}/common/meshMaker.cpp
 
+${OBJDIR}/audioBase.o: ${SRCDIR}/audio/audioBase.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/audioBase.o ${SRCDIR}/audio/audioBase.cpp
 
-$(BINDIR)/$(TARGET).dll: ${OBJ_FILES}
-	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(BINDIR)/$(TARGET).dll
+${OBJDIR}/audioCreator.o: ${SRCDIR}/audio/audioCreator.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/audioCreator.o ${SRCDIR}/audio/audioCreator.cpp
 
+${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/audioSource.o ${SRCDIR}/audio/audioSource.cpp
 
+$(TARGET): ${OBJ_FILES}
+	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)
+	${COPY} ${TARGET} ${BINDIR}/${TARGET}
 
 
 examples: ${EXAMPLES} engine
 ${OBJDIR}/1-helloWorld.o: ${EXMDIR}/1-helloWorld.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/1-helloWorld.o ${EXMDIR}/1-helloWorld.cpp
 
-${BINDIR}/1-helloWorld.exe: ${OBJDIR}/1-helloWorld.o
-	$(LD) -Wl ${OBJDIR}/1-helloWorld.o -o ${BINDIR}/1-helloWorld.exe
+1-helloWorld${EXT}: ${OBJDIR}/1-helloWorld.o
+	$(LD) ${EFLAGS} ${OBJDIR}/1-helloWorld.o -o 1-helloWorld${EXT}
+	${MOVE} 1-helloWorld${EXT} ${BINDIR}/1-helloWorld${EXT}
 
 ${OBJDIR}/2-helloActors.o: ${EXMDIR}/2-helloActors.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/2-helloActors.o ${EXMDIR}/2-helloActors.cpp
 
-${BINDIR}/2-helloActors.exe: ${OBJDIR}/2-helloActors.o
-	$(LD) -Wl ${OBJDIR}/2-helloActors.o -o ${BINDIR}/2-helloActors.exe
+2-helloActors${EXT}: ${OBJDIR}/2-helloActors.o
+	$(LD) ${EFLAGS} ${OBJDIR}/2-helloActors.o -o 2-helloActors${EXT}
+	${MOVE} 2-helloActors${EXT} ${BINDIR}/2-helloActors${EXT}
 	
 ${OBJDIR}/3-helloPhysics.o: ${EXMDIR}/3-helloPhysics.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/3-helloPhysics.o ${EXMDIR}/3-helloPhysics.cpp
 
-${BINDIR}/3-helloPhysics.exe: ${OBJDIR}/3-helloPhysics.o
-	$(LD) -Wl ${OBJDIR}/3-helloPhysics.o -o ${BINDIR}/3-helloPhysics.exe
+3-helloPhysics${EXT}: ${OBJDIR}/3-helloPhysics.o
+	$(LD) ${EFLAGS} ${OBJDIR}/3-helloPhysics.o -o 3-helloPhysics${EXT}
+	${MOVE} 3-helloPhysics${EXT} ${BINDIR}/3-helloPhysics${EXT}
 
 ${OBJDIR}/4-helloSorting.o: ${EXMDIR}/4-helloSorting.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/4-helloSorting.o ${EXMDIR}/4-helloSorting.cpp
 
-${BINDIR}/4-helloSorting.exe: ${OBJDIR}/4-helloSorting.o
-	$(LD) -Wl ${OBJDIR}/4-helloSorting.o -o ${BINDIR}/4-helloSorting.exe
+4-helloSorting${EXT}: ${OBJDIR}/4-helloSorting.o
+	$(LD) ${EFLAGS} ${OBJDIR}/4-helloSorting.o -o 4-helloSorting${EXT}
+	${MOVE} 4-helloSorting${EXT} ${BINDIR}/4-helloSorting${EXT}
 
 ${OBJDIR}/5-helloInput.o: ${EXMDIR}/5-helloInput.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/5-helloInput.o ${EXMDIR}/5-helloInput.cpp
 
-${BINDIR}/5-helloInput.exe: ${OBJDIR}/5-helloInput.o
-	$(LD) -Wl ${OBJDIR}/5-helloInput.o -o ${BINDIR}/5-helloInput.exe
+5-helloInput${EXT}: ${OBJDIR}/5-helloInput.o
+	$(LD) ${EFLAGS} ${OBJDIR}/5-helloInput.o -o 5-helloInput${EXT}
+	${MOVE} 5-helloInput${EXT} ${BINDIR}/5-helloInput${EXT}
 
 ${OBJDIR}/6-helloBytemap.o: ${EXMDIR}/6-helloBytemap.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/6-helloBytemap.o ${EXMDIR}/6-helloBytemap.cpp
 
-${BINDIR}/6-helloBytemap.exe: ${OBJDIR}/6-helloBytemap.o
-	$(LD) -Wl ${OBJDIR}/6-helloBytemap.o -o ${BINDIR}/6-helloBytemap.exe
+6-helloBytemap${EXT}: ${OBJDIR}/6-helloBytemap.o
+	$(LD) ${EFLAGS} ${OBJDIR}/6-helloBytemap.o -o 6-helloBytemap${EXT}
+	${MOVE} 6-helloBytemap${EXT} ${BINDIR}/6-helloBytemap${EXT}
 
 ${OBJDIR}/7-helloSound.o: ${EXMDIR}/7-helloSound.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/7-helloSound.o ${EXMDIR}/7-helloSound.cpp
 
-${BINDIR}/7-helloSound.exe: ${OBJDIR}/7-helloSound.o
-	$(LD) -Wl ${OBJDIR}/7-helloSound.o -o ${BINDIR}/7-helloSound.exe
+7-helloSound${EXT}: ${OBJDIR}/7-helloSound.o
+	$(LD) ${EFLAGS} ${OBJDIR}/7-helloSound.o -o 7-helloSound${EXT}
+	${MOVE} 7-helloSound${EXT} ${BINDIR}/7-helloSound${EXT}
 
 ${OBJDIR}/8-helloGUI.o: ${EXMDIR}/8-helloGUI.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/8-helloGUI.o ${EXMDIR}/8-helloGUI.cpp
 
-${BINDIR}/8-helloGUI.exe: ${OBJDIR}/8-helloGUI.o
-	$(LD) -Wl ${OBJDIR}/8-helloGUI.o -o ${BINDIR}/8-helloGUI.exe
+8-helloGUI${EXT}: ${OBJDIR}/8-helloGUI.o
+	$(LD) ${EFLAGS} ${OBJDIR}/8-helloGUI.o -o 8-helloGUI${EXT}
+	${MOVE} 8-helloGUI${EXT} ${BINDIR}/8-helloGUI${EXT}
 
 ${OBJDIR}/9-helloEffects.o: ${EXMDIR}/9-helloEffects.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/9-helloEffects.o ${EXMDIR}/9-helloEffects.cpp
 
-${BINDIR}/9-helloEffects.exe: ${OBJDIR}/9-helloEffects.o
-	$(LD) -Wl ${OBJDIR}/9-helloEffects.o -o ${BINDIR}/9-helloEffects.exe
+9-helloEffects${EXT}: ${OBJDIR}/9-helloEffects.o
+	$(LD) ${EFLAGS} ${OBJDIR}/9-helloEffects.o -o 9-helloEffects${EXT}
+	${MOVE} 9-helloEffects${EXT} ${BINDIR}/9-helloEffects${EXT}
 
 ${OBJDIR}/10-helloAnimation.o: ${EXMDIR}/10-helloAnimation.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/10-helloAnimation.o ${EXMDIR}/10-helloAnimation.cpp
 
-${BINDIR}/10-helloAnimation.exe: ${OBJDIR}/10-helloAnimation.o
-	$(LD) -Wl ${OBJDIR}/10-helloAnimation.o -o ${BINDIR}/10-helloAnimation.exe
+10-helloAnimation${EXT}: ${OBJDIR}/10-helloAnimation.o
+	$(LD) ${EFLAGS} ${OBJDIR}/10-helloAnimation.o -o 10-helloAnimation${EXT}
+	${MOVE} 10-helloAnimation${EXT} ${BINDIR}/10-helloAnimation${EXT}
 
 ${OBJDIR}/11-helloMusic.o: ${EXMDIR}/11-helloMusic.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/11-helloMusic.o ${EXMDIR}/11-helloMusic.cpp
 
-${BINDIR}/11-helloMusic.exe: ${OBJDIR}/11-helloMusic.o
-	$(LD) -Wl ${OBJDIR}/11-helloMusic.o -o ${BINDIR}/11-helloMusic.exe
+11-helloMusic${EXT}: ${OBJDIR}/11-helloMusic.o
+	$(LD) ${EFLAGS} ${OBJDIR}/11-helloMusic.o -o 11-helloMusic${EXT}
+	${MOVE} 11-helloMusic${EXT} ${BINDIR}/11-helloMusic${EXT}
 
 ${OBJDIR}/12-hello3d.o: ${EXMDIR}/12-hello3d.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/12-hello3d.o ${EXMDIR}/12-hello3d.cpp
 
-${BINDIR}/12-hello3d.exe: ${OBJDIR}/12-hello3d.o
-	$(LD) -Wl ${OBJDIR}/12-hello3d.o -o ${BINDIR}/12-hello3d.exe
+12-hello3d${EXT}: ${OBJDIR}/12-hello3d.o
+	$(LD) ${EFLAGS} ${OBJDIR}/12-hello3d.o -o 12-hello3d${EXT}
+	${MOVE} 12-hello3d${EXT} ${BINDIR}/12-hello3d${EXT}
 
 ${OBJDIR}/13-hello3dPhysics.o: ${EXMDIR}/13-hello3dPhysics.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/13-hello3dPhysics.o ${EXMDIR}/13-hello3dPhysics.cpp
 
-${BINDIR}/13-hello3dPhysics.exe: ${OBJDIR}/13-hello3dPhysics.o
-	$(LD) -Wl ${OBJDIR}/13-hello3dPhysics.o -o ${BINDIR}/13-hello3dPhysics.exe
+13-hello3dPhysics${EXT}: ${OBJDIR}/13-hello3dPhysics.o
+	$(LD) ${EFLAGS} ${OBJDIR}/13-hello3dPhysics.o -o 13-hello3dPhysics${EXT}
+	${MOVE} 13-hello3dPhysics${EXT} ${BINDIR}/13-hello3dPhysics${EXT}
 
 ${OBJDIR}/14-helloMushrooms.o: ${EXMDIR}/14-helloMushrooms.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/14-helloMushrooms.o ${EXMDIR}/14-helloMushrooms.cpp
 
-${BINDIR}/14-helloMushrooms.exe: ${OBJDIR}/14-helloMushrooms.o
-	$(LD) -Wl ${OBJDIR}/14-helloMushrooms.o -o ${BINDIR}/14-helloMushrooms.exe
+14-helloMushrooms${EXT}: ${OBJDIR}/14-helloMushrooms.o
+	$(LD) ${EFLAGS} ${OBJDIR}/14-helloMushrooms.o -o 14-helloMushrooms${EXT}
+	${MOVE} 14-helloMushrooms${EXT} ${BINDIR}/14-helloMushrooms${EXT}
 
 ${OBJDIR}/15-helloPlainsAndRays.o: ${EXMDIR}/15-helloPlainsAndRays.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/15-helloPlainsAndRays.o ${EXMDIR}/15-helloPlainsAndRays.cpp
 
-${BINDIR}/15-helloPlainsAndRays.exe: ${OBJDIR}/15-helloPlainsAndRays.o
-	$(LD) -Wl ${OBJDIR}/15-helloPlainsAndRays.o -o ${BINDIR}/15-helloPlainsAndRays.exe
+15-helloPlainsAndRays${EXT}: ${OBJDIR}/15-helloPlainsAndRays.o
+	$(LD) ${EFLAGS} ${OBJDIR}/15-helloPlainsAndRays.o -o 15-helloPlainsAndRays${EXT}
+	${MOVE} 15-helloPlainsAndRays${EXT} ${BINDIR}/15-helloPlainsAndRays${EXT}
 
 
 

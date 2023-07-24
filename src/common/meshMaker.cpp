@@ -1,13 +1,13 @@
 #include "meshMaker.h"
 #include <string>
 
-extern const float cubeData[];
-extern const float plainData[];
+extern const float meshMakerCubeData[];
+extern const float meshMakerPlainData[];
 
 Mesh *MeshMaker::createBox(Vector3 dimensions)
 {
     float data[8 * 36];
-    memcpy(data, cubeData, (8 * 36) * sizeof(float));
+    memcpy(data, meshMakerCubeData, (8 * 36) * sizeof(float));
 
     for (int i = 0; i < 36; i++)
     {
@@ -25,7 +25,7 @@ Mesh *MeshMaker::createBox(Vector3 dimensions)
 Mesh *MeshMaker::createPlane(Vector2 dimensions, float UVScale)
 {
     float data[8 * 6];
-    memcpy(data, plainData, (8 * 6) * sizeof(float));
+    memcpy(data, meshMakerPlainData, (8 * 6) * sizeof(float));
     for (int i = 0; i < 6; i++)
     {
         int index = i * 8;
@@ -40,7 +40,7 @@ Mesh *MeshMaker::createPlane(Vector2 dimensions, float UVScale)
     return newMesh;
 }
 
-const float cubeData[] = {
+const float meshMakerCubeData[] = {
     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
     -0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
     0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
@@ -83,7 +83,7 @@ const float cubeData[] = {
     0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
-const float plainData[] = {
+const float meshMakerPlainData[] = {
     -0.5f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
     0.5f, 0.0f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
     -0.5f, 0.0f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,

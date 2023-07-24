@@ -6,12 +6,10 @@
 #include "common/childProcess.h"
 #include "common/config.h"
 #include "connector/withLogger.h"
+#include "audio/audioBase.h"
+#include "resource/sound.h"
 #include <vector>
-
-struct AudioDevice
-{
-    const char *name;
-};
+#include <string>
 
 class SoundController : WithLogger
 {
@@ -21,17 +19,18 @@ public:
 
     void process(float delta);
 
+    AudioBase *getAudioBase();
+
     void setListenerCamera(void *listenerCamera);
     void *getListenerCamera();
-
-    void subscribeSoundPlayer(ChildProcess *audioSubscribe);
-    bool unsubscribeSoundPlayer(ChildProcess *audioSubscribe);
 
 protected:
     Config *config;
     bool bSoundEnabled = false;
-    std::vector<AudioDevice *> devicesList;
+    std::vector<std::string> devicesList;
     std::vector<ChildProcess *> soundPlayers;
 
     void *listenerCamera = nullptr;
+
+    AudioBase *audioBase = nullptr;
 };

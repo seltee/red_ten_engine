@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "../src/rtengine.h"
-#pragma comment(lib, "bin/rtengine.lib")
 
 int main()
 {

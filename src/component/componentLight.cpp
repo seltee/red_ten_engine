@@ -5,7 +5,6 @@
 #include "common/commonShaders.h"
 #include "common/utils.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
 ComponentLight::ComponentLight()
@@ -103,7 +102,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
 
         CommonShaders::getScreenMesh()->use();
         glBlendFunc(GL_ONE, GL_ONE);
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 
     if (type == LightType::Omni)
@@ -117,7 +116,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
 
         CommonShaders::getScreenMesh()->use();
         glBlendFunc(GL_ONE, GL_ONE);
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
 }
 

@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // ComponentSprite are able to draw textures by fragments
 // This way usualy spritesheet could be used to animate things

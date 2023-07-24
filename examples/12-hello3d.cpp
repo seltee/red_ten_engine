@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 #define LIGHT_COUNT 5
 #define BUTTON_SWITCH_SHADOW_QUALITY 1

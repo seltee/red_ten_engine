@@ -46,7 +46,7 @@ struct HullEdge
 
 inline Vector3 getNormalizedPerpendicular(Vector3 v)
 {
-    if (fabsf(v.x) > fabsf(v.y))
+    if (abs(v.x) > abs(v.y))
     {
         float len = sqrtf(v.x * v.x + v.z * v.z);
         return Vector3(v.z, 0.0f, -v.x) / len;

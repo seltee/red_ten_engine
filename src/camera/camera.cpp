@@ -5,8 +5,6 @@
 #include "math/math.h"
 #include "common/utils.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include <al.h>
-#include <alc.h>
 
 SoundController *Camera::soundController = nullptr;
 
@@ -70,11 +68,8 @@ void Camera::onProcess(float delta)
 {
     if (isListenerCamera())
     {
-        ALfloat listenerOri[] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
-        auto position = transform.getPosition();
-        alListener3f(AL_POSITION, position.x, position.y, position.z);
-        alListener3f(AL_VELOCITY, 0, 0, 0);
-        alListenerfv(AL_ORIENTATION, listenerOri);
+        soundController->getAudioBase()->setPosition(transform.getPosition());
+        soundController->getAudioBase()->setOrientation(transform.getRotation());
     }
 }
 

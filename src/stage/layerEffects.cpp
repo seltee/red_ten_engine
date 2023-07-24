@@ -4,7 +4,6 @@
 #include "common/commonShaders.h"
 #include "stage/layerEffects.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 
 LayerEffects::LayerEffects(std::string name, int index) : Layer(name, index)
 {
@@ -44,8 +43,8 @@ void LayerEffects::render(View *view)
 {
     if (effects.size() > 0)
     {
-        int width = view->getWidth();
-        int height = view->getHeight();
+        int width = view->getDrawableWidth();
+        int height = view->getDrawableHeight();
         glBindTexture(GL_TEXTURE_2D, renderedTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
@@ -70,7 +69,7 @@ void LayerEffects::render(View *view)
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, view->getTexture());
                 CommonShaders::getScreenMesh()->use();
-                glDrawArrays(GL_QUADS, 0, 4);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
 
                 view->useFrameBuffer();
                 effectShader->use(m, m);
@@ -78,7 +77,7 @@ void LayerEffects::render(View *view)
 
                 glBindTexture(GL_TEXTURE_2D, renderedTexture);
                 CommonShaders::getScreenMesh()->use();
-                glDrawArrays(GL_QUADS, 0, 4);
+                glDrawArrays(GL_TRIANGLES, 0, 6);
             }
         }
     }

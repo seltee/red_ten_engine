@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // Actor just draws ball or crate depending on how it was setted up and moves it in circle on every update
 class Figure : public Actor

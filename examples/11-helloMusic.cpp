@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // We use ComponentSoundPlayer to play sound as well
 // Only difference - it's played as stream inside ComponentSoundPlayer

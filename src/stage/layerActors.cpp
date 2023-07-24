@@ -5,7 +5,6 @@
 #include "math/math.h"
 #include "actor/actorGUIElement.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include "common/commonShaders.h"
 #include "component/componentLight.h"
 #include <math.h>
@@ -107,7 +106,7 @@ void LayerActors::render(View *view)
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 
     // Lightning phase
     if (sceneLights.size() > 0)
@@ -204,7 +203,7 @@ void LayerActors::render(View *view)
     CommonShaders::getScreenShader()->use(m1, m2);
     CommonShaders::getScreenMesh()->use();
 
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void LayerActors::prepareNewActor(Actor *actor)

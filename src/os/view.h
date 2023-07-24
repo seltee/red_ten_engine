@@ -17,13 +17,15 @@ public:
 
     EXPORT void swapBuffers();
 
-    EXPORT int getWidth();
-    EXPORT int getHeight();
-    EXPORT int getRefreshRate();
-    EXPORT float getHWProportion();
-    EXPORT bool isFullscreen();
-    EXPORT const char *getOGLVersion();
-    EXPORT const char *getVersion();
+    inline int getWidth() { return width; }
+    inline int getHeight() { return height; }
+    inline int getDrawableWidth() { return drawableWidth; }
+    inline int getDrawableHeight() { return drawableHeight; }
+    inline int getRefreshRate() { return refreshRate; }
+    inline float getHWProportion() { return (float)height / (float)width; }
+    inline bool isFullscreen() { return bIsFullscreen; }
+    inline const char *getOGLVersion() { return oglVersion; }
+    inline const char *getVersion() { return version; }
 
     EXPORT void minimize();
 
@@ -40,6 +42,8 @@ protected:
     void *window = nullptr;
     int width = 640;
     int height = 480;
+    int drawableWidth = 640;
+    int drawableHeight = 480;
     int refreshRate = 0;
     int displayMode = -1;
     bool bIsFullscreen = false;

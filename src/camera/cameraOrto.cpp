@@ -4,7 +4,6 @@
 #include "camera/cameraOrto.h"
 #include "math/glm/gtc/type_ptr.hpp"
 #include "opengl/glew.h"
-#include <windows.h>
 
 CameraOrto::CameraOrto() : Camera()
 {

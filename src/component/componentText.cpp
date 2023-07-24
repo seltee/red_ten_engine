@@ -38,7 +38,9 @@ bool ComponentText::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool 
         shader->use(vpMatrix, mOut);
         shader->setOpacity(opacity);
 
+        glActiveTexture((unsigned int)TextureSlot::TEXTURE_0);
         glBindTexture(GL_TEXTURE_2D, textureID);
+
         CommonShaders::getSpriteMesh()->use();
         prepareColorMode();
         return true;
@@ -48,7 +50,7 @@ bool ComponentText::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool 
 
 int ComponentText::getVertexAmount()
 {
-    return 4;
+    return 6;
 }
 
 void ComponentText::setOpacity(float opacity)
@@ -125,18 +127,16 @@ void ComponentText::rebuildString()
         }
         else
         {
-            transform.setScale(surface->w, surface->h);
-            textTextureWidth = surface->w;
+            textTextureWidth = surface->pitch / 4;
             textTextureHeight = surface->h;
+
+            transform.setScale(textTextureWidth, textTextureHeight);
 
             glGenTextures(1, &textureID);
             glBindTexture(GL_TEXTURE_2D, textureID);
-
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textTextureWidth, textTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-            glGenerateMipmap(GL_TEXTURE_2D);
 
             SDL_FreeSurface(surface);
         }

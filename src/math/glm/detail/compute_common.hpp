@@ -30,7 +30,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER GLM_CONSTEXPR static float call(float x)
 		{
-			return fabsf(x);
+			return abs(x);
 		}
 	};
 #endif

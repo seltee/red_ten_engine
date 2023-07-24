@@ -3,7 +3,6 @@
 
 #include "phongShader.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
 extern const char *gShaderVertexCode;
@@ -206,7 +205,7 @@ void PhongShader::setShaderCode(const char *vertexCode, const char *fragCode, co
 
 // Straight go shader
 const char *gShaderVertexCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec3 aNormal;\n"
     "layout (location = 2) in vec2 aTexCoord;\n"
@@ -229,7 +228,7 @@ const char *gShaderVertexCode =
     "}\n";
 
 const char *gShaderFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) out vec4 gAlbedoSpec;"
     "layout (location = 1) out vec3 gNormal;"
     "layout (location = 2) out vec3 gPosition;"
@@ -251,7 +250,7 @@ const char *gShaderFragmentCode =
 
 // Shadow go shader
 const char *gShaderShadowVertexCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec3 aNormal;\n"
     "layout (location = 2) in vec2 aTexCoord;\n"
@@ -262,7 +261,7 @@ const char *gShaderShadowVertexCode =
     "}\n";
 
 const char *gShaderShadowFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) out vec4 gAlbedoSpec;"
     "uniform sampler2D TextureDefuse;\n"
     "uniform sampler2D TextureSpecular;\n"

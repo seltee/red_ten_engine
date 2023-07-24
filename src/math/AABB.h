@@ -44,14 +44,14 @@ public:
         lineMiddle = lineMiddle - AABBcenter;         // Translate box and segment to origin
 
         // Try world coordinate axes as separating axes
-        float adx = fabsf(lineHalfLength.x);
-        if (fabsf(lineMiddle.x) > AABBhalfLength.x + adx)
+        float adx = abs(lineHalfLength.x);
+        if (abs(lineMiddle.x) > AABBhalfLength.x + adx)
             return false;
-        float ady = fabsf(lineHalfLength.y);
-        if (fabsf(lineMiddle.y) > AABBhalfLength.y + ady)
+        float ady = abs(lineHalfLength.y);
+        if (abs(lineMiddle.y) > AABBhalfLength.y + ady)
             return false;
-        float adz = fabsf(lineHalfLength.z);
-        if (fabsf(lineMiddle.z) > AABBhalfLength.z + adz)
+        float adz = abs(lineHalfLength.z);
+        if (abs(lineMiddle.z) > AABBhalfLength.z + adz)
             return false;
 
         // Add in an epsilon term to counteract arithmetic errors when line is
@@ -62,11 +62,11 @@ public:
         adz += e;
 
         // Try cross products of line direction vector with coordinate axes
-        if (fabsf(lineMiddle.y * lineHalfLength.z - lineMiddle.z * lineHalfLength.y) > AABBhalfLength.y * adz + AABBhalfLength.z * ady)
+        if (abs(lineMiddle.y * lineHalfLength.z - lineMiddle.z * lineHalfLength.y) > AABBhalfLength.y * adz + AABBhalfLength.z * ady)
             return false;
-        if (fabsf(lineMiddle.z * lineHalfLength.x - lineMiddle.x * lineHalfLength.z) > AABBhalfLength.x * adz + AABBhalfLength.z * adx)
+        if (abs(lineMiddle.z * lineHalfLength.x - lineMiddle.x * lineHalfLength.z) > AABBhalfLength.x * adz + AABBhalfLength.z * adx)
             return false;
-        if (fabsf(lineMiddle.x * lineHalfLength.y - lineMiddle.y * lineHalfLength.x) > AABBhalfLength.x * ady + AABBhalfLength.y * adx)
+        if (abs(lineMiddle.x * lineHalfLength.y - lineMiddle.y * lineHalfLength.x) > AABBhalfLength.x * ady + AABBhalfLength.y * adx)
             return false;
         // No separating axis found; line must be overlapping AABB
         return true;

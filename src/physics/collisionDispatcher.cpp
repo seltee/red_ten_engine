@@ -122,9 +122,9 @@ void CollisionDispatcher::collideOBBVsPlain(PhysicsBody *OBB, PhysicsBody *plain
     Vector3 plainNormal = plainShape->normal;
 
     Vector3 size = OBBShape->getSize() * 0.5f;
-    float r = size.x * fabsf(glm::dot(plainNormal, axisX)) +
-              size.y * fabsf(glm::dot(plainNormal, axisY)) +
-              size.z * fabsf(glm::dot(plainNormal, axisZ));
+    float r = size.x * abs(glm::dot(plainNormal, axisX)) +
+              size.y * abs(glm::dot(plainNormal, axisY)) +
+              size.z * abs(glm::dot(plainNormal, axisZ));
 
     Vector3 OBBCenter = OBB->getCenterOfMass();
 
@@ -132,7 +132,7 @@ void CollisionDispatcher::collideOBBVsPlain(PhysicsBody *OBB, PhysicsBody *plain
     float s = glm::dot(plainNormal, OBBCenter) - plainShape->distance;
 
     // Intersection occurs when distance s falls within [-r,+r] interval
-    if (fabsf(s) <= r)
+    if (abs(s) <= r)
     {
         Vector3 closestToCenter = plainShape->getClosestPoint(OBBCenter);
         Vector3 sideNormal = glm::normalize(OBBCenter - closestToCenter);

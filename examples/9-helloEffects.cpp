@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 enum GUI_BUTTON
 {
@@ -304,7 +303,7 @@ int main()
 // Screen here is represented in 0-1 on each axis inside texCoord
 // There is no vertex shaders because we use the default one
 
-const char *fragmentInverseShader = "#version 400\n"
+const char *fragmentInverseShader = "#version 410 core\n"
                                     "out vec4 fragColor;\n"
                                     "in vec2 texCoord;\n"
                                     "uniform sampler2D t;\n"
@@ -313,7 +312,7 @@ const char *fragmentInverseShader = "#version 400\n"
                                     "  fragColor = vec4(1.0 - color.x, 1.0 - color.y, 1.0 - color.z, color.w);\n"
                                     "}\n";
 
-const char *fragmentShiftShader = "#version 400\n"
+const char *fragmentShiftShader = "#version 410 core\n"
                                   "out vec4 fragColor;\n"
                                   "in vec2 texCoord;\n"
                                   "uniform sampler2D t;\n"
@@ -325,7 +324,7 @@ const char *fragmentShiftShader = "#version 400\n"
                                   "  fragColor = vec4(rightColor.x, leftColor.y, color.z, color.w);\n"
                                   "}\n";
 
-const char *fragmentBWShader = "#version 400\n"
+const char *fragmentBWShader = "#version 410 core\n"
                                "out vec4 fragColor;\n"
                                "in vec2 texCoord;\n"
                                "uniform sampler2D t;\n"
@@ -335,7 +334,7 @@ const char *fragmentBWShader = "#version 400\n"
                                "  fragColor = vec4(m, m, m, 1.0);\n"
                                "}\n";
 
-const char *fragmentJoJoShader = "#version 400\n"
+const char *fragmentJoJoShader = "#version 410 core\n"
                                  "out vec4 fragColor;\n"
                                  "in vec2 texCoord;\n"
                                  "uniform sampler2D t;\n"

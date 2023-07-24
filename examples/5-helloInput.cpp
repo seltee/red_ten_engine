@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // What a game without controlling your character? The way to make actor receive input is to use ActorPawn
 class CratePlayer : public ActorPawn

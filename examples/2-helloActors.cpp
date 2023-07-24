@@ -3,7 +3,6 @@
 
 #include "../src/rtengine.h"
 #include <math.h>
-#pragma comment(lib, "bin/rtengine.lib")
 
 // To create actor's logic you need to inherit actor into your class then you will get an access to Actor's life cycle
 class Ball : public Actor

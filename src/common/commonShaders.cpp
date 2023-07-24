@@ -48,10 +48,10 @@ void CommonShaders::build()
     // 3 - position, 2 - UV
     int fullAttributeSizes[2] = {3, 2};
     spriteMesh = new Mesh();
-    spriteMesh->setupFloatsArray(spriteData, 4, 2, fullAttributeSizes);
+    spriteMesh->setupFloatsArray(spriteData, 6, 2, fullAttributeSizes);
 
     screenMesh = new Mesh();
-    screenMesh->setupFloatsArray(screenData, 4, 2, fullAttributeSizes);
+    screenMesh->setupFloatsArray(screenData, 6, 2, fullAttributeSizes);
 
     // 3 - position
     int triAttributeSizes[1] = {3};
@@ -162,14 +162,18 @@ Mesh *CommonShaders::getCubeMesh()
 }
 
 float spriteData[] = {
-    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+    1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 
 float screenData[] = {
     -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
     1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
     -1.0f, 1.0f, 0.0f, 0.0f, 1.0f};
 
@@ -212,7 +216,7 @@ float cubeData[] = {
     0.5f, -0.5f, -0.5f};
 
 const char *spriteVertexShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
     "out vec2 texCoord;\n"
@@ -224,7 +228,7 @@ const char *spriteVertexShader =
     "}\n";
 
 const char *spriteFramedVertexShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
     "out vec2 texCoord;\n"
@@ -238,7 +242,7 @@ const char *spriteFramedVertexShader =
     "}\n";
 
 const char *spriteFragmentShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D t;\n"
@@ -249,7 +253,7 @@ const char *spriteFragmentShader =
     "}\n";
 
 const char *screenVertexShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
     "out vec2 texCoord;\n"
@@ -259,7 +263,7 @@ const char *screenVertexShader =
     "}\n";
 
 const char *screenFragmentShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D t;\n"
@@ -268,7 +272,7 @@ const char *screenFragmentShader =
     "}\n";
 
 const char *clearFragmentShader =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 fragColor;\n"
     "uniform vec3 clearColor;\n"
     "void main() {\n"
@@ -276,7 +280,7 @@ const char *clearFragmentShader =
     "}\n";
 
 const char *initialLightningFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D tAlbedo;\n"
@@ -289,7 +293,7 @@ const char *initialLightningFragmentCode =
     "}\n";
 
 const char *sunFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D tAlbedoSpec;\n"
@@ -304,7 +308,7 @@ const char *sunFragmentCode =
     "}\n";
 
 const char *sunWithShadowFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D tPosition;\n"
@@ -344,7 +348,7 @@ const char *sunWithShadowFragmentCode =
     "}\n";
 
 const char *omniFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
     "uniform sampler2D tPosition;\n"
@@ -366,7 +370,7 @@ const char *omniFragmentCode =
     "}\n";
 
 const char *debugCubeVertexCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "uniform mat4 mTransform;\n"
     "uniform mat4 mViewProjection;\n"
@@ -375,7 +379,7 @@ const char *debugCubeVertexCode =
     "}\n";
 
 const char *debugCubeFragmentCode =
-    "#version 400\n"
+    "#version 410 core\n"
     "out vec4 fragColor;\n"
     "uniform vec3 color;\n"
     "void main() {\n"

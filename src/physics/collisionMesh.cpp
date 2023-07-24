@@ -72,7 +72,7 @@ bool CollisionMesh::testCollision(CollisionMesh *foreignMesh)
                                                 pol2->b.z * t1 + pol2->a.z * (1 - t1)});
                 if (pointInTriangle(pol1->a, pol1->b, pol1->c, pointInPlane))
                 {
-                    float sw = fabsf(t1 - 0.5f);
+                    float sw = abs(t1 - 0.5f);
                     Vector3 p = (pol2->a - pol2->b) * t1;
                     summ += p;
                     printf("INTERSECTION %f %f %f %f %f\n", p.x, p.y, p.z, glm::length(p), sw);
@@ -87,7 +87,7 @@ bool CollisionMesh::testCollision(CollisionMesh *foreignMesh)
                                                 pol2->c.z * t2 + pol2->b.z * (1 - t2)});
                 if (pointInTriangle(pol1->a, pol1->b, pol1->c, pointInPlane))
                 {
-                    float sw = fabsf(t2 - 0.5f);
+                    float sw = abs(t2 - 0.5f);
                     Vector3 p = (pol2->b - pol2->c) * t2;
                     summ += p;
                     printf("INTERSECTION %f %f %f %f %f\n", p.x, p.y, p.z, glm::length(p), sw);
@@ -102,7 +102,7 @@ bool CollisionMesh::testCollision(CollisionMesh *foreignMesh)
                                                 pol2->a.z * t2 + pol2->c.z * (1 - t2)});
                 if (pointInTriangle(pol1->a, pol1->b, pol1->c, pointInPlane))
                 {
-                    float sw = fabsf(t3 - 0.5f);
+                    float sw = abs(t3 - 0.5f);
                     Vector3 p = (pol2->c - pol2->a) * t3;
                     summ += p;
                     printf("INTERSECTION %f %f %f %f %f\n", p.x, p.y, p.z, glm::length(p), sw);

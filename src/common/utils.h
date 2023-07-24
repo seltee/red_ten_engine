@@ -5,7 +5,16 @@
 
 #define CONST_PI 3.1415926f
 #define CONST_PI2 6.2831853f
+
+#ifdef __APPLE__
+#define EXPORT __attribute__ ((visibility("default")))
+#else
 #define EXPORT __declspec(dllexport)
+#endif
+
+#ifndef _strdup
+#define _strdup strdup
+#endif
 
 EXPORT float randf();
 EXPORT float randf(float from, float to);

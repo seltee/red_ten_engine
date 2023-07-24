@@ -3,11 +3,7 @@
 
 #include "os/view.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include "common/commonShaders.h"
-#include <windows.h>
-#include <gl/GL.h>
-#include <gl/GLU.h>
 #include <SDL.h>
 
 View::View(Config *config)
@@ -25,6 +21,11 @@ bool View::makeWindow()
     if (window)
         return false;
 
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
     auto newWindow = SDL_CreateWindow(windowName.c_str(),
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,
@@ -40,7 +41,13 @@ bool View::makeWindow()
             SDL_SetWindowDisplayMode(newWindow, &mode);
         }
 
-        SDL_GL_CreateContext(newWindow);
+        SDL_GLContext context = SDL_GL_CreateContext(newWindow);
+        if (!context)
+        {
+            printf("Failed to create OpenGL context\n");
+        }
+
+        glewExperimental = GL_TRUE;
         glewInit();
 
         CommonShaders commonShaders;
@@ -51,6 +58,7 @@ bool View::makeWindow()
         oglVersion = (char *)glGetString(GL_RENDERER); // get renderer string
         version = (char *)glGetString(GL_VERSION);     // version as a string
 
+        SDL_GL_GetDrawableSize((SDL_Window *)window, &drawableWidth, &drawableHeight);
         updateFrameBuffer();
 
         return true;
@@ -112,6 +120,7 @@ bool View::changeMode()
         }
     }
 
+    SDL_GL_GetDrawableSize((SDL_Window *)window, &drawableWidth, &drawableHeight);
     updateFrameBuffer();
     return true;
 }
@@ -119,41 +128,6 @@ bool View::changeMode()
 void View::swapBuffers()
 {
     SDL_GL_SwapWindow((SDL_Window *)window);
-}
-
-int View::getWidth()
-{
-    return width;
-}
-
-int View::getHeight()
-{
-    return height;
-}
-
-int View::getRefreshRate()
-{
-    return refreshRate;
-}
-
-float View::getHWProportion()
-{
-    return ((float)height) / ((float)width);
-}
-
-bool View::isFullscreen()
-{
-    return bIsFullscreen;
-}
-
-const char *View::getOGLVersion()
-{
-    return oglVersion;
-}
-
-const char *View::getVersion()
-{
-    return version;
 }
 
 void View::minimize()
@@ -207,7 +181,7 @@ void View::updateFrameBuffer()
     // Color texture
     glGenTextures(1, &renderedTexture);
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, drawableWidth, drawableHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -217,5 +191,5 @@ void View::updateFrameBuffer()
 
     if (renderer)
         delete renderer;
-    renderer = new Renderer(width, height, config);
+    renderer = new Renderer(drawableWidth, drawableHeight, config);
 }

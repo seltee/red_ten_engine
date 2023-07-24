@@ -5,8 +5,6 @@
 #include "loaders/stb_vorbis.h"
 #include <stdio.h>
 #include <string>
-#include <al.h>
-#include <alc.h>
 
 struct WavHeader
 {
@@ -50,7 +48,6 @@ Sound::Sound(std::string path)
         {
             logger->logf("%s - ogg\n", path.c_str());
             extension = Extension::OGG;
-            bIsStreamable = true;
         }
     }
 }
@@ -75,39 +72,34 @@ void Sound::setForceMono(bool state)
     bForceMono = state;
 }
 
-unsigned int Sound::getBuffer()
-{
-    return buffer;
-}
-
-SoundStream *Sound::createNewStream()
+bool Sound::setupStream(SoundStream *stream)
 {
     if (!bIsLoaded)
-        return nullptr;
+        return false;
 
     int error = 0;
     stb_vorbis *vorbis = stb_vorbis_open_filename(path.c_str(), &error, nullptr);
 
     if (error != 0)
-        return nullptr;
+        return false;
+
     stb_vorbis_info info = stb_vorbis_get_info(vorbis);
 
-    SoundStream *stream = new SoundStream();
     stream->fileReader = vorbis;
     stream->loadBuffer = (short *)malloc(sizeof(short) * SOUND_BUFFER_SIZE * info.channels);
-    alGenBuffers((ALuint)SOUND_BUFFERS_AMOUNT, stream->buffers);
+
     stream->numChannels = info.channels;
     stream->sampleRate = info.sample_rate;
     if (info.channels == 1)
-        stream->format = AL_FORMAT_MONO16;
+        stream->format = AudioFormat::MONO_16;
     if (info.channels == 2)
-        stream->format = AL_FORMAT_STEREO16;
+        stream->format = AudioFormat::STEREO_16;
     stream->lastLoaded = 0;
 
-    return stream;
+    return true;
 }
 
-bool Sound::processBuffers(SoundStream *stream)
+bool Sound::processBuffers(SoundStream *stream, void (*processBuffer) (SoundStream *stream, int buffer, int amount))
 {
     if (!bIsLoaded || !isStreamable())
         return false;
@@ -119,12 +111,7 @@ bool Sound::processBuffers(SoundStream *stream)
         int loaded = stb_vorbis_get_samples_short_interleaved((stb_vorbis *)stream->fileReader, stream->numChannels, stream->loadBuffer, SOUND_BUFFER_SIZE);
         if (loaded)
         {
-            alBufferData(
-                stream->buffers[stream->lastLoaded % SOUND_BUFFERS_AMOUNT],
-                stream->format,
-                stream->loadBuffer,
-                loaded * stream->numChannels * 2,
-                stream->sampleRate);
+            processBuffer(stream, stream->lastLoaded % SOUND_BUFFERS_AMOUNT, loaded * stream->numChannels * 2);
         }
         else
             return false;
@@ -139,17 +126,6 @@ void Sound::closeBuffer(SoundStream *stream)
     if (!stream)
         return;
     stb_vorbis_close((stb_vorbis *)stream->fileReader);
-    alDeleteBuffers(SOUND_BUFFERS_AMOUNT, stream->buffers);
-    free(stream);
-}
-
-void Sound::restartBuffer(SoundStream *stream)
-{
-    if (!stream || !bIsLoaded)
-        return;
-
-    stb_vorbis_seek_start((stb_vorbis *)stream->fileReader);
-    stream->lastLoaded = 0;
 }
 
 void Sound::load()
@@ -166,21 +142,22 @@ void Sound::load()
 
 bool Sound::loadWAV()
 {
-    FILE *file;
-    fopen_s(&file, path.c_str(), "rb");
-
-    if (!file)
+    FILE *file = fopen(path.c_str(), "rb");
+    if (file == nullptr)
+    {
+        logger->logff("unable to open file %s\n", path.c_str());
         return false;
+    }
 
     WavHeader wavHeader;
     fread(&wavHeader, sizeof(WavHeader), 1, file);
 
     logger->logf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i, data size %i\n",
-           path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
-           wavHeader.bitsPerSample, wavHeader.dataSize);
+                 path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
+                 wavHeader.bitsPerSample, wavHeader.dataSize);
 
-    auto dataSize = wavHeader.dataSize;
-    unsigned char *data = (unsigned char *)malloc(dataSize);
+    dataSize = wavHeader.dataSize;
+    data = (unsigned char *)malloc(dataSize);
     if (!data)
     {
         logger->logff("failed to make buffer of %i\n", dataSize);
@@ -204,41 +181,43 @@ bool Sound::loadWAV()
         dataSize = newDataSize;
     }
 
-    ALenum format = 0;
+    format = AudioFormat::UNKNOWN;
     if (wavHeader.numOfChannels == 1)
     {
         if (wavHeader.bitsPerSample == 8)
-            format = AL_FORMAT_MONO8;
+            format = AudioFormat::MONO_8;
         if (wavHeader.bitsPerSample == 16)
-            format = AL_FORMAT_MONO16;
+            format = AudioFormat::MONO_16;
     }
     if (wavHeader.numOfChannels == 2)
     {
         if (wavHeader.bitsPerSample == 8)
-            format = AL_FORMAT_STEREO8;
+            format = AudioFormat::STEREO_8;
         if (wavHeader.bitsPerSample == 16)
-            format = AL_FORMAT_STEREO16;
+            format = AudioFormat::STEREO_16;
     }
 
-    if (!format)
+    if (format == AudioFormat::UNKNOWN)
     {
         free(data);
         logger->logff("Unknown sound format in %s\n", path.c_str());
         return false;
     }
 
-    alGenBuffers((ALuint)1, &buffer);
-    alBufferData(buffer, format, data, dataSize, wavHeader.sampleRate);
-    free(data);
+    sampleRate = wavHeader.sampleRate;
+    bIsStreamable = false;
     return true;
 }
 
 bool Sound::loadOGG()
 {
-    FILE *file;
-    fopen_s(&file, path.c_str(), "rb");
-    if (!file)
+    FILE *file = fopen(path.c_str(), "rb");
+    if (file == nullptr)
+    {
+        logger->logff("unable to open file %s\n", path.c_str());
         return false;
+    }
     fclose(file);
+    bIsStreamable = true;
     return true;
 }

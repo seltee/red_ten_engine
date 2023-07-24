@@ -12,7 +12,7 @@ ResourceFont::ResourceFont(std::string path, int size)
 
     if (path == "default")
     {
-        SDL_RWops *rwFromMemory = SDL_RWFromMem((void*)DMSansRegularTTF, DMSansRegularTTFSize);
+        SDL_RWops *rwFromMemory = SDL_RWFromMem((void *)DMSansRegularTTF, DMSansRegularTTFSize);
         font = (InternalFont *)TTF_OpenFontRW(rwFromMemory, 1, size);
     }
     else

@@ -254,7 +254,7 @@ inline Vector3 lerp(const Vector3 &a, const Vector3 &b, float t)
 
 inline bool isAlmostZero(Vector3 v)
 {
-	if (fabsf(v.x) > 1e-6 || fabsf(v.y) > 1e-6 || fabsf(v.z) > 1e-6)
+	if (abs(v.x) > 1e-6 || abs(v.y) > 1e-6 || abs(v.z) > 1e-6)
 		return false;
 	return true;
 }

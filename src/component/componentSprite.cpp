@@ -38,7 +38,7 @@ bool ComponentSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, boo
 
 int ComponentSprite::getVertexAmount()
 {
-    return 4;
+    return 6;
 }
 
 void ComponentSprite::setOpacity(float opacity)

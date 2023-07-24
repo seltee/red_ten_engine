@@ -254,7 +254,10 @@ bool Node::doSkip(const char *name)
 bool FBXLoader::load(std::string meshPath)
 {
     printf("Load 3d file %s\n", meshPath.c_str());
-    fopen_s(&file, meshPath.c_str(), "rb");
+    file = fopen(meshPath.c_str(), "rb");
+    if (file == nullptr){
+        return false;
+    }
 
     char buff[21];
     fread(buff, 21, 1, file);

@@ -36,6 +36,15 @@ bool RawShader::build()
             glAttachShader(programm, vertexShader);
             glLinkProgram(programm);
 
+            glValidateProgram(programm);
+            int params;
+            glGetProgramiv(programm, GL_VALIDATE_STATUS, &params);
+            if (params != GL_TRUE)
+            {
+                logger->logff("Shader validation failed:\nVertex shader:\n%s\nFragment shader:\n%s\n", vertexCode, fragmentCode);
+                return false;
+            }
+
             locMViewProjection = glGetUniformLocation(programm, "mViewProjection");
             locMTransform = glGetUniformLocation(programm, "mTransform");
 

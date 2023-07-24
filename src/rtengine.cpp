@@ -7,9 +7,9 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <cmath>
-#include <shellscalingapi.h>
 
 #ifdef _WIN32
+#include <shellscalingapi.h>
 #include <windows.h>
 #endif
 

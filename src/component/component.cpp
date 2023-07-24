@@ -31,7 +31,7 @@ void Component::render(Matrix4 &vpMatrix, Transformation *tf)
     {
         int drawAmount = getVertexAmount();
         if (drawAmount)
-            glDrawArrays(drawAmount == 4 ? GL_QUADS : GL_TRIANGLES, 0, drawAmount);
+            glDrawArrays(GL_TRIANGLES, 0, drawAmount);
     }
 }
 

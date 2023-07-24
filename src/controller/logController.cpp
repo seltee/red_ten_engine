@@ -2,11 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "logController.h"
+#include "stdio.h"
 
 LogController::LogController(std::string filePath)
 {
-    errno_t err = fopen_s(&logFile, filePath.c_str(), "w");
-    if (err == 0)
+    logFile = fopen(filePath.c_str(), "w");
+    if (logFile != nullptr)
         bReady = true;
 }
 

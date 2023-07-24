@@ -5,7 +5,6 @@
 #include "math/glm/gtc/type_ptr.hpp"
 #include "common/commonShaders.h"
 #include "opengl/glew.h"
-#include "opengl/wglew.h"
 #include <math.h>
 
 ComponentMesh::ComponentMesh() : Component()

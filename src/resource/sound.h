@@ -8,10 +8,20 @@
 #pragma once
 #include "common/utils.h"
 #include "connector/withLogger.h"
+#include "audio/audioBase.h"
 #include <string>
 
 #define SOUND_BUFFER_SIZE (1024 * 128)
 #define SOUND_BUFFERS_AMOUNT 4
+
+enum class AudioFormat
+{
+    UNKNOWN = 0,
+    MONO_8,
+    MONO_16,
+    STEREO_8,
+    STEREO_16
+};
 
 enum Extension
 {
@@ -27,7 +37,7 @@ struct SoundStream
     unsigned int buffers[SOUND_BUFFERS_AMOUNT];
     int numChannels;
     int sampleRate;
-    int format;
+    AudioFormat format;
     int lastLoaded;
 };
 
@@ -40,14 +50,37 @@ public:
     EXPORT bool isStreamable();
     EXPORT bool isLoaded();
     EXPORT void setForceMono(bool state);
-    EXPORT unsigned int getBuffer();
-    EXPORT SoundStream* createNewStream();
-    EXPORT bool processBuffers(SoundStream* stream);
-    EXPORT void closeBuffer(SoundStream* stream);
-    EXPORT void restartBuffer(SoundStream* stream);
+    EXPORT bool setupStream(SoundStream *stream);
+    EXPORT bool processBuffers(SoundStream *stream, void (*processBuffer) (SoundStream *stream, int buffer, int amount));
+    EXPORT void closeBuffer(SoundStream *stream);
     EXPORT void load();
 
+    inline void setId(int id) { this->id = id; }
+    inline int getId() { return id; }
 
+    inline unsigned char *getData()
+    {
+        load();
+        return data;
+    }
+
+    inline int getDataSize()
+    {
+        load();
+        return dataSize;
+    }
+
+    inline AudioFormat getAudioFormat()
+    {
+        load();
+        return format;
+    }
+
+    inline unsigned int getSampleRate()
+    {
+        load();
+        return sampleRate;
+    }
 
 protected:
     bool loadWAV();
@@ -56,7 +89,12 @@ protected:
     std::string path;
     bool bIsStreamable;
     bool bIsLoaded = false;
-    unsigned int buffer = 0;
     bool bForceMono = false;
     Extension extension = Extension::UNKNOWN;
+
+    int id = -1;
+    unsigned char *data;
+    unsigned int dataSize;
+    AudioFormat format;
+    unsigned int sampleRate;
 };
