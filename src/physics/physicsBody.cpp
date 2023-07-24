@@ -107,14 +107,18 @@ Vector3 PhysicsBody::getLinearVelocity()
 
 void PhysicsBody::setLinearVelocity(Vector3 velocity)
 {
+    lock.lock();
     if (motion)
         motion->linearVelocity = velocity;
+    lock.unlock();
 }
 
 void PhysicsBody::addLinearVelocity(Vector3 velocity)
 {
+    lock.lock();
     if (motion)
         motion->linearVelocity += velocity;
+    lock.unlock();
 }
 
 Vector3 PhysicsBody::getAngularVelocity()
@@ -126,20 +130,26 @@ Vector3 PhysicsBody::getAngularVelocity()
 
 void PhysicsBody::setAngularVelocity(Vector3 velocity)
 {
+    lock.lock();
     if (motion)
         motion->angularVelocity = velocity;
+    lock.unlock();
 }
 
 void PhysicsBody::addAngularVelocity(Vector3 velocity)
 {
+    lock.lock();
     if (motion)
         motion->angularVelocity += velocity;
+    lock.unlock();
 }
 
 void PhysicsBody::translate(Vector3 v)
 {
+    lock.lock();
     translationAccumulator += v;
     translationDivision += 1.0f;
+    lock.unlock();
 }
 
 Matrix3 PhysicsBody::getInvertedInertia()

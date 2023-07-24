@@ -6,6 +6,13 @@
 #include "physics/shapes/shape.h"
 #include <vector>
 
+struct BodyPair
+{
+    PhysicsBody *a;
+    PhysicsBody *b;
+};
+
+
 class Actor;
 
 class PhysicsWorld
@@ -23,6 +30,11 @@ public:
     EXPORT std::vector<PhysicsBodyPoint> castRay(Line ray);
 
 protected:
+    void applyForces();
+    void findCollisionPairs(std::vector<BodyPair> *pairs);
+    void findCollisions(std::vector<BodyPair> *pairs, CollisionCollector *collisionCollector);
+    void solveSollisions(CollisionCollector *collisionCollector);
+
     std::vector<PhysicsBody *> bodies;
     CollisionDispatcher collisionDispatcher;
 
@@ -31,4 +43,5 @@ protected:
     float subStep = 0.0f;
 
     float simScale = 0.01f;
+    int maxThreads;
 };

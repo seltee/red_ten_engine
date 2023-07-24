@@ -6,6 +6,7 @@
 #include "physics/motion.h"
 #include "physics/constraint6DOF.h"
 #include <vector>
+#include <thread>
 
 class PhysicsBody;
 class Actor;
@@ -123,4 +124,6 @@ protected:
 
     Actor *actor = nullptr;
     Shape *shape = nullptr;
+
+    std::mutex lock;
 };

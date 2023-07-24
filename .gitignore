@@ -4,6 +4,7 @@ bin/*.exp
 bin/*.lib
 bin/*.pdb
 bin/*.so
+bin/*.ini
 bin/1-*
 bin/2-*
 bin/3-*

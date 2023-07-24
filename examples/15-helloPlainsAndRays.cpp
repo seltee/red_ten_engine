@@ -5,8 +5,6 @@
 #include "helpers.h"
 #include <math.h>
 
-const int spawnPerSecond = 2;
-
 int main()
 {
     // Engine setup
@@ -33,7 +31,7 @@ int main()
     // Layers and camera setup
     // Also enabling physics for the layer
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
-    layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f), 0.1f, 100);
+    layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f), 0.1f, 150);
 
     auto camera = layerActors->createActor<CameraPerspective>();
     camera->setWidthBasedResolution(1280);
@@ -87,45 +85,29 @@ int main()
     auto platform = layerActors->createActor<Platform>();
     platform->transform.setPosition(Vector3(0.0f, -3.0f, 0.0f));
 
-    auto sphere = layerActors->createActor<Sphere>();
-    sphere->transform.setPosition(-10.0f, 4.0f, 0.0f);
-    sphere->getPhysicsBody()->addLinearVelocity(Vector3(0.18f, 0.0f, -0.05f));
-    sphere->getPhysicsBody()->addAngularVelocity(Vector3(0.0f, 0.015f, 0.0f));
+    // spawn 400 objects
+    for (int i = 0; i < 400; i++)
+    {
+        Actor *spawn = nullptr;
+        int sp = i % 3;
+        if (sp == 0)
+            spawn = layerActors->createActor<Sphere>();
+        if (sp == 1 || sp == 2)
+            spawn = layerActors->createActor<Crate>();
 
-    auto box = layerActors->createActor<Crate>();
-    box->transform.setPosition(-1.8f, 0.0f, 1.8f);
-    box->transform.setRotation(glm::angleAxis(-0.6f, Vector3(1.0f, 0.01f, 0.0f)));
-    box->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
+        float x = (float)((i % 10) - 5) * 1.2f;
+        float z = (float)(((i / 10) % 10) - 5) * 1.2f;
+        float y = (float)(i / 100) * 1.2f + 1.0f;
 
-    auto box3 = layerActors->createActor<Crate>();
-    box3->transform.setPosition(-1.8f, 2.0f, 1.8f);
-    box3->transform.setRotation(glm::angleAxis(-0.6f, Vector3(0.4f, 1.0f, 0.0f)));
-    box3->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
+        spawn->transform.setPosition(x, y, z);
+    }
 
-    float spawnCounter = (float)spawnPerSecond;
     float rotationCounter = 0.0f;
     float impulseCounter = 0.0f;
     while (!engine->isTerminationIntended())
     {
         float delta = engine->syncFrame();
         viewController->processEvents();
-
-        // Spawn new spheres
-        spawnCounter += delta * (float)spawnPerSecond;
-        while (spawnCounter > 1.0f)
-        {
-            spawnCounter -= 1.0f;
-            int sp = rand() % 10;
-            Actor *spawn = nullptr;
-            if (sp > 4)
-                spawn = layerActors->createActor<Sphere>();
-            else
-                spawn = layerActors->createActor<Crate>();
-
-            spawn->transform.setPosition(randf(-4.0f, 4.0f), randf(6.0f, 9.0f), randf(-4.0f, 4.0f));
-            spawn->transform.setRotation(glm::angleAxis(-0.01f, Vector3(1.0f, 0.01f, 0.0f)));
-            spawn->getPhysicsBody()->addLinearVelocity(Vector3(0.1f, 0.0f, 0.0f));
-        }
 
         // Set our rotating boxes positions && calc ray end and ray start vectors
         const float distance = 5.0f;

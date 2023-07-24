@@ -1,8 +1,89 @@
 #include "physicsWorld.h"
+#include <thread>
+#include <chrono>
+
+std::mutex lock;
+
+void _processBody(std::vector<PhysicsBody *>::iterator bodyStart, std::vector<PhysicsBody *>::iterator bodyEnd, float subStep, Vector3 localGravity)
+{
+    for (; bodyStart < bodyEnd; bodyStart++)
+    {
+        (*bodyStart)->process(subStep, localGravity);
+    }
+}
+
+void _collectPairs(
+    std::vector<PhysicsBody *>::iterator bodyStart,
+    std::vector<PhysicsBody *>::iterator bodyEnd,
+    std::vector<PhysicsBody *> *bodyList,
+    std::vector<BodyPair> *list)
+{
+    for (auto a = bodyStart; a < bodyEnd; a++)
+    {
+        for (auto b = bodyList->begin(); b != bodyList->end(); b++)
+        {
+            if (a == b)
+                break;
+
+            if ((*a)->getMotionType() == MotionType::Static && (*b)->getMotionType() == MotionType::Static)
+                continue;
+
+            if ((*a)->checkAABB((*b)->getAABB()))
+            {
+                lock.lock();
+                list->push_back({*a, *b});
+                lock.unlock();
+            }
+        }
+    }
+}
+
+void _collide(
+    std::vector<BodyPair>::iterator pairStart,
+    std::vector<BodyPair>::iterator pairEnd,
+    CollisionDispatcher *collisionDispatcher,
+    CollisionCollector *collisionCollector)
+{
+    for (auto pair = pairStart; pair < pairEnd; pair++)
+    {
+        collisionDispatcher->collide(pair->a, pair->b, collisionCollector);
+    }
+}
+
+void _solve(
+    std::vector<CollisionPair>::iterator pairStart,
+    std::vector<CollisionPair>::iterator pairEnd,
+    float simScale,
+    float subStep)
+{
+    CollisionSolver collisionSolver(simScale);
+    for (auto pair = pairStart; pair < pairEnd; pair++)
+    {
+        collisionSolver.solve(pair->a, pair->b, pair->manifold, subStep);
+    }
+}
+
+void _ray(
+    std::vector<PhysicsBody *>::iterator bodyStart,
+    std::vector<PhysicsBody *>::iterator bodyEnd,
+    Line rayLocal,
+    std::vector<PhysicsBodyPoint> *points)
+{
+    for (auto body = bodyStart; body < bodyEnd; body++)
+    {
+        if (!(*body)->checkAABB(rayLocal))
+            continue;
+
+        lock.lock();
+        (*body)->castRay(rayLocal, points);
+        lock.unlock();
+    }
+}
 
 PhysicsWorld::PhysicsWorld(Vector3 gravity, float simScale, int stepsPerSecond)
 {
     setBasicParameters(gravity, simScale, stepsPerSecond);
+    maxThreads = std::thread::hardware_concurrency();
 }
 
 void PhysicsWorld::setBasicParameters(Vector3 gravity, float simScale, int stepsPerSecond)
@@ -30,8 +111,6 @@ PhysicsBody *PhysicsWorld::createPhysicsBody(Shape *shape, Actor *actor)
 void PhysicsWorld::process(float delta)
 {
     deltaAccumulator += delta;
-    Vector3 localGravity = gravity * simScale;
-    CollisionCollector collisionCollector;
 
     for (auto it = bodies.begin(); it != bodies.end(); it++)
         (*it)->prepareSteps();
@@ -40,36 +119,13 @@ void PhysicsWorld::process(float delta)
     {
         deltaAccumulator -= subStep;
 
-        for (auto it = bodies.begin(); it != bodies.end(); it++)
-        {
-            (*it)->process(subStep, localGravity);
-        }
+        CollisionCollector collisionCollector;
+        std::vector<BodyPair> pairs;
 
-        for (auto a = bodies.begin(); a != bodies.end(); a++)
-        {
-            for (auto b = bodies.begin(); b != bodies.end(); b++)
-            {
-                if (a == b)
-                    break;
-
-                if ((*a)->getMotionType() == MotionType::Static && (*b)->getMotionType() == MotionType::Static)
-                    continue;
-
-                if ((*a)->checkAABB((*b)->getAABB()))
-                {
-                    collisionDispatcher.collide(*a, *b, &collisionCollector);
-                }
-            }
-        }
-
-        if (collisionCollector.pairs.size() > 0)
-        {
-            CollisionSolver collisionSolver(simScale);
-            for (auto pair = collisionCollector.pairs.begin(); pair != collisionCollector.pairs.end(); pair++)
-            {
-                collisionSolver.solve(pair->a, pair->b, pair->manifold, subStep);
-            }
-        }
+        applyForces();
+        findCollisionPairs(&pairs);
+        findCollisions(&pairs, &collisionCollector);
+        solveSollisions(&collisionCollector);
     }
 }
 
@@ -88,16 +144,115 @@ void PhysicsWorld::removeDestroyed()
 
 std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(Line ray)
 {
-
     std::vector<PhysicsBodyPoint> points;
-
+    std::vector<std::thread> threads;
+    int bodiesPerThread = bodies.size() / maxThreads;
     Line rayLocal = Line(ray.a * simScale, ray.b * simScale);
-    for (auto body = bodies.begin(); body != bodies.end(); body++)
+    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+
+    for (int i = 0; i < maxThreads; i++)
     {
-        if (!(*body)->checkAABB(rayLocal))
-            continue;
-        (*body)->castRay(rayLocal, &points);
+        if (i == maxThreads - 1)
+            threads.push_back(std::thread(_ray, currentBody, bodies.end(), rayLocal, &points));
+        else
+        {
+            threads.push_back(std::thread(_ray, currentBody, currentBody + bodiesPerThread, rayLocal, &points));
+            currentBody += bodiesPerThread;
+        }
     }
+    for (auto &th : threads)
+        th.join();
 
     return points;
+}
+
+// Process gravitation and forces on each body
+void PhysicsWorld::applyForces()
+{
+    Vector3 localGravity = gravity * simScale;
+    std::vector<std::thread> threads;
+    int bodiesPerThread = bodies.size() / maxThreads;
+    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+    for (int i = 0; i < maxThreads; i++)
+    {
+        if (i == maxThreads - 1)
+            threads.push_back(std::thread(_processBody, currentBody, bodies.end(), subStep, localGravity));
+        else
+        {
+            threads.push_back(std::thread(_processBody, currentBody, currentBody + bodiesPerThread, subStep, localGravity));
+            currentBody += bodiesPerThread;
+        }
+    }
+    for (auto &th : threads)
+        th.join();
+}
+
+void PhysicsWorld::findCollisionPairs(std::vector<BodyPair> *pairs)
+{
+    // find possible collision pairs
+    std::vector<std::thread> threads;
+    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+    int bodiesPerThread = bodies.size() / maxThreads;
+    for (int i = 0; i < maxThreads; i++)
+    {
+        if (i == maxThreads - 1)
+            threads.push_back(std::thread(_collectPairs, currentBody, bodies.end(), &bodies, pairs));
+        else
+        {
+            threads.push_back(std::thread(_collectPairs, currentBody, currentBody + bodiesPerThread, &bodies, pairs));
+            currentBody += bodiesPerThread;
+        }
+    }
+    for (auto &th : threads)
+        th.join();
+}
+
+void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollector *collisionCollector)
+{
+
+    // find exact collisions
+    std::vector<std::thread> threads;
+    std::vector<BodyPair>::iterator currentPair = pairs->begin();
+    int pairsPerThread = pairs->size() / maxThreads;
+    for (int i = 0; i < maxThreads; i++)
+    {
+        if (i == maxThreads - 1)
+            threads.push_back(
+                std::thread(_collide, currentPair, pairs->end(), &collisionDispatcher, collisionCollector));
+        else
+        {
+            threads.push_back(
+                std::thread(_collide, currentPair, currentPair + pairsPerThread, &collisionDispatcher, collisionCollector));
+            currentPair += pairsPerThread;
+        }
+    }
+    for (auto &th : threads)
+        th.join();
+}
+
+void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
+{
+
+    // solve collision pairs
+    std::vector<std::thread> threads;
+    if (collisionCollector->pairs.size() > 0)
+    {
+        threads.clear();
+        std::vector<CollisionPair>::iterator currentCollisionPair = collisionCollector->pairs.begin();
+        int pairsPerThread = collisionCollector->pairs.size() / maxThreads;
+        for (int i = 0; i < maxThreads; i++)
+        {
+            if (i == maxThreads - 1)
+                threads.push_back(
+                    std::thread(_solve, currentCollisionPair, collisionCollector->pairs.end(), simScale, subStep));
+            else
+            {
+                threads.push_back(
+                    std::thread(_solve, currentCollisionPair, currentCollisionPair + pairsPerThread, simScale, subStep));
+                currentCollisionPair += pairsPerThread;
+            }
+        }
+        for (auto &th : threads)
+            th.join();
+    }
 }
