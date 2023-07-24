@@ -105,7 +105,7 @@ int main()
     auto backgroundActorSprite = backgroundActor->createComponent<ComponentSprite>();
     backgroundActorSprite->setTexture(background);
 
-    auto jojo = layerActors->createActor<JoJo>();
+    layerActors->createActor<JoJo>();
 
     while (!engine->isTerminationIntended())
     {

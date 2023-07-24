@@ -6,9 +6,9 @@ std::mutex lock;
 
 void _processBody(std::vector<PhysicsBody *>::iterator bodyStart, std::vector<PhysicsBody *>::iterator bodyEnd, float subStep, Vector3 localGravity)
 {
-    for (; bodyStart < bodyEnd; bodyStart++)
+    for (auto body = bodyStart; body < bodyEnd; body++)
     {
-        (*bodyStart)->process(subStep, localGravity);
+        (*body)->process(subStep, localGravity);
     }
 }
 
@@ -26,6 +26,9 @@ void _collectPairs(
                 break;
 
             if ((*a)->getMotionType() == MotionType::Static && (*b)->getMotionType() == MotionType::Static)
+                continue;
+
+            if ((*a)->isSleeping() && (*b)->isSleeping())
                 continue;
 
             if ((*a)->checkAABB((*b)->getAABB()))
@@ -232,7 +235,6 @@ void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollect
 
 void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
 {
-
     // solve collision pairs
     std::vector<std::thread> threads;
     if (collisionCollector->pairs.size() > 0)

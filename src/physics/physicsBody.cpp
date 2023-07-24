@@ -14,8 +14,25 @@ void PhysicsBody::prepareSteps()
 {
     if (transformation)
     {
-        position = transformation->getPosition() * simScale;
-        orientation = transformation->getRotation();
+        // if sleeping check if position is changed
+        if (bIsSleeping)
+        {
+            Vector3 newPosition = transformation->getPosition() * simScale;
+            Quat newOrientation = transformation->getRotation();
+
+            if (newPosition.x != position.x || newPosition.y != position.y || newPosition.z != position.z ||
+                newOrientation.x != orientation.x || newOrientation.y != orientation.y || newOrientation.z != orientation.z || newOrientation.w != orientation.w)
+            {
+                bIsSleeping = false;
+                position = newPosition;
+                orientation = newOrientation;
+            }
+        }
+        else
+        {
+            position = transformation->getPosition() * simScale;
+            orientation = transformation->getRotation();
+        }
     }
     if (translationDivision != 0.0f)
     {
@@ -27,6 +44,8 @@ void PhysicsBody::prepareSteps()
 
         translationAccumulator = Vector3(0.0f);
         translationDivision = 0.0f;
+
+        bIsSleeping = false;
     }
 }
 
@@ -108,6 +127,7 @@ Vector3 PhysicsBody::getLinearVelocity()
 void PhysicsBody::setLinearVelocity(Vector3 velocity)
 {
     lock.lock();
+    bIsSleeping = false;
     if (motion)
         motion->linearVelocity = velocity;
     lock.unlock();
@@ -116,6 +136,7 @@ void PhysicsBody::setLinearVelocity(Vector3 velocity)
 void PhysicsBody::addLinearVelocity(Vector3 velocity)
 {
     lock.lock();
+    bIsSleeping = false;
     if (motion)
         motion->linearVelocity += velocity;
     lock.unlock();
@@ -131,6 +152,7 @@ Vector3 PhysicsBody::getAngularVelocity()
 void PhysicsBody::setAngularVelocity(Vector3 velocity)
 {
     lock.lock();
+    bIsSleeping = false;
     if (motion)
         motion->angularVelocity = velocity;
     lock.unlock();
@@ -139,6 +161,7 @@ void PhysicsBody::setAngularVelocity(Vector3 velocity)
 void PhysicsBody::addAngularVelocity(Vector3 velocity)
 {
     lock.lock();
+    bIsSleeping = false;
     if (motion)
         motion->angularVelocity += velocity;
     lock.unlock();
@@ -173,6 +196,14 @@ Vector3 PhysicsBody::getPointVelocity(Vector3 localPoint)
 
 void PhysicsBody::process(float delta, Vector3 gravity)
 {
+    if (bIsSleeping)
+        return;
+    if (motionType == MotionType::Static)
+    {
+        setAsleep();
+        return;
+    }
+
     if (motion)
     {
         if (constraints.size() > 0)
@@ -199,6 +230,17 @@ void PhysicsBody::process(float delta, Vector3 gravity)
     localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
     localTransform *= glm::toMat4(orientation);
     this->shape->provideTransformation(&localTransform);
+
+    if (glm::length2(motion->linearVelocity) < delta * 0.9f && glm::length2(motion->angularVelocity) < delta * 0.9f)
+    {
+        sleepAccumulator += delta;
+        if (sleepAccumulator > 0.7f)
+            setAsleep();
+    }
+    else
+    {
+        sleepAccumulator = 0.0f;
+    }
 }
 
 void PhysicsBody::castRay(Line ray, std::vector<PhysicsBodyPoint> *points)
@@ -211,4 +253,12 @@ void PhysicsBody::castRay(Line ray, std::vector<PhysicsBodyPoint> *points)
             points->push_back({actor, point->point / simScale, point->distance});
         }
     }
+}
+
+void PhysicsBody::setAsleep()
+{
+    bIsSleeping = true;
+    localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+    localTransform *= glm::toMat4(orientation);
+    this->shape->provideTransformation(&localTransform);
 }

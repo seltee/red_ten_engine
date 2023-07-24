@@ -13,9 +13,8 @@ class Actor;
 
 enum class MotionType : unsigned char
 {
-    Static,    ///< Non movable
-//    Kinematic, ///< Movable using velocities only, does not respond to forces
-    Dynamic,   ///< Responds to forces as a normal physics object
+    Static,  ///< Non movable
+    Dynamic, ///< Responds to forces as a normal physics object
 };
 
 struct PhysicsBodyPoint
@@ -59,7 +58,8 @@ public:
 
     EXPORT void translate(Vector3 v);
 
-    EXPORT void addConstraint6DOF(Constraint6DOFDescriptor descriptor){
+    EXPORT void addConstraint6DOF(Constraint6DOFDescriptor descriptor)
+    {
         auto constraint = new Constraint6DOF(descriptor);
         constraints.push_back(constraint);
     }
@@ -102,9 +102,19 @@ public:
     {
         return this->shape->getAABB();
     }
+    inline bool isSleeping()
+    {
+        return bIsSleeping;
+    }
+    inline void forceWake()
+    {
+        bIsSleeping = false;
+    }
+
+    void setAsleep();
 
 protected:
-    std::vector<Constraint*> constraints;
+    std::vector<Constraint *> constraints;
     Vector3 translationAccumulator = Vector3(0.0f);
     float translationDivision = 0.0f;
 
@@ -126,4 +136,7 @@ protected:
     Shape *shape = nullptr;
 
     std::mutex lock;
+
+    bool bIsSleeping = false;
+    float sleepAccumulator = 0.0f;
 };
