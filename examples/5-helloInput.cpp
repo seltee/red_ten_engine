@@ -32,18 +32,18 @@ public:
         // Second parameter is a multiplier of device input making it here in range from -400 to 400
         // Note that keyboard usually have input of 0 to 1, but axises have input from -1 to 1.
         // Also some gamepad axises may have -1 in their rest position, like triggers
-        inputX->addKeyboardBinding(KeyboardCodes::D, 400.0f);
-        inputX->addKeyboardBinding(KeyboardCodes::A, -400.0f);
-        inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 400.0f);
-        inputX->addKeyboardBinding(KeyboardCodes::LEFT, -400.0f);
-        inputX->addGamepadAxisBinding(0, 400.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::D, 5.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::A, -5.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 5.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::LEFT, -5.0f);
+        inputX->addGamepadAxisBinding(0, 5.0f);
 
         auto inputY = registerAxisCallback(this, &CratePlayer::controlY);
-        inputY->addKeyboardBinding(KeyboardCodes::S, -400.0f);
-        inputY->addKeyboardBinding(KeyboardCodes::W, 400.0f);
-        inputY->addKeyboardBinding(KeyboardCodes::DOWN, -400.0f);
-        inputY->addKeyboardBinding(KeyboardCodes::UP, 400.0f);
-        inputY->addGamepadAxisBinding(1, -400.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::S, -5.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::W, 5.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::DOWN, -5.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::UP, 5.0f);
+        inputY->addGamepadAxisBinding(1, -5.0f);
 
         auto inputHide = registerButtonCallback(this, &CratePlayer::hideSurrounding);
         inputHide->addKeyboardBinding(KeyboardCodes::SPACE, 1.0f);
@@ -160,7 +160,7 @@ int main()
     auto camera = layerActors->createActor<CameraOrto>();
     camera->setWidthBasedResolution(1280);
 
-    layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f));
+    layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f), 0.01f, 100);
 
     // Textures setup
     auto resourceController = engine->getResourceController();

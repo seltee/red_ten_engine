@@ -156,8 +156,6 @@ void CollisionDispatcher::collideOBBVsPlain(PhysicsBody *OBB, PhysicsBody *plain
         float depth = 0.0f;
         for (int i = 0; i < 8; i++)
         {
-            // debug->addDebugBox(points[i] / 0.1f, 0.1f, 0.04f, Vector3(0.6f, 0.0f, 0.0f));
-
             Vector3 p = Vector3(points[i].x, points[i].y, points[i].z);
             Vector3 closest = plainShape->getClosestPoint(p);
             Vector3 difference = p - closest;
@@ -177,7 +175,6 @@ void CollisionDispatcher::collideOBBVsPlain(PhysicsBody *OBB, PhysicsBody *plain
             manifold.normal = -sideNormal;
             manifold.depth = depth;
             manifold.addCollisionPoint(c, plainShape->getClosestPoint(c));
-
             collector->addBodyPair(OBB, plain, manifold);
         }
     }

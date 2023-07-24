@@ -10,6 +10,13 @@ void CollisionSolver::solve(PhysicsBody *a, PhysicsBody *b, CollisionManifold &m
 {
     Vector3 normal = manifold.normal;
     float depth = manifold.depth;
+
+    Vector3 translate = (normal * depth) * 0.6f;
+    if (a->getMotionType() != MotionType::Static)
+        a->translate((b->getMotionType() != MotionType::Static) ? -translate / 2.0f : -translate);
+    if (b->getMotionType() != MotionType::Static)
+        b->translate((a->getMotionType() != MotionType::Static) ? translate / 2.0f : translate);
+
     Vector3 pointA = manifold.pointsOnA[0];
     Vector3 pointB = manifold.pointsOnB[0];
     Vector3 localPointA = pointA - a->getCenterOfMass();
@@ -33,12 +40,6 @@ void CollisionSolver::solve(PhysicsBody *a, PhysicsBody *b, CollisionManifold &m
         normalVelocityBias = combinedRestitution * normalVelocity;
 
     // printf("normalVelocityBias %f, %f\n", normalVelocityBias, normalVelocity);
-
-    Vector3 translate = normal * depth;
-    if (a->getMotionType() != MotionType::Static)
-        a->translate(-translate);
-    if (b->getMotionType() != MotionType::Static)
-        b->translate(translate);
 
     float lambda = solveAxis(
         a,

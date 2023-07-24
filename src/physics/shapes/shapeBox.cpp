@@ -21,7 +21,7 @@ ShapeBox::ShapeBox(Vector3 center, Vector3 size, PhysicsWorld *world) : ShapeCon
 ShapeBox::ShapeBox(Vector2 center, Vector2 size, PhysicsWorld *world) : ShapeConvex(Vector3(center.x, center.y, 0.0f))
 {
     Vector3 center3 = Vector3(center.x, center.y, 0.0f);
-    Vector3 size3 = Vector3(size.x, size.y, 10.0f);
+    Vector3 size3 = Vector3(size.x, size.y, (size.x + size.y) / 2.0f);
 
     this->size = size3 * world->getSimScale();
 
@@ -106,10 +106,10 @@ Hull *ShapeBox::getHull()
 
         int p4[] = {4, 1, 7, 3};
         hull->addPolygon(p4, 4);
-        
+
         int p5[] = {0, 3, 7, 5};
         hull->addPolygon(p5, 4);
-        
+
         int p6[] = {2, 6, 1, 4};
         hull->addPolygon(p6, 4);
 

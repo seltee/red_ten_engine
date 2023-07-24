@@ -34,18 +34,55 @@ void PhysicsBody::prepareSteps()
             orientation = transformation->getRotation();
         }
     }
-    if (translationDivision != 0.0f)
+}
+
+void PhysicsBody::finishStep(float delta)
+{
+    if (glm::length2(translationAccumulator) > 0.0000000001f)
     {
         if (constraints.size() > 0)
             for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
                 translationAccumulator = (*constraint)->processTranslation(translationAccumulator);
 
-        position += translationAccumulator / translationDivision;
-
+        position += translationAccumulator;
         translationAccumulator = Vector3(0.0f);
-        translationDivision = 0.0f;
-
         bIsSleeping = false;
+    }
+
+    if (motion && !bIsSleeping)
+    {
+        if (constraints.size() > 0)
+            for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
+                (*constraint)->processMotion(motion);
+
+        position += motion->linearVelocity * delta;
+
+        Vector3 angularVelocityDelta = motion->angularVelocity * delta;
+        float len = glm::length(angularVelocityDelta);
+        if (len > 1.0e-6f)
+        {
+            orientation = glm::normalize(glm::angleAxis(len, angularVelocityDelta / len) * orientation);
+        }
+
+        if (transformation)
+        {
+            transformation->setPosition(position / simScale);
+            transformation->setRotation(orientation);
+        }
+
+        localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+        localTransform *= glm::toMat4(orientation);
+        this->shape->provideTransformation(&localTransform);
+
+
+        if (glm::length2(motion->linearVelocity) < delta && glm::length2(motion->angularVelocity) < delta)
+        {
+            sleepAccumulator += delta;
+            if (sleepAccumulator > 0.8f)
+                setAsleep();
+        }
+        else
+            sleepAccumulator = 0.0f;
     }
 }
 
@@ -137,6 +174,7 @@ void PhysicsBody::addLinearVelocity(Vector3 velocity)
 {
     lock.lock();
     bIsSleeping = false;
+    sleepAccumulator = 0.0f;
     if (motion)
         motion->linearVelocity += velocity;
     lock.unlock();
@@ -153,6 +191,7 @@ void PhysicsBody::setAngularVelocity(Vector3 velocity)
 {
     lock.lock();
     bIsSleeping = false;
+    sleepAccumulator = 0.0f;
     if (motion)
         motion->angularVelocity = velocity;
     lock.unlock();
@@ -162,6 +201,7 @@ void PhysicsBody::addAngularVelocity(Vector3 velocity)
 {
     lock.lock();
     bIsSleeping = false;
+    sleepAccumulator = 0.0f;
     if (motion)
         motion->angularVelocity += velocity;
     lock.unlock();
@@ -171,7 +211,8 @@ void PhysicsBody::translate(Vector3 v)
 {
     lock.lock();
     translationAccumulator += v;
-    translationDivision += 1.0f;
+    bIsSleeping = false;
+    sleepAccumulator = 0.0f;
     lock.unlock();
 }
 
@@ -206,40 +247,7 @@ void PhysicsBody::process(float delta, Vector3 gravity)
 
     if (motion)
     {
-        if (constraints.size() > 0)
-            for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
-                (*constraint)->processMotion(motion);
-
         motion->process(delta, gravity, orientation);
-        position += motion->linearVelocity * delta;
-
-        Vector3 angularVelocityDelta = motion->angularVelocity * delta;
-        float len = glm::length(angularVelocityDelta);
-        if (len > 1.0e-6f)
-        {
-            orientation = glm::normalize(glm::angleAxis(len, angularVelocityDelta / len) * orientation);
-        }
-    }
-
-    if (transformation)
-    {
-        transformation->setPosition(position / simScale);
-        transformation->setRotation(orientation);
-    }
-
-    localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
-    localTransform *= glm::toMat4(orientation);
-    this->shape->provideTransformation(&localTransform);
-
-    if (glm::length2(motion->linearVelocity) < delta * 0.9f && glm::length2(motion->angularVelocity) < delta * 0.9f)
-    {
-        sleepAccumulator += delta;
-        if (sleepAccumulator > 0.7f)
-            setAsleep();
-    }
-    else
-    {
-        sleepAccumulator = 0.0f;
     }
 }
 

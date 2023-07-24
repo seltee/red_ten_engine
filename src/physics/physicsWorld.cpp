@@ -4,12 +4,22 @@
 
 std::mutex lock;
 
+void _prepareBody(std::vector<PhysicsBody *>::iterator bodyStart, std::vector<PhysicsBody *>::iterator bodyEnd)
+{
+    for (auto body = bodyStart; body < bodyEnd; body++)
+        (*body)->prepareSteps();
+}
+
 void _processBody(std::vector<PhysicsBody *>::iterator bodyStart, std::vector<PhysicsBody *>::iterator bodyEnd, float subStep, Vector3 localGravity)
 {
     for (auto body = bodyStart; body < bodyEnd; body++)
-    {
         (*body)->process(subStep, localGravity);
-    }
+}
+
+void _finishBody(std::vector<PhysicsBody *>::iterator bodyStart, std::vector<PhysicsBody *>::iterator bodyEnd, float subStep)
+{
+    for (auto body = bodyStart; body < bodyEnd; body++)
+        (*body)->finishStep(subStep);
 }
 
 void _collectPairs(
@@ -92,8 +102,8 @@ PhysicsWorld::PhysicsWorld(Vector3 gravity, float simScale, int stepsPerSecond)
 void PhysicsWorld::setBasicParameters(Vector3 gravity, float simScale, int stepsPerSecond)
 {
     this->gravity = gravity;
-    subStep = 1.0f / (float)stepsPerSecond;
     this->simScale = simScale;
+    this->subStep = 1.0f / (float)stepsPerSecond;
 }
 
 float PhysicsWorld::getSimScale()
@@ -114,9 +124,7 @@ PhysicsBody *PhysicsWorld::createPhysicsBody(Shape *shape, Actor *actor)
 void PhysicsWorld::process(float delta)
 {
     deltaAccumulator += delta;
-
-    for (auto it = bodies.begin(); it != bodies.end(); it++)
-        (*it)->prepareSteps();
+    prepareBodies();
 
     while (deltaAccumulator > subStep)
     {
@@ -129,6 +137,7 @@ void PhysicsWorld::process(float delta)
         findCollisionPairs(&pairs);
         findCollisions(&pairs, &collisionCollector);
         solveSollisions(&collisionCollector);
+        finishStep();
     }
 }
 
@@ -167,6 +176,26 @@ std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(Line ray)
         th.join();
 
     return points;
+}
+
+// Prepare global before multiple physics steps
+void PhysicsWorld::prepareBodies()
+{
+    std::vector<std::thread> threads;
+    int bodiesPerThread = bodies.size() / maxThreads;
+    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+    for (int i = 0; i < maxThreads; i++)
+    {
+        if (i == maxThreads - 1)
+            threads.push_back(std::thread(_prepareBody, currentBody, bodies.end()));
+        else
+        {
+            threads.push_back(std::thread(_prepareBody, currentBody, currentBody + bodiesPerThread));
+            currentBody += bodiesPerThread;
+        }
+    }
+    for (auto &th : threads)
+        th.join();
 }
 
 // Process gravitation and forces on each body
@@ -257,4 +286,23 @@ void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
         for (auto &th : threads)
             th.join();
     }
+}
+
+void PhysicsWorld::finishStep()
+{
+    std::vector<std::thread> threads;
+    int bodiesPerThread = bodies.size() / maxThreads;
+    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+    for (int i = 0; i < maxThreads; i++)
+    {
+        if (i == maxThreads - 1)
+            threads.push_back(std::thread(_finishBody, currentBody, bodies.end(), subStep));
+        else
+        {
+            threads.push_back(std::thread(_finishBody, currentBody, currentBody + bodiesPerThread, subStep));
+            currentBody += bodiesPerThread;
+        }
+    }
+    for (auto &th : threads)
+        th.join();
 }

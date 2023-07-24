@@ -30,10 +30,12 @@ public:
     EXPORT std::vector<PhysicsBodyPoint> castRay(Line ray);
 
 protected:
+    void prepareBodies();
     void applyForces();
     void findCollisionPairs(std::vector<BodyPair> *pairs);
     void findCollisions(std::vector<BodyPair> *pairs, CollisionCollector *collisionCollector);
     void solveSollisions(CollisionCollector *collisionCollector);
+    void finishStep();
 
     std::vector<PhysicsBody *> bodies;
     CollisionDispatcher collisionDispatcher;

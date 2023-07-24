@@ -30,6 +30,7 @@ public:
     PhysicsBody(Shape *shape, float simScale);
     virtual ~PhysicsBody();
     EXPORT void prepareSteps();
+    EXPORT void finishStep(float delta);
 
     EXPORT void setRelation(Transformation *transformation);
     EXPORT void setStaticMotionType();
@@ -116,7 +117,6 @@ public:
 protected:
     std::vector<Constraint *> constraints;
     Vector3 translationAccumulator = Vector3(0.0f);
-    float translationDivision = 0.0f;
 
     Transformation *transformation = nullptr;
 
