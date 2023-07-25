@@ -6,12 +6,12 @@
 #include "common/utils.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
-SoundController *Camera::soundController = nullptr;
+AudioController *Camera::audioController = nullptr;
 
 Camera::Camera()
 {
     registerClassName("Camera");
-    if (!soundController->getListenerCamera())
+    if (!audioController->getListenerCamera())
     {
         setAsListenerCamera();
     }
@@ -68,19 +68,19 @@ void Camera::onProcess(float delta)
 {
     if (isListenerCamera())
     {
-        soundController->getAudioBase()->setPosition(transform.getPosition());
-        soundController->getAudioBase()->setOrientation(transform.getRotation());
+        audioController->getAudioBase()->setPosition(transform.getPosition());
+        audioController->getAudioBase()->setOrientation(transform.getRotation());
     }
 }
 
 void Camera::setAsListenerCamera()
 {
-    soundController->setListenerCamera(this);
+    audioController->setListenerCamera(this);
 }
 
 bool Camera::isListenerCamera()
 {
-    return this == soundController->getListenerCamera();
+    return this == audioController->getListenerCamera();
 }
 
 float Camera::getLineThickness()
@@ -88,7 +88,7 @@ float Camera::getLineThickness()
     return 0.01f;
 }
 
-void Camera::setSoundController(SoundController *soundController)
+void Camera::setAudioController(AudioController *audioController)
 {
-    Camera::soundController = soundController;
+    Camera::audioController = audioController;
 }

@@ -7,7 +7,7 @@
 #include "actor/actor.h"
 #include "stage/layer.h"
 #include "math/math.h"
-#include "controller/soundController.h"
+#include "controller/audioController.h"
 #include <list>
 
 class Camera : public Actor
@@ -32,11 +32,11 @@ public:
     
     EXPORT virtual float getLineThickness();
 
-    static void setSoundController(SoundController *soundController);
+    static void setAudioController(AudioController *audioController);
 
 protected:
     Matrix4 projectionMatrix;
     Matrix4 viewMatrix;
 
-    static SoundController *soundController;
+    static AudioController *audioController;
 };

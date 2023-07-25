@@ -1,12 +1,12 @@
 // SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "soundController.h"
+#include "audioController.h"
 #include "audio/audioCreator.h"
 #include <stdio.h>
 #include <string>
 
-SoundController::SoundController(Config *config)
+AudioController::AudioController(Config *config)
 {
     audioBase = AudioCreator::createAudio(config);
     audioBase->getDevicesList(&devicesList);
@@ -33,26 +33,26 @@ SoundController::SoundController(Config *config)
     logger->logff("Sound Enabled using %s", prefferedDevice.c_str());
 }
 
-void SoundController::update()
+void AudioController::update()
 {
 }
 
-void SoundController::process(float delta)
+void AudioController::process(float delta)
 {
     audioBase->process(delta);
 }
 
-AudioBase *SoundController::getAudioBase()
+AudioBase *AudioController::getAudioBase()
 {
     return audioBase;
 }
 
-void SoundController::setListenerCamera(void *listenerCamera)
+void AudioController::setListenerCamera(void *listenerCamera)
 {
     this->listenerCamera = listenerCamera;
 }
 
-void *SoundController::getListenerCamera()
+void *AudioController::getListenerCamera()
 {
     return listenerCamera;
 }

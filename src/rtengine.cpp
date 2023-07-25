@@ -17,7 +17,7 @@ ViewController *RTEngine::viewController = nullptr;
 StageController *RTEngine::stageController = nullptr;
 ResourceController *RTEngine::resourceController = nullptr;
 InputController *RTEngine::inputController = nullptr;
-SoundController *RTEngine::soundController = nullptr;
+AudioController *RTEngine::audioController = nullptr;
 LogController *RTEngine::logController = nullptr;
 ConfigController *RTEngine::configController = nullptr;
 DebugController *RTEngine::debugController = nullptr;
@@ -75,12 +75,12 @@ RTEngine::RTEngine(std::string configFilePath)
         WithRepository::setResourceController(resourceController);
     }
 
-    if (!soundController)
+    if (!audioController)
     {
-        soundController = new SoundController(config);
-        configController->setSoundController(soundController);
-        Camera::setSoundController(soundController);
-        SoundPlayer::setSoundController(soundController);
+        audioController = new AudioController(config);
+        configController->setAudioController(audioController);
+        Camera::setAudioController(audioController);
+        SoundPlayer::setAudioController(audioController);
     }
 
     if (!meshMaker)
@@ -167,7 +167,7 @@ float RTEngine::syncFrame()
         logController->logConsole("FPS %i", fps);
     }
 
-    soundController->process(delta);
+    audioController->process(delta);
     debugController->process(delta);
     return delta;
 }

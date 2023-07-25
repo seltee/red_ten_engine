@@ -5,7 +5,7 @@
 #include "common/utils.h"
 #include "common/childProcess.h"
 #include "math/math.h"
-#include "controller/soundController.h"
+#include "controller/audioController.h"
 #include "resource/sound.h"
 #include "audio/audioSource.h"
 
@@ -31,7 +31,7 @@ public:
     EXPORT void setVolume(float volume);
     EXPORT float getVolume();
 
-    static void setSoundController(SoundController *soundController);
+    static void setAudioController(AudioController *audioController);
 
 protected:
     Sound *sound = nullptr;
@@ -40,5 +40,5 @@ protected:
 
     bool repeatStream = false;
 
-    static SoundController *soundController;
+    static AudioController *audioController;
 };

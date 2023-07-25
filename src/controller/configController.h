@@ -2,7 +2,7 @@
 #include "common/config.h"
 #include "common/utils.h"
 #include "controller/viewController.h"
-#include "controller/soundController.h"
+#include "controller/audioController.h"
 
 class ConfigController
 {
@@ -12,10 +12,10 @@ public:
     EXPORT void applyConfig();
     
     void setViewController(ViewController *viewController);
-    void setSoundController(SoundController *soundController);
+    void setAudioController(AudioController *audioController);
 
 protected:
     Config *config;
     ViewController *viewController;
-    SoundController *soundController;
+    AudioController *audioController;
 };

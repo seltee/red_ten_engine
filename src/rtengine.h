@@ -31,7 +31,7 @@
 #include "controller/stageController.h"
 #include "controller/resourceController.h"
 #include "controller/inputController.h"
-#include "controller/soundController.h"
+#include "controller/audioController.h"
 #include "controller/logController.h"
 #include "controller/configController.h"
 #include "controller/debugController.h"
@@ -59,7 +59,7 @@ protected:
     static StageController *stageController;
     static ResourceController *resourceController;
     static InputController *inputController;
-    static SoundController *soundController;
+    static AudioController *audioController;
     static LogController *logController;
     static ConfigController *configController;
     static DebugController *debugController;

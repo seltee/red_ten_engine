@@ -64,7 +64,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
 			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o \
 			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o \
-			${OBJDIR}/soundController.o ${OBJDIR}/resourceController.o \
+			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o ${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o \
@@ -105,8 +105,8 @@ ${OBJDIR}/stageController.o: ${SRCDIR}/controller/stageController.cpp
 ${OBJDIR}/resourceController.o: ${SRCDIR}/controller/resourceController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceController.o ${SRCDIR}/controller/resourceController.cpp
 
-${OBJDIR}/soundController.o: ${SRCDIR}/controller/soundController.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/soundController.o ${SRCDIR}/controller/soundController.cpp
+${OBJDIR}/audioController.o: ${SRCDIR}/controller/audioController.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/audioController.o ${SRCDIR}/controller/audioController.cpp
 
 ${OBJDIR}/inputController.o: ${SRCDIR}/controller/inputController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/inputController.o ${SRCDIR}/controller/inputController.cpp

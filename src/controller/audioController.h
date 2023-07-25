@@ -11,10 +11,10 @@
 #include <vector>
 #include <string>
 
-class SoundController : WithLogger
+class AudioController : WithLogger
 {
 public:
-    SoundController(Config *config);
+    AudioController(Config *config);
     void update();
 
     void process(float delta);
