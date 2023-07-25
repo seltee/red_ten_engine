@@ -26,9 +26,10 @@ enum class ShapeCollisionType
     None = 0,
     Plain = 1,
     Sphere = 2,
-    OBB = 3,
-    Convex = 4,
-    Amount = 5
+    Convex = 3,
+    OBB = 4,
+    Polygon = 5,
+    Amount = 6
 };
 
 class Shape

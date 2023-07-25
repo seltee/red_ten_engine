@@ -30,6 +30,11 @@ void ShapeConvex::updateTransformation()
     }
 }
 
+ShapeCollisionType ShapeConvex::getType()
+{
+    return ShapeCollisionType::Convex;
+}
+
 // From Christer Ericson - Real-Time Collision Detection
 bool ShapeConvex::testRay(Line line, std::vector<RayCollisionPoint> *points)
 {
@@ -199,6 +204,31 @@ Vector3 ShapeConvex::findFurthestPoint(Vector3 direction)
         return hull->absoluteVerticies[outVertex];
     }
     return Vector3(0.0f, 0.0f, 0.0f);
+}
+
+Vector3 ShapeConvex::getClosestPointToHull(Vector3 point)
+{
+    float minDistance = MAXFLOAT;
+    Vector3 closestPoint(0);
+    Hull *hull = getHull();
+    if (!hull)
+        return closestPoint;
+
+    for (auto polygonIt = hull->polies.begin(); polygonIt != hull->polies.end(); polygonIt++)
+    {
+        Vector3 polyPoints[8];
+        for (int i = 0; i < (*polygonIt).pointsAmount;i++){
+            polyPoints[i] = hull->absoluteVerticies[(*polygonIt).points[i]];
+        }
+
+        Vector3 closestCurrent = getClosestPointOnPolygon(polyPoints, (*polygonIt).pointsAmount, (*polygonIt).absoluteNormal, point);
+        float distance = glm::length(point - closestCurrent);
+        if (distance < minDistance){
+            minDistance = distance;
+            closestPoint = closestCurrent;
+        }
+    }
+    return closestPoint;
 }
 
 void ShapeConvex::renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness)

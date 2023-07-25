@@ -36,6 +36,8 @@ std::string Shape::getTypeName(ShapeCollisionType type)
         return "Convex";
     case ShapeCollisionType::Plain:
         return "Plain";
+    case ShapeCollisionType::Polygon:
+        return "PolygonalGeometry";
     case ShapeCollisionType::Amount:
         return "Amount???";
     }

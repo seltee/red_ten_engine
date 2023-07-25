@@ -52,7 +52,6 @@ public:
         sphere->setFrictionAndRestitution(0.8f, 0.1f);
         sphere->setPhysicsMotionType(MotionType::Dynamic);
         sphere->transform.setPosition(x, y, z);
-        sphere->showBoundingBox(true);
 
         return sphere;
     }

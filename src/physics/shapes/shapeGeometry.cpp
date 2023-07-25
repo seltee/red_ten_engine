@@ -20,6 +20,10 @@ Geometry *ShapeGeometry::getGeometry()
     return geometry;
 }
 
+ShapeCollisionType ShapeGeometry::getType(){
+    return ShapeCollisionType::Polygon;
+}
+
 void ShapeGeometry::provideTransformation(Matrix4 *transformation)
 {
     aabb = AABB(Vector3(FLT_MAX), Vector3(-FLT_MAX));
@@ -38,6 +42,28 @@ void ShapeGeometry::provideTransformation(Matrix4 *transformation)
         aabb.end.y = fmaxf(vertexes[i].y, aabb.end.y);
         aabb.end.z = fmaxf(vertexes[i].z, aabb.end.z);
     }
+}
+
+Vector3 ShapeGeometry::getClosestPoint(Vector3 point)
+{
+    int polyCount = vertexAmount / 3;
+    float minDistance = MAXFLOAT;
+    Vector3 out(0.0f);
+    for (int i = 0; i < polyCount; i++)
+    {
+        int s = i * 3;
+        Vector3 v1 = vertexes[s];
+        Vector3 v2 = vertexes[s + 1];
+        Vector3 v3 = vertexes[s + 2];
+
+        Vector3 closest = getClosestPointOnTriangle(v1, v2, v3, point);
+        float distance = glm::length(closest - point);
+        if (distance < minDistance){
+            minDistance = distance;
+            out = closest;
+        }
+    }
+    return out;
 }
 
 bool ShapeGeometry::testRay(Line line, std::vector<RayCollisionPoint> *points)

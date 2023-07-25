@@ -3,6 +3,7 @@
 #include "physics/shapes/shapeSphere.h"
 #include "physics/shapes/shapeBox.h"
 #include "physics/shapes/shapeConvex.h"
+#include "physics/shapes/shapeGeometry.h"
 #include "math/hullCliping.h"
 #include <vector>
 
@@ -31,6 +32,26 @@ CollisionDispatcher::CollisionDispatcher()
         CollisionDispatcher::collideSphereVsSphere(sphere1, sphere2, collector);
     };
 
+    collectCollisions[(int)ShapeCollisionType::Sphere][(int)ShapeCollisionType::Polygon] = [](PhysicsBody *sphere, PhysicsBody *geometry, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideSphereVsGeometry(sphere, geometry, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Polygon][(int)ShapeCollisionType::Sphere] = [](PhysicsBody *geometry, PhysicsBody *sphere, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideSphereVsGeometry(sphere, geometry, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Sphere][(int)ShapeCollisionType::Convex] = [](PhysicsBody *sphere, PhysicsBody *convex, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideSphereVsConvex(sphere, convex, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Convex][(int)ShapeCollisionType::Sphere] = [](PhysicsBody *convex, PhysicsBody *sphere, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideSphereVsConvex(sphere, convex, collector);
+    };
+
     collectCollisions[(int)ShapeCollisionType::OBB][(int)ShapeCollisionType::Plain] = [](PhysicsBody *OBB, PhysicsBody *plain, CollisionCollector *collector)
     {
         CollisionDispatcher::collideOBBVsPlain(OBB, plain, collector);
@@ -54,6 +75,21 @@ CollisionDispatcher::CollisionDispatcher()
     collectCollisions[(int)ShapeCollisionType::OBB][(int)ShapeCollisionType::OBB] = [](PhysicsBody *OBB_A, PhysicsBody *OBB_B, CollisionCollector *collector)
     {
         CollisionDispatcher::collideConvexVsConvex(OBB_A, OBB_B, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Convex][(int)ShapeCollisionType::Convex] = [](PhysicsBody *convexA, PhysicsBody *convexB, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideConvexVsConvex(convexA, convexB, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Convex][(int)ShapeCollisionType::Plain] = [](PhysicsBody *convex, PhysicsBody *plain, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideConvexVsPlain(convex, plain, collector);
+    };
+
+    collectCollisions[(int)ShapeCollisionType::Plain][(int)ShapeCollisionType::Convex] = [](PhysicsBody *plain, PhysicsBody *convex, CollisionCollector *collector)
+    {
+        CollisionDispatcher::collideConvexVsPlain(convex, plain, collector);
     };
 }
 
@@ -102,6 +138,50 @@ void CollisionDispatcher::collideSphereVsSphere(PhysicsBody *sphereA, PhysicsBod
         manifold.addCollisionPoint(Vector3(sphereAPosition + manifold.normal * shapeARadius), Vector3(sphereBPosition - manifold.normal * shapeBRadius));
 
         collector->addBodyPair(sphereA, sphereB, manifold);
+    }
+}
+
+void CollisionDispatcher::collideSphereVsConvex(PhysicsBody *sphere, PhysicsBody *convex, CollisionCollector *collector)
+{
+    ShapeSphere *sphereShape = (ShapeSphere *)sphere->getShape();
+    ShapeConvex *geometryShape = (ShapeConvex *)convex->getShape();
+
+    Vector3 center = sphere->getCenterOfMass();
+    Vector3 closest = geometryShape->getClosestPointToHull(center);
+
+    Vector3 difference = closest - center;
+    float distance = glm::length(difference);
+    if (distance < sphereShape->getRadius())
+    {
+        CollisionManifold manifold;
+        manifold.normal = difference / distance;
+        manifold.depth = sphereShape->getRadius() - distance;
+        Vector3 collisionPoint = Vector3(center + manifold.normal * sphereShape->getRadius());
+        manifold.addCollisionPoint(collisionPoint, closest);
+
+        collector->addBodyPair(sphere, convex, manifold);
+    }
+}
+
+void CollisionDispatcher::collideSphereVsGeometry(PhysicsBody *sphere, PhysicsBody *geometry, CollisionCollector *collector)
+{
+    ShapeSphere *sphereShape = (ShapeSphere *)sphere->getShape();
+    ShapeGeometry *geometryShape = (ShapeGeometry *)geometry->getShape();
+
+    Vector3 center = sphere->getCenterOfMass();
+    Vector3 closest = geometryShape->getClosestPoint(center);
+
+    Vector3 difference = closest - center;
+    float distance = glm::length(difference);
+    if (distance < sphereShape->getRadius())
+    {
+        CollisionManifold manifold;
+        manifold.normal = difference / distance;
+        manifold.depth = sphereShape->getRadius() - distance;
+        Vector3 collisionPoint = Vector3(center + manifold.normal * sphereShape->getRadius());
+        manifold.addCollisionPoint(collisionPoint, closest);
+
+        collector->addBodyPair(sphere, geometry, manifold);
     }
 }
 
@@ -263,5 +343,45 @@ void CollisionDispatcher::collideConvexVsConvex(PhysicsBody *convexA, PhysicsBod
     if (manifold.collisionAmount > 0)
     {
         collector->addBodyPair(convexA, convexB, manifold);
+    }
+}
+
+void CollisionDispatcher::collideConvexVsPlain(PhysicsBody *convex, PhysicsBody *plain, CollisionCollector *collector)
+{
+    ShapeConvex *convexShape = (ShapeConvex *)convex->getShape();
+    ShapePlain *plainShape = (ShapePlain *)plain->getShape();
+
+    Hull *hull = convexShape->getHull();
+    if (!hull)
+        return;
+
+    Vector3 convexCenter = convex->getCenterOfMass();
+    Vector3 closestToCenter = plainShape->getClosestPoint(convexCenter);
+    Vector3 sideNormal = glm::normalize(convexCenter - closestToCenter);
+
+    float n = 0.0f;
+    Vector3 c = Vector3(0.0f);
+    float depth = 0.0f;
+    for (int i = 0; i < hull->amountOfVertices; i++)
+    {
+        Vector3 p = Vector3(hull->absoluteVerticies[i]);
+        Vector3 closest = plainShape->getClosestPoint(p);
+        Vector3 difference = p - closest;
+
+        if (glm::dot(sideNormal, difference) < 0.0f)
+        {
+            c += p;
+            n += 1.0f;
+            depth = fmaxf(glm::length(difference), depth);
+        }
+    }
+    if (n > 0.0f)
+    {
+        c /= n;
+        CollisionManifold manifold;
+        manifold.normal = -sideNormal;
+        manifold.depth = depth;
+        manifold.addCollisionPoint(c, plainShape->getClosestPoint(c));
+        collector->addBodyPair(convex, plain, manifold);
     }
 }

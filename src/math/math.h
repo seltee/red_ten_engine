@@ -214,7 +214,8 @@ inline bool testRayAgainstPolygon(Vector3 &pA, Vector3 &pB, Vector3 &pC, Line &l
     Vector3 h = glm::cross(dir_norm, e1);
     const float a = glm::dot(e0, h);
 
-    if (a > -epsilon && a < epsilon) {
+    if (a > -epsilon && a < epsilon)
+    {
         return false;
     }
 
@@ -222,20 +223,23 @@ inline bool testRayAgainstPolygon(Vector3 &pA, Vector3 &pB, Vector3 &pC, Line &l
     const float f = 1.0f / a;
     const float u = f * glm::dot(s, h);
 
-    if (u < 0.0f || u > 1.0f) {
+    if (u < 0.0f || u > 1.0f)
+    {
         return false;
     }
 
     Vector3 q = glm::cross(s, e0);
     const float v = f * glm::dot(dir_norm, q);
 
-    if (v < 0.0f || u + v > 1.0f) {
+    if (v < 0.0f || u + v > 1.0f)
+    {
         return false;
     }
 
     const float t = f * glm::dot(e1, q);
     const float len = glm::length(dir);
-    if (t > epsilon && t < len) {
+    if (t > epsilon && t < len)
+    {
         p = line.a + dir_norm * t;
         distance = t / len;
         return true;
@@ -299,4 +303,70 @@ inline bool isAlmostZero(Vector3 v)
     if (abs(v.x) > 1e-6 || abs(v.y) > 1e-6 || abs(v.z) > 1e-6)
         return false;
     return true;
+}
+
+inline Vector3 getClosestPointOnTriangle(Vector3 &a, Vector3 &b, Vector3 &c, Vector3 &point)
+{
+    const Vector3 ab = b - a;
+    const Vector3 ac = c - a;
+    const Vector3 ap = point - a;
+
+    const float d1 = glm::dot(ab, ap);
+    const float d2 = glm::dot(ac, ap);
+    if (d1 <= 0.f && d2 <= 0.f)
+        return a;
+
+    const Vector3 bp = point - b;
+    const float d3 = glm::dot(ab, bp);
+    const float d4 = glm::dot(ac, bp);
+    if (d3 >= 0.f && d4 <= d3)
+        return b;
+
+    const Vector3 cp = point - c;
+    const float d5 = glm::dot(ab, cp);
+    const float d6 = glm::dot(ac, cp);
+    if (d6 >= 0.f && d5 <= d6)
+        return c;
+
+    const float vc = d1 * d4 - d3 * d2;
+    if (vc <= 0.f && d1 >= 0.f && d3 <= 0.f)
+    {
+        const float v = d1 / (d1 - d3);
+        return a + v * ab;
+    }
+
+    const float vb = d5 * d2 - d1 * d6;
+    if (vb <= 0.f && d2 >= 0.f && d6 <= 0.f)
+    {
+        const float v = d2 / (d2 - d6);
+        return a + v * ac;
+    }
+
+    const float va = d3 * d6 - d5 * d4;
+    if (va <= 0.f && (d4 - d3) >= 0.f && (d5 - d6) >= 0.f)
+    {
+        const float v = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+        return b + v * (c - b);
+    }
+
+    const float denom = 1.f / (va + vb + vc);
+    const float v = vb * denom;
+    const float w = vc * denom;
+
+    return a + v * ab + w * ac;
+}
+
+inline Vector3 getClosestPointOnPolygon(Vector3 *verticies, int amount, Vector3 &normal, Vector3 &point)
+{
+    float minDist = MAXFLOAT;
+    Vector3 out(0.0f);
+    for (int i = 0; i < amount - 2; i++){
+        Vector3 closest = getClosestPointOnTriangle(verticies[i], verticies[i+1], verticies[i+2], point);
+        float distance = glm::length(closest-point);
+        if (distance < minDist){
+            minDist = distance;
+            out = closest;
+        }
+    }
+    return out;
 }

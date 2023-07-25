@@ -214,7 +214,7 @@ void LayerActors::prepareNewActor(Actor *actor)
     actors.push_back(actor);
     actor->setCurrentLayer(this);
     actor->onSpawned();
-    auto body = actor->getPhysicsBody();
+    actor->getPhysicsBody();
     
     if (!activeCamera && actor->implements("Camera"))
         activeCamera = (Camera *)actor;

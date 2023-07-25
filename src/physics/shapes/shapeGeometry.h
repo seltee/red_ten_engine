@@ -17,7 +17,11 @@ public:
     EXPORT ShapeGeometry(Vector3 center, Geometry *geometry, PhysicsWorld *world);
     EXPORT Geometry *getGeometry();
 
+    EXPORT virtual ShapeCollisionType getType();
+
     EXPORT void provideTransformation(Matrix4 *transformation);
+
+    EXPORT Vector3 getClosestPoint(Vector3 point);
 
     EXPORT bool testRay(Line line, std::vector<RayCollisionPoint> *points);
 
