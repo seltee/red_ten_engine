@@ -201,6 +201,48 @@ inline float closestPointSegmentSegment(Vector3 p1, Vector3 q1, Vector3 p2, Vect
     return glm::dot(c1 - c2, c1 - c2);
 }
 
+// Möller–Trumbore intersection algorithm
+inline bool testRayAgainstPolygon(Vector3 &pA, Vector3 &pB, Vector3 &pC, Line &line, float &distance, Vector3 &p)
+{
+    const float epsilon = 0.000001f;
+    Vector3 e0 = pB - pA;
+    Vector3 e1 = pC - pA;
+
+    Vector3 dir = line.b - line.a;
+    Vector3 dir_norm = glm::normalize(dir);
+
+    Vector3 h = glm::cross(dir_norm, e1);
+    const float a = glm::dot(e0, h);
+
+    if (a > -epsilon && a < epsilon) {
+        return false;
+    }
+
+    Vector3 s = line.a - pA;
+    const float f = 1.0f / a;
+    const float u = f * glm::dot(s, h);
+
+    if (u < 0.0f || u > 1.0f) {
+        return false;
+    }
+
+    Vector3 q = glm::cross(s, e0);
+    const float v = f * glm::dot(dir_norm, q);
+
+    if (v < 0.0f || u + v > 1.0f) {
+        return false;
+    }
+
+    const float t = f * glm::dot(e1, q);
+    const float len = glm::length(dir);
+    if (t > epsilon && t < len) {
+        p = line.a + dir_norm * t;
+        distance = t / len;
+        return true;
+    }
+    return false;
+}
+
 // from Christofer Ericson - real time collision detection
 // Sutherland-Hodgman algorithm
 inline void clipPolygon(std::vector<Vector3> *out, const Vector3 *polygon, const Vector3 &plainNormal, const Vector3 &plainPoint)
@@ -254,8 +296,7 @@ inline Vector3 lerp(const Vector3 &a, const Vector3 &b, float t)
 
 inline bool isAlmostZero(Vector3 v)
 {
-	if (abs(v.x) > 1e-6 || abs(v.y) > 1e-6 || abs(v.z) > 1e-6)
-		return false;
-	return true;
+    if (abs(v.x) > 1e-6 || abs(v.y) > 1e-6 || abs(v.z) > 1e-6)
+        return false;
+    return true;
 }
-

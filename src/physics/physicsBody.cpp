@@ -14,24 +14,19 @@ void PhysicsBody::prepareSteps()
 {
     if (transformation)
     {
-        // if sleeping check if position is changed
-        if (bIsSleeping)
-        {
-            Vector3 newPosition = transformation->getPosition() * simScale;
-            Quat newOrientation = transformation->getRotation();
+        Vector3 newPosition = transformation->getPosition() * simScale;
+        Quat newOrientation = transformation->getRotation();
 
-            if (newPosition.x != position.x || newPosition.y != position.y || newPosition.z != position.z ||
-                newOrientation.x != orientation.x || newOrientation.y != orientation.y || newOrientation.z != orientation.z || newOrientation.w != orientation.w)
-            {
-                bIsSleeping = false;
-                position = newPosition;
-                orientation = newOrientation;
-            }
-        }
-        else
+        if (newPosition.x != position.x || newPosition.y != position.y || newPosition.z != position.z ||
+            newOrientation.x != orientation.x || newOrientation.y != orientation.y || newOrientation.z != orientation.z || newOrientation.w != orientation.w)
         {
-            position = transformation->getPosition() * simScale;
-            orientation = transformation->getRotation();
+            bIsSleeping = false;
+            position = newPosition;
+            orientation = newOrientation;
+
+            localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+            localTransform *= glm::toMat4(orientation);
+            this->shape->provideTransformation(&localTransform);
         }
     }
 }
@@ -74,7 +69,6 @@ void PhysicsBody::finishStep(float delta)
         localTransform *= glm::toMat4(orientation);
         this->shape->provideTransformation(&localTransform);
 
-
         if (glm::length2(motion->linearVelocity) < delta && glm::length2(motion->angularVelocity) < delta)
         {
             sleepAccumulator += delta;
@@ -89,6 +83,11 @@ void PhysicsBody::finishStep(float delta)
 void PhysicsBody::setRelation(Transformation *transformation)
 {
     this->transformation = transformation;
+    position = transformation->getPosition() * simScale;
+    orientation = transformation->getRotation();
+    localTransform = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+    localTransform *= glm::toMat4(orientation);
+    this->shape->provideTransformation(&localTransform);
 }
 
 void PhysicsBody::setStaticMotionType()

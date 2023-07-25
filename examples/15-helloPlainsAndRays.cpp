@@ -31,7 +31,7 @@ int main()
     // Layers and camera setup
     // Also enabling physics for the layer
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
-    layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f), 0.1f, 150);
+    layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f), 0.1f, 160);
 
     auto camera = layerActors->createActor<CameraPerspective>();
     camera->setWidthBasedResolution(1280);

@@ -10,11 +10,13 @@ public:
     Land()
     {
         registerClassName("Land");
+    }
 
+    void onSpawned()
+    {
         auto landComponent = createComponent<ComponentMesh>();
         landComponent->setMesh(landMesh);
         landComponent->setShader(landShader);
-
         landComponent->addShapeGeometry(landMesh->getGeometry());
     }
 
@@ -30,10 +32,13 @@ public:
     Mushroom()
     {
         registerClassName("Mushroom");
+    }
+
+    void onSpawned()
+    {
         mushroomComponent = createComponent<ComponentMesh>();
         mushroomComponent->setMesh(mushroomMesh);
         mushroomComponent->setShader(mushroomShader);
-
         mushroomComponent->addShapeGeometry(mushroomMesh->getGeometry());
     }
 
@@ -89,14 +94,12 @@ public:
         if (state && camera)
         {
             PointWithDirection pointWithDirection = camera->screenToWorld(mouseX, mouseY);
-
-            Vector3 v(pointWithDirection.vDirection.x * 100.0f, pointWithDirection.vDirection.y * 100.0f, pointWithDirection.vDirection.z * 100.0f);
             PhysicsBodyPoint point;
-            if (((LayerActors *)layer)->castRaySingleCollision(Line(pointWithDirection.vPosition, v), point))
+            if ((layer)->castRaySingleCollision(Line(pointWithDirection.vPosition, pointWithDirection.vPosition + pointWithDirection.vDirection * 100.0f), point))
             {
                 if (point.actor->implements("Land"))
                 {
-                    auto mushroom = ((LayerActors *)layer)->createActor<Mushroom>();
+                    auto mushroom = (layer)->createActor<Mushroom>();
                     mushroom->transform.setPosition(point.point.x, point.point.y, point.point.z);
                     mushroom->transform.setRotation(Vector3(0.0f, randf(0.0f, CONST_PI * 4.0f), 0.0f));
                 }
@@ -160,7 +163,6 @@ int main()
     auto resourceController = engine->getResourceController();
     auto landAlbedoTexture = resourceController->addTexture("./data/3d/land_albedo.jpg");
     auto landNormalTexture = resourceController->addTexture("./data/3d/land_normal.jpg");
-
     auto mushroomAlbedoTexture = resourceController->addTexture("./data/3d/mushroom_albedo.jpg");
 
     // our tower
@@ -199,7 +201,7 @@ int main()
         float z = cos(angle) * radius;
 
         PhysicsBodyPoint point;
-        if (layerActors->castRaySingleCollision(Line(Vector3(x, 10.0f, z), Vector3(0, -20.0f, 0)), point))
+        if (layerActors->castRaySingleCollision(Line(Vector3(x, 10.0f, z), Vector3(x, -20.0f, z)), point))
         {
             if (point.actor->implements("Land"))
             {

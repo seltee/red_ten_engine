@@ -214,7 +214,8 @@ void LayerActors::prepareNewActor(Actor *actor)
     actors.push_back(actor);
     actor->setCurrentLayer(this);
     actor->onSpawned();
-
+    auto body = actor->getPhysicsBody();
+    
     if (!activeCamera && actor->implements("Camera"))
         activeCamera = (Camera *)actor;
 }
@@ -262,7 +263,7 @@ bool LayerActors::castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint
             if (point->distance < resultPoint.distance)
                 resultPoint = *point;
         }
-        return true;
+        return result.size() > 0;
     }
 
     return false;

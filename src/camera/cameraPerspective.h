@@ -35,7 +35,7 @@ protected:
     Layer *layer;
     bool useWidthBasedProportion = true;
     float mainLine = 320.0f;
-    float farDistance = 5600.0f;
+    float farDistance = 400.0f;
     float nearDistance = 1.0f;
     float fov = 45.0f;
     float distance = 45.0f;

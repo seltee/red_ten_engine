@@ -6,16 +6,30 @@
 #include "common/geometry.h"
 #include "physics/shapes/shape.h"
 #include "math/math.h"
+#include "connector/withDebug.h"
 
 class PhysicsWorld;
 
-class ShapeGeometry : public Shape
+class ShapeGeometry : public Shape,
+                      public WithDebug
 {
 public:
     EXPORT ShapeGeometry(Vector3 center, Geometry *geometry, PhysicsWorld *world);
-
     EXPORT Geometry *getGeometry();
+
+    EXPORT void provideTransformation(Matrix4 *transformation);
+
+    EXPORT bool testRay(Line line, std::vector<RayCollisionPoint> *points);
+
+    EXPORT AABB getAABB();
+
+    EXPORT void renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness);
 
 protected:
     Geometry *geometry = nullptr;
+    AABB aabb;
+
+    Vector3 *vertexes;
+    int vertexAmount;
+    float simScale;
 };

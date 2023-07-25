@@ -104,14 +104,14 @@ PointWithDirection CameraPerspective::screenToWorld(float x, float y)
     Matrix4 mView = glm::inverse(projectionMatrix * *getViewMatrix());
 
     Vector4 near = Vector4((x - halfWidth) / halfWidth, -1 * (y - halfHeight) / halfHeight, 0.0f, 1.0);
-    Vector4 far = Vector4((x - halfWidth) / halfWidth, -1 * (y - halfHeight) / halfHeight, farDistance, 1.0);
+    Vector4 far = Vector4((x - halfWidth) / halfWidth, -1 * (y - halfHeight) / halfHeight, 1.0f, 1.0);
 
     Vector4 nearResult = mView * near;
     Vector4 farResult = mView * far;
     nearResult /= nearResult.w;
     farResult /= farResult.w;
 
-    out.vDirection = glm::normalize(Vector3(nearResult - farResult));
+    out.vDirection = glm::normalize(Vector3(farResult - nearResult));
 
     out.vPosition = Vector3({nearResult.x,
                              nearResult.y,
