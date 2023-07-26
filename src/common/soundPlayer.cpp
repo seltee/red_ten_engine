@@ -4,11 +4,9 @@
 #include "soundPlayer.h"
 #include "math/math.h"
 
-AudioController *SoundPlayer::audioController = nullptr;
-
 SoundPlayer::SoundPlayer()
 {
-    audioSource = audioController->getAudioBase()->createSource();
+    audioSource = audio->getAudioBase()->createSource();
     audioSource->setMaxDistance(4000.0f);
     audioSource->setReferenceDistance(2000.0f);
 }
@@ -113,9 +111,4 @@ void SoundPlayer::setVolume(float volume)
 float SoundPlayer::getVolume()
 {
     return 1.0f;
-}
-
-void SoundPlayer::setAudioController(AudioController *audioController)
-{
-    SoundPlayer::audioController = audioController;
 }

@@ -55,8 +55,8 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Music", 0);
-    auto camera = layerActors->createActor<CameraOrto>();
-    camera->setWidthBasedResolution(1280);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // Textures setup
     auto resourceController = engine->getResourceController();

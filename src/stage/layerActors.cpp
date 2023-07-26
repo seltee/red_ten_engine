@@ -124,7 +124,7 @@ void LayerActors::render(View *view)
                 glDisable(GL_BLEND);
 
                 // prepare shadowed render
-                Matrix4 mLightViewProjection = (*light)->preparePreShadowPhase(activeCamera->transform.getPosition());
+                Matrix4 mLightViewProjection = (*light)->preparePreShadowPhase(activeCamera->getOwnerTransform()->getPosition());
                 renderer->setupShadowHQ();
 
                 for (auto actor = shadowCasters.begin(); actor != shadowCasters.end(); ++actor)
@@ -215,9 +215,6 @@ void LayerActors::prepareNewActor(Actor *actor)
     actor->setCurrentLayer(this);
     actor->onSpawned();
     actor->getPhysicsBody();
-    
-    if (!activeCamera && actor->implements("Camera"))
-        activeCamera = (Camera *)actor;
 }
 
 void LayerActors::enablePhisics(Vector3 gravity, float simScale, int stepsPerSecond)
@@ -389,6 +386,11 @@ bool LayerActors::isProcessingEnabled()
 Camera *LayerActors::getActiveCamera()
 {
     return activeCamera;
+}
+
+void LayerActors::setActiveCamera(Camera *activeCamera)
+{
+    this->activeCamera = activeCamera;
 }
 
 void LayerActors::setAmbientColor(float r, float g, float b)

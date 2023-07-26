@@ -38,6 +38,7 @@ public:
         return newComonent;
     }
     EXPORT void removeComponents();
+    EXPORT void removeComponent(Component *component);
     EXPORT void prepareNewComponent(Component *component);
     EXPORT void setPhysicsWorld(PhysicsWorld *physicsWorld);
     EXPORT PhysicsWorld *getPhysicsWorld();

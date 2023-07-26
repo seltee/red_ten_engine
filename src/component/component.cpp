@@ -18,6 +18,7 @@ Component::~Component()
 void Component::prepare(Entity *owner)
 {
     this->owner = owner;
+    onCreated();
 }
 
 void Component::process(float delta)
@@ -54,6 +55,10 @@ Matrix4 Component::preparePreShadowPhase(Vector3 cameraPosition)
 {
     Matrix4 m;
     return m;
+}
+
+void Component::onCreated()
+{
 }
 
 bool Component::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)

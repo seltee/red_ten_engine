@@ -9,7 +9,6 @@
 class CameraOrto : public Camera
 {
 public:
-    EXPORT CameraOrto();
     EXPORT void prepareToRender(View *view);
     EXPORT void finishRender();
     EXPORT int getWidth();
@@ -21,6 +20,8 @@ public:
     EXPORT void setHeightBasedResolution(float height);
     
     EXPORT float getLineThickness();
+
+    EXPORT CameraType getCameraType();
 
     View *view = nullptr;
 

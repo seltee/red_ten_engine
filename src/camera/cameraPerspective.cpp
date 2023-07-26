@@ -5,11 +5,6 @@
 #include "opengl/glew.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
-CameraPerspective::CameraPerspective() : Camera()
-{
-    registerClassName("CameraPerspective");
-}
-
 void CameraPerspective::prepareToRender(View *view)
 {
     glEnable(GL_DEPTH_TEST);
@@ -123,4 +118,9 @@ PointWithDirection CameraPerspective::screenToWorld(float x, float y)
 float CameraPerspective::getLineThickness()
 {
     return 0.02f;
+}
+
+CameraType CameraPerspective::getCameraType()
+{
+    return CameraType::Perspective;
 }

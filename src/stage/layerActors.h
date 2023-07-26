@@ -50,6 +50,7 @@ public:
     EXPORT bool isProcessingEnabled();
 
     EXPORT Camera *getActiveCamera();
+    EXPORT void setActiveCamera(Camera *activeCamera);
 
     EXPORT void setAmbientColor(float r, float g, float b);
 
@@ -59,7 +60,6 @@ public:
     EXPORT void showDebugBox(Vector3 p, float size, Vector3 color, float showTime);
 
 protected:
-
     bool bIsVisible = true;
     bool bProcessingEnabled = true;
     float ambientColor[3] = {1.0f, 1.0f, 1.0f};

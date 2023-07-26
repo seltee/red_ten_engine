@@ -67,16 +67,17 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o ${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o \
-			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o \
+			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
 			${OBJDIR}/sound.o ${OBJDIR}/texture.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderer.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
+			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/fbx_loader.o ${OBJDIR}/stb_vorbis.o \
 			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
 			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o \
-			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o \
+			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o \
 			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
 			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
 			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
@@ -198,11 +199,20 @@ ${OBJDIR}/actorPawn.o: ${SRCDIR}/actor/actorPawn.cpp
 ${OBJDIR}/actorGUIElement.o: ${SRCDIR}/actor/actorGUIElement.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/actorGUIElement.o ${SRCDIR}/actor/actorGUIElement.cpp
 
+${OBJDIR}/actorCamera.o: ${SRCDIR}/actor/actorCamera.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/actorCamera.o ${SRCDIR}/actor/actorCamera.cpp
+
 ${OBJDIR}/component.o: ${SRCDIR}/component/component.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/component.o ${SRCDIR}/component/component.cpp
 
 ${OBJDIR}/componentSprite.o: ${SRCDIR}/component/componentSprite.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentSprite.o ${SRCDIR}/component/componentSprite.cpp
+
+${OBJDIR}/componentCameraOrto.o: ${SRCDIR}/component/componentCameraOrto.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/componentCameraOrto.o ${SRCDIR}/component/componentCameraOrto.cpp
+
+${OBJDIR}/componentCameraPerspective.o: ${SRCDIR}/component/componentCameraPerspective.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/componentCameraPerspective.o ${SRCDIR}/component/componentCameraPerspective.cpp
 
 ${OBJDIR}/componentFramedSprite.o: ${SRCDIR}/component/componentFramedSprite.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentFramedSprite.o ${SRCDIR}/component/componentFramedSprite.cpp
@@ -281,6 +291,9 @@ ${OBJDIR}/withRepository.o: ${SRCDIR}/connector/withRepository.cpp
 	
 ${OBJDIR}/withMeshMaker.o: ${SRCDIR}/connector/withMeshMaker.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withMeshMaker.o ${SRCDIR}/connector/withMeshMaker.cpp
+
+${OBJDIR}/withAudio.o: ${SRCDIR}/connector/withAudio.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withAudio.o ${SRCDIR}/connector/withAudio.cpp
 
 ${OBJDIR}/soundPlayer.o: ${SRCDIR}/common/soundPlayer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundPlayer.o ${SRCDIR}/common/soundPlayer.cpp

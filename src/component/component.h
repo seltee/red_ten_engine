@@ -34,6 +34,7 @@ public:
     EXPORT virtual void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture);
     EXPORT virtual Matrix4 preparePreShadowPhase(Vector3 cameraPosition);
 
+    EXPORT virtual void onCreated();
     EXPORT virtual bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
     EXPORT void prepareColorMode();
     EXPORT virtual int getVertexAmount();

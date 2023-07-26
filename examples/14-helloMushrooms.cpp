@@ -154,10 +154,11 @@ int main()
     auto layerActors = stage->createLayerActors("Hello Mushroom", 0);
     layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f), 0.1f, 200);
 
-    auto camera = layerActors->createActor<CameraPerspective>();
+    auto cameraActor = layerActors->createActor<ActorCamera>();
+    auto camera = cameraActor->setupPerspectiveCamera();
     camera->setWidthBasedResolution(1280);
-    camera->transform.setPosition(6.0f, 10.0f, 6.0f);
-    camera->lookAt(0.0f, -2.0f, 0.0f);
+    cameraActor->transform.setPosition(6.0f, 10.0f, 6.0f);
+    cameraActor->lookAt(0.0f, -2.0f, 0.0f);
 
     // Resources
     auto resourceController = engine->getResourceController();

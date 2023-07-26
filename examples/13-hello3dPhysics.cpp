@@ -108,8 +108,9 @@ int main()
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
     layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f));
 
-    auto camera = layerActors->createActor<CameraPerspective>();
-    camera->setWidthBasedResolution(1280);
+
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
     camera->transform.setPosition(2.0f, 7.0f, 8.0f);
     camera->lookAt(0.0f, 0.0f, 0.0f);
 

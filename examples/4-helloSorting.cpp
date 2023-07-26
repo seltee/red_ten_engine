@@ -61,8 +61,8 @@ int main()
     auto layerActors = stage->createLayerActors("Hello Sorting", 0);
     layerActors->enableSorting();
 
-    auto camera = layerActors->createActor<CameraOrto>();
-    camera->setWidthBasedResolution(1280);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // Textures setup
     auto resourceController = engine->getResourceController();

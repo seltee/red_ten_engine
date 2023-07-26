@@ -6,15 +6,10 @@
 #include "common/utils.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
-AudioController *Camera::audioController = nullptr;
-
 Camera::Camera()
 {
-    registerClassName("Camera");
-    if (!audioController->getListenerCamera())
-    {
+    if (!audio->getListenerCamera())
         setAsListenerCamera();
-    }
 }
 
 void Camera::prepareToRender(View *view)
@@ -32,8 +27,12 @@ Matrix4 *Camera::getProjectionMatrix()
 
 Matrix4 *Camera::getViewMatrix()
 {
-    viewMatrix = glm::inverse(*transform.getModelMatrix());
     return &viewMatrix;
+}
+
+void Camera::setViewMatrix(Matrix4 &view)
+{
+    this->viewMatrix = view;
 }
 
 int Camera::getWidth()
@@ -56,6 +55,16 @@ float Camera::getHeightViewProportion()
     return 0;
 }
 
+Transformation *Camera::getOwnerTransform()
+{
+    return ownerTransform;
+}
+
+void Camera::setOwnerTransform(Transformation *transform)
+{
+    ownerTransform = transform;
+}
+
 PointWithDirection Camera::screenToWorld(float x, float y)
 {
     PointWithDirection s;
@@ -64,31 +73,22 @@ PointWithDirection Camera::screenToWorld(float x, float y)
     return s;
 }
 
-void Camera::onProcess(float delta)
-{
-    if (isListenerCamera())
-    {
-        audioController->getAudioBase()->setPosition(transform.getPosition());
-        audioController->getAudioBase()->setOrientation(transform.getRotation());
-    }
-}
-
 void Camera::setAsListenerCamera()
 {
-    audioController->setListenerCamera(this);
+    audio->setListenerCamera(this);
 }
 
 bool Camera::isListenerCamera()
 {
-    return this == audioController->getListenerCamera();
+    return this == audio->getListenerCamera();
+}
+
+CameraType Camera::getCameraType()
+{
+    return CameraType::None;
 }
 
 float Camera::getLineThickness()
 {
     return 0.01f;
-}
-
-void Camera::setAudioController(AudioController *audioController)
-{
-    Camera::audioController = audioController;
 }

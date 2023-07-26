@@ -163,8 +163,8 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Physics", 0);
-    auto camera = layerActors->createActor<CameraOrto>();
-    camera->setWidthBasedResolution(240);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupOrtoCamera()->setWidthBasedResolution(240);
 
     // We need to enable phisics on layer and provide gravity level.
     // That's enough to make physics work - layer will provide all nessary data to existing actors

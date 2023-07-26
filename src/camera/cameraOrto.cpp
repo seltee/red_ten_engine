@@ -5,11 +5,6 @@
 #include "math/glm/gtc/type_ptr.hpp"
 #include "opengl/glew.h"
 
-CameraOrto::CameraOrto() : Camera()
-{
-    registerClassName("CameraOrto");
-}
-
 void CameraOrto::prepareToRender(View *view)
 {
     glDisable(GL_DEPTH_TEST);
@@ -89,4 +84,9 @@ void CameraOrto::setHeightBasedResolution(float height)
 float CameraOrto::getLineThickness()
 {
     return 0.6f;
+}
+
+CameraType CameraOrto::getCameraType()
+{
+    return CameraType::Orto;
 }

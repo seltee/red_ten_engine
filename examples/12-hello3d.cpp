@@ -133,13 +133,12 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
+
     auto layerGUI = stage->createLayerActors("Hello Gui Layer", 1);
-
-    auto camera = layerActors->createActor<CameraPerspective>();
-    camera->setWidthBasedResolution(1280);
-
-    auto guiCamera = layerGUI->createActor<CameraOrto>();
-    guiCamera->setWidthBasedResolution(config->getWindowWidth());
+    auto guiCamera = layerGUI->createActor<ActorCamera>();
+    guiCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // Resources
     auto resourceController = engine->getResourceController();
@@ -194,12 +193,12 @@ int main()
     // Shadow quality switch GUI
     GUISimpleButton::font = resourceController->addFont("./data/BebasNeue-Regular.ttf", 32);
     auto newButton = layerGUI->createActor<GUISimpleButton>();
-    newButton->transform.setPosition(-config->getWindowWidth() / 2 + 60, -config->getWindowHeight() / 2 + 64);
+    newButton->transform.setPosition(-config->getWindowWidth() / 2 + 60, -config->getWindowHeight() / 2 + 94);
     newButton->setPressID(BUTTON_SWITCH_SHADOW_QUALITY);
     newButton->setText("Toggle shadow quality");
 
     auto shadowQualityActor = layerGUI->createActor<Actor>();
-    shadowQualityActor->transform.setPosition(-config->getWindowWidth() / 2 + 60, -config->getWindowHeight() / 2 + 32);
+    shadowQualityActor->transform.setPosition(-config->getWindowWidth() / 2 + 60, -config->getWindowHeight() / 2 + 62);
     auto shadowQualityText = shadowQualityActor->createComponent<ComponentText>();
     shadowQualityText->setFont(GUISimpleButton::font);
     shadowQualityText->setText(std::string("Shadow quality: ") + Config::qualityToString(config->getShadowQuality()));
@@ -208,6 +207,8 @@ int main()
 
     // Update config file if something changed from the initial configuration during setup
     config->saveConfig();
+
+    float cameraMovementDelta = 0.0f;
 
     while (!engine->isTerminationIntended())
     {
@@ -228,6 +229,10 @@ int main()
             Vector3(cosf(sunRotation) + 0.5f, sinf(sunRotation), cosf(sunRotation)),
             Vector3(0.7f + (1.0f - effectiveLight) * 0.4f, 0.7f, 0.7f) * effectiveLight,
             true);
+
+        // Camera flying effect
+        cameraMovementDelta += delta * 0.25f;
+        camera->getCameraComponent()->transform.setPosition(Vector3(0.0f, sinf(cameraMovementDelta) * 0.4f, 0.0f));
 
         // Controlling the shadow quality
         int firstPressID;

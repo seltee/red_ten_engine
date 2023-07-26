@@ -157,8 +157,8 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Input", 0);
-    auto camera = layerActors->createActor<CameraOrto>();
-    camera->setWidthBasedResolution(1280);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f), 0.01f, 100);
 

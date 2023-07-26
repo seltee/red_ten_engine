@@ -79,8 +79,7 @@ RTEngine::RTEngine(std::string configFilePath)
     {
         audioController = new AudioController(config);
         configController->setAudioController(audioController);
-        Camera::setAudioController(audioController);
-        SoundPlayer::setAudioController(audioController);
+        WithAudio::setAudioController(audioController);
     }
 
     if (!meshMaker)

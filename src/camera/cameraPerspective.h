@@ -10,7 +10,6 @@
 class CameraPerspective : public Camera
 {
 public:
-    EXPORT CameraPerspective();
     EXPORT void prepareToRender(View *view);
     EXPORT void finishRender();
     EXPORT int getWidth();
@@ -28,6 +27,8 @@ public:
     EXPORT PointWithDirection screenToWorld(float x, float y);
 
     EXPORT float getLineThickness();
+
+    EXPORT CameraType getCameraType();
 
     View *view = nullptr;
 

@@ -166,13 +166,13 @@ int main()
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Actor Layer", 0);
-    auto camera = layerActors->createActor<CameraOrto>();
-    camera->setWidthBasedResolution(1280);
+    auto camera = layerActors->createActor<ActorCamera>();
+    camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // In this example we have 2 layers, one is our game happening (for example) and the second for gui
     auto layerGUI = stage->createLayerActors("Hello GUI Layer", 1);
-    auto guiCamera = layerGUI->createActor<CameraOrto>();
-    guiCamera->setWidthBasedResolution(1280);
+    auto guiCamera = layerGUI->createActor<ActorCamera>();
+    guiCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // Textures setup
     auto resourceController = engine->getResourceController();

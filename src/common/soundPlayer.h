@@ -6,10 +6,11 @@
 #include "common/childProcess.h"
 #include "math/math.h"
 #include "controller/audioController.h"
+#include "connector/withAudio.h"
 #include "resource/sound.h"
 #include "audio/audioSource.h"
 
-class SoundPlayer : public ChildProcess
+class SoundPlayer : public ChildProcess, public WithAudio
 {
 public:
     EXPORT SoundPlayer();
@@ -31,14 +32,10 @@ public:
     EXPORT void setVolume(float volume);
     EXPORT float getVolume();
 
-    static void setAudioController(AudioController *audioController);
-
 protected:
     Sound *sound = nullptr;
     SoundStream *soundStream = nullptr;
     AudioSource *audioSource = nullptr;
 
     bool repeatStream = false;
-
-    static AudioController *audioController;
 };

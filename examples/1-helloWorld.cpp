@@ -27,13 +27,13 @@ int main()
     // To make 2d games you should use ortographic camera that has no perspective distorsion
     // Second parameter "index" is being used to sort the layers
     auto layerActors = stage->createLayerActors("Hello Actors", 0);
-    auto camera = layerActors->createActor<CameraOrto>();
+    auto camera = layerActors->createActor<ActorCamera>();
 
     // There are physical and logical resolutions exist in the engine.
     // Physical is the width and height of your view in pixels.
     // Logical is the when you use to draw. If you set height based resolution of 640 your logical screen height will always be 640
     // But width will be calculated depending on the view size. You also can base logical resolution on width if prefer
-    camera->setWidthBasedResolution(640);
+    camera->setupOrtoCamera()->setWidthBasedResolution(640);
 
     // To put sprite onto our stage layer we first need to load image for this sprite
     auto resourceController = engine->getResourceController();

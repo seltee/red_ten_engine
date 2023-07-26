@@ -55,6 +55,17 @@ void Actor::removeComponents()
     bPhysicsNeedsToBeRebuild = true;
 }
 
+void Actor::removeComponent(Component *component)
+{
+    for (auto it = components.begin(); it != components.end(); it++)
+    {
+        if (*it == component){
+            delete *it;
+        }
+        return;
+    }
+}
+
 void Actor::prepareNewComponent(Component *component)
 {
     this->components.push_back(component);

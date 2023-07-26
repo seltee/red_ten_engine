@@ -54,7 +54,8 @@ public:
 
 LayerDebug::LayerDebug(int index) : LayerActors("debug", index)
 {
-    camera = createActor<CameraOrto>();
+    cameraActor = createActor<ActorCamera>();
+    camera = cameraActor->setupOrtoCamera();
     camera->setWidthBasedResolution(1280);
 }
 

@@ -185,12 +185,12 @@ int main()
     // We have now 4 layers. 3 to draw actors and 1 to apply effects
     // Note the position of effect layer. It will be below gui layer and will effect only first 2 layers with background and jojo
     auto bottomLayerActors = stage->createLayerActors("Hello Bottom Actor Layer", 0);
-    auto bottomLayerCamera = bottomLayerActors->createActor<CameraOrto>();
-    bottomLayerCamera->setWidthBasedResolution(1280);
+    auto bottomLayerCamera = bottomLayerActors->createActor<ActorCamera>();
+    bottomLayerCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     auto topLayerActors = stage->createLayerActors("Hello Top Actor Layer", 1);
-    auto topLayerCamera = topLayerActors->createActor<CameraOrto>();
-    topLayerCamera->setWidthBasedResolution(1280);
+    auto topLayerCamera = topLayerActors->createActor<ActorCamera>();
+    topLayerCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     auto effectLayer = stage->createLayerEffects("Hello Effects Layer", 2);
     auto effectJoJo = new SuperEffect(fragmentJoJoShader);
@@ -203,8 +203,8 @@ int main()
     effectLayer->addEffect(effectShift);
 
     auto layerGUI = stage->createLayerActors("Hello GUI Layer", 3);
-    auto guiCamera = layerGUI->createActor<CameraOrto>();
-    guiCamera->setWidthBasedResolution(1280);
+    auto guiCamera = layerGUI->createActor<ActorCamera>();
+    guiCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // Textures, fonts setup
     auto resourceController = engine->getResourceController();

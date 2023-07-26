@@ -6,11 +6,11 @@
 #include "shaders/effect.h"
 #include "stage/layerActors.h"
 #include "stage/layer.h"
-#include "camera/cameraOrto.h"
 #include "resource/resourceFont.h"
 #include "component/componentText.h"
 #include "common/color.h"
 #include "controller/debugController.h"
+#include "actor/actorCamera.h"
 #include <vector>
 
 class LayerDebug : public LayerActors
@@ -24,8 +24,8 @@ public:
 protected:
     bool hasIndex(int index);
 
+    ActorCamera *cameraActor;
     CameraOrto *camera;
-
     std::vector<Actor*> debugActors;
 
     static ResourceFont *font;
