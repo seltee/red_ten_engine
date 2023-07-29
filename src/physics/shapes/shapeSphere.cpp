@@ -4,7 +4,7 @@
 #include "shapeSphere.h"
 #include "physics/physicsWorld.h"
 
-ShapeSphere::ShapeSphere(Vector3 center, float radius, PhysicsWorld *world) : Shape(center)
+ShapeSphere::ShapeSphere(const Vector3 &center, float radius, PhysicsWorld *world) : Shape(center)
 {
     this->radius = radius * world->getSimScale();
 
@@ -35,7 +35,7 @@ Vector3 ShapeSphere::getAbsoluteCenter()
     return absoluteCenter;
 }
 
-bool ShapeSphere::testRay(Line line, std::vector<RayCollisionPoint> *points)
+bool ShapeSphere::testRay(const Segment &line, std::vector<RayCollisionPoint> *points)
 {
     Vector3 normal = glm::normalize(line.b - line.a);
     Vector3 m = line.a - absoluteCenter;

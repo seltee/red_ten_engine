@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "math/math.h"
 #include "common/utils.h"
@@ -35,8 +38,8 @@ protected:
     // inversed mass 1 / mass
     float invMass = 1.0f;
 
-    float linearDamping = 0.1f;
-    float angularDamping = 0.1f;
+    float linearDamping = 0.4f;
+    float angularDamping = 0.4f;
 
     // allows object to fall slower
     float gravityFactor = 1.0f;

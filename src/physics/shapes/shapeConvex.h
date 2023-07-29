@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "common/utils.h"
 #include "math/math.h"
@@ -26,6 +29,8 @@ class ShapeConvex : public Shape,
 {
 public:
     ShapeConvex(Vector3 center) : Shape(center) {}
+    ~ShapeConvex();
+
     EXPORT virtual Hull *getHull() { return hull; }
 
     EXPORT Hull *setNewHull(Vector3 *verticies, int amount);
@@ -35,15 +40,15 @@ public:
 
     EXPORT virtual ShapeCollisionType getType();
 
-    EXPORT bool testRay(Line line, std::vector<RayCollisionPoint> *points);
+    EXPORT bool testRay(const Segment &line, std::vector<RayCollisionPoint> *points);
 
     EXPORT AABB getAABB();
 
     EXPORT FaceQuery queryFaceDirection(ShapeConvex *foreignShape);
     EXPORT EdgeQuery queryEdgeDirection(ShapeConvex *foreignShape);
 
-    EXPORT Vector3 findFurthestPoint(Vector3 inDirection);
-    EXPORT Vector3 getClosestPointToHull(Vector3 point);
+    EXPORT Vector3 findFurthestPoint(const Vector3 &inDirection);
+    EXPORT Vector3 getClosestPointToHull(const Vector3 & point);
 
     EXPORT void renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness);
     EXPORT inline Vector3 getHullCenter() { return getHull()->hullCenter; }

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -21,11 +21,15 @@ public:
 
     EXPORT void provideTransformation(Matrix4 *transformation);
 
-    EXPORT Vector3 getClosestPoint(Vector3 point);
+    EXPORT Vector3 getClosestPoint(const Vector3 &point);
+    EXPORT float getClosestPoint(const Segment &segment, Vector3 &onSegment, Vector3 &onGeometry);
 
-    EXPORT bool testRay(Line line, std::vector<RayCollisionPoint> *points);
+    EXPORT bool testRay(const Segment &line, std::vector<RayCollisionPoint> *points);
 
     EXPORT AABB getAABB();
+
+    EXPORT inline Vector3 *getAbsoluteVerticies() { return verticies; };
+    EXPORT inline int getVerticiesAmount() { return verticiesAmount; }
 
     EXPORT void renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness);
 
@@ -33,7 +37,7 @@ protected:
     Geometry *geometry = nullptr;
     AABB aabb;
 
-    Vector3 *vertexes;
-    int vertexAmount;
+    Vector3 *verticies;
+    int verticiesAmount;
     float simScale;
 };

@@ -66,7 +66,8 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o \
 			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
-			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o ${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o \
+			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o \
+			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
 			${OBJDIR}/sound.o ${OBJDIR}/texture.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
@@ -89,7 +90,8 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
 			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
-			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT}
+			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
+			16-helloFPV${EXT}
 
 all: engine examples
 
@@ -243,6 +245,9 @@ ${OBJDIR}/shapePlain.o: ${SRCDIR}/physics/shapes/shapePlain.cpp
 
 ${OBJDIR}/shapeConvex.o: ${SRCDIR}/physics/shapes/shapeConvex.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeConvex.o ${SRCDIR}/physics/shapes/shapeConvex.cpp
+
+${OBJDIR}/shapeCapsule.o: ${SRCDIR}/physics/shapes/shapeCapsule.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shapeCapsule.o ${SRCDIR}/physics/shapes/shapeCapsule.cpp
 
 ${OBJDIR}/shape.o: ${SRCDIR}/physics/shapes/shape.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/shape.o ${SRCDIR}/physics/shapes/shape.cpp
@@ -474,6 +479,13 @@ ${OBJDIR}/15-helloPlainsAndRays.o: ${EXMDIR}/15-helloPlainsAndRays.cpp
 15-helloPlainsAndRays${EXT}: ${OBJDIR}/15-helloPlainsAndRays.o
 	$(LD) ${EFLAGS} ${OBJDIR}/15-helloPlainsAndRays.o -o 15-helloPlainsAndRays${EXT}
 	${MOVE} 15-helloPlainsAndRays${EXT} ${BINDIR}/15-helloPlainsAndRays${EXT}
+
+${OBJDIR}/16-helloFPV.o: ${EXMDIR}/16-helloFPV.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/16-helloFPV.o ${EXMDIR}/16-helloFPV.cpp
+
+16-helloFPV${EXT}: ${OBJDIR}/16-helloFPV.o
+	$(LD) ${EFLAGS} ${OBJDIR}/16-helloFPV.o -o 16-helloFPV${EXT}
+	${MOVE} 16-helloFPV${EXT} ${BINDIR}/16-helloFPV${EXT}
 
 
 

@@ -1,6 +1,9 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "constraint6DOF.h"
 
-Constraint6DOF::Constraint6DOF(Constraint6DOFDescriptor &descriptor)
+Constraint6DOF::Constraint6DOF(const Constraint6DOFDescriptor &descriptor)
 {
     this->descriptor = descriptor;
 }
@@ -21,7 +24,7 @@ void Constraint6DOF::processMotion(Motion *motion)
         motion->linearVelocity.z = 0.0f;
 }
 
-Vector3 Constraint6DOF::processTranslation(Vector3 translation)
+Vector3 Constraint6DOF::processTranslation(Vector3 &translation)
 {
     if (descriptor.blockXMoving)
         translation.x = 0.0f;

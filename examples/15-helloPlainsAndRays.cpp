@@ -22,11 +22,11 @@ int main()
     config->setFullscreenState(false);
 
     // View setup
-    auto view = viewController->createView("Example \"13. Hello 3D Physics\"");
+    auto view = viewController->createView("Example \"15. Hello Plains and Rays\"");
 
     // Stage setup
     auto stageController = engine->getStageController();
-    auto stage = stageController->createStage("Hello 3D Physics");
+    auto stage = stageController->createStage("Hello Plains and Rays");
 
     // Layers and camera setup
     // Also enabling physics for the layer
@@ -122,7 +122,7 @@ int main()
         if (impulseCounter > 1.0f)
         {
             impulseCounter -= 1.0f;
-            auto result = layerActors->castRayCollision(Line(p1, p2), true);
+            auto result = layerActors->castRayCollision(Segment(p1, p2), true);
         }
 
         stage->process(delta);

@@ -3,9 +3,15 @@
 
 #include "shape.h"
 
+Vector3 Shape::debugColorWireframe = Vector3(0.4f, 0.4f, 0.4f);
+
 Shape::Shape(Vector3 center)
 {
     this->center = center;
+}
+
+Shape::~Shape()
+{
 }
 
 ShapeCollisionType Shape::getType()
@@ -36,8 +42,10 @@ std::string Shape::getTypeName(ShapeCollisionType type)
         return "Convex";
     case ShapeCollisionType::Plain:
         return "Plain";
-    case ShapeCollisionType::Polygon:
+    case ShapeCollisionType::Geometry:
         return "PolygonalGeometry";
+    case ShapeCollisionType::Capsule:
+        return "Capsule";
     case ShapeCollisionType::Amount:
         return "Amount???";
     }
@@ -48,7 +56,7 @@ void Shape::provideTransformation(Matrix4 *transformation)
 {
 }
 
-bool Shape::testRay(Line line, std::vector<RayCollisionPoint> *points)
+bool Shape::testRay(const Segment &line, std::vector<RayCollisionPoint> *points)
 {
     return false;
 }

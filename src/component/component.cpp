@@ -171,6 +171,20 @@ ShapeGeometry *Component::addShapeGeometry(Vector3 center, Geometry *geometry)
     return nullptr;
 }
 
+ShapeCapsule *Component::addShapeCapsule(float height, float radius)
+{
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeCapsule(height, radius, world);
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+    return nullptr;
+}
+
 Matrix4 Component::getLocalspaceMatrix()
 {
     return Matrix4(1.0f);

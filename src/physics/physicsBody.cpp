@@ -69,7 +69,7 @@ void PhysicsBody::finishStep(float delta)
         localTransform *= glm::toMat4(orientation);
         this->shape->provideTransformation(&localTransform);
 
-        if (glm::length2(motion->linearVelocity) < delta && glm::length2(motion->angularVelocity) < delta)
+        if (glm::length2(motion->linearVelocity) < delta * 0.2f && glm::length2(motion->angularVelocity) < delta * 0.2f)
         {
             sleepAccumulator += delta;
             if (sleepAccumulator > 0.8f)
@@ -227,14 +227,14 @@ Matrix3 PhysicsBody::getInvertedInertia()
     return glm::inverse(inertia);
 }
 
-Vector3 PhysicsBody::getPointVelocity(Vector3 localPoint)
+Vector3 PhysicsBody::getPointVelocity(const Vector3 &localPoint)
 {
     if (motion)
         return motion->getPointVelocity(localPoint);
     return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-void PhysicsBody::process(float delta, Vector3 gravity)
+void PhysicsBody::process(float delta, const Vector3 &gravity)
 {
     if (bIsSleeping)
         return;
@@ -250,7 +250,7 @@ void PhysicsBody::process(float delta, Vector3 gravity)
     }
 }
 
-void PhysicsBody::castRay(Line ray, std::vector<PhysicsBodyPoint> *points)
+void PhysicsBody::castRay(const Segment &ray, std::vector<PhysicsBodyPoint> *points)
 {
     std::vector<RayCollisionPoint> localPoints;
     if (this->shape->testRay(ray, &localPoints))

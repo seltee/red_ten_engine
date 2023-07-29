@@ -28,14 +28,14 @@ public:
     EXPORT void process(float delta);
     EXPORT void render(View *view);
     EXPORT void prepareNewActor(Actor *actor);
-    EXPORT void enablePhisics(Vector3 gravity, float simScale = 1.0f, int stepsPerSecond = 100);
+    EXPORT void enablePhisics(const Vector3 &gravity, float simScale = 1.0f, int stepsPerSecond = 100);
     EXPORT void enableSorting();
     EXPORT void disableSorting();
 
-    EXPORT bool castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine = false, float showTime = 1.6f);
-    EXPORT std::vector<PhysicsBodyPoint> castRayCollision(Line ray, bool viewDebugLine = false, float showTime = 1.6f);
-    EXPORT std::list<PhysicsBodyPoint> castSphereCollision(Vector3 p, float radius);
-    EXPORT std::list<PhysicsBodyPoint> castPointCollision(Vector3 p);
+    EXPORT bool castRaySingleCollision(const Segment &ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine = false, float showTime = 1.6f);
+    EXPORT std::vector<PhysicsBodyPoint> castRayCollision(const Segment &ray, bool viewDebugLine = false, float showTime = 1.6f);
+    EXPORT std::list<PhysicsBodyPoint> castSphereCollision(const Vector3 &p, float radius);
+    EXPORT std::list<PhysicsBodyPoint> castPointCollision(const Vector3 &p);
 
     EXPORT std::list<Actor *> *getActorsList();
     EXPORT std::list<Actor *> getActorsByName(std::string name);
@@ -56,8 +56,8 @@ public:
 
     EXPORT PhysicsWorld *getPhysicsWorld();
 
-    EXPORT void showDebugLine(Line ray, Vector3 color, float showTime);
-    EXPORT void showDebugBox(Vector3 p, float size, Vector3 color, float showTime);
+    EXPORT void showDebugLine(const Segment &ray, const Vector3 &color, float showTime);
+    EXPORT void showDebugBox(const Vector3 &p, float size, const Vector3 &color, float showTime);
 
 protected:
     bool bIsVisible = true;

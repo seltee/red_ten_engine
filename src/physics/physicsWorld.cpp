@@ -79,7 +79,7 @@ void _solve(
 void _ray(
     std::vector<PhysicsBody *>::iterator bodyStart,
     std::vector<PhysicsBody *>::iterator bodyEnd,
-    Line rayLocal,
+    const Segment &rayLocal,
     std::vector<PhysicsBodyPoint> *points)
 {
     for (auto body = bodyStart; body < bodyEnd; body++)
@@ -93,13 +93,13 @@ void _ray(
     }
 }
 
-PhysicsWorld::PhysicsWorld(Vector3 gravity, float simScale, int stepsPerSecond)
+PhysicsWorld::PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerSecond)
 {
     setBasicParameters(gravity, simScale, stepsPerSecond);
     maxThreads = std::thread::hardware_concurrency();
 }
 
-void PhysicsWorld::setBasicParameters(Vector3 gravity, float simScale, int stepsPerSecond)
+void PhysicsWorld::setBasicParameters(const Vector3 &gravity, float simScale, int stepsPerSecond)
 {
     this->gravity = gravity;
     this->simScale = simScale;
@@ -125,7 +125,6 @@ void PhysicsWorld::process(float delta)
 {
     deltaAccumulator += delta;
     prepareBodies();
-
     while (deltaAccumulator > subStep)
     {
         deltaAccumulator -= subStep;
@@ -154,12 +153,12 @@ void PhysicsWorld::removeDestroyed()
             ++body;
 }
 
-std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(Line ray)
+std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
 {
     std::vector<PhysicsBodyPoint> points;
     std::vector<std::thread> threads;
     int bodiesPerThread = bodies.size() / maxThreads;
-    Line rayLocal = Line(ray.a * simScale, ray.b * simScale);
+    Segment rayLocal = Segment(ray.a * simScale, ray.b * simScale);
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
 
     for (int i = 0; i < maxThreads; i++)

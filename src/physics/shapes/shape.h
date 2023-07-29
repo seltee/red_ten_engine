@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -28,8 +28,9 @@ enum class ShapeCollisionType
     Sphere = 2,
     Convex = 3,
     OBB = 4,
-    Polygon = 5,
-    Amount = 6
+    Geometry = 5,
+    Capsule = 6,
+    Amount = 7
 };
 
 class Shape
@@ -38,19 +39,22 @@ protected:
     Shape(Vector3 center);
 
 public:
+    virtual ~Shape();
     EXPORT virtual ShapeCollisionType getType();
     EXPORT virtual Matrix3 getInertiaTensor();
     EXPORT inline float getMass() { return mass; }
     EXPORT static std::string getTypeName(ShapeCollisionType type);
     EXPORT virtual void provideTransformation(Matrix4 *transformation);
 
-    EXPORT virtual bool testRay(Line line, std::vector<RayCollisionPoint> *points);
+    EXPORT virtual bool testRay(const Segment &line, std::vector<RayCollisionPoint> *points);
 
     EXPORT virtual void renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness);
 
     EXPORT virtual AABB getAABB();
 
     EXPORT inline void setDebugName(std::string str) { name = str; }
+
+    static Vector3 debugColorWireframe;
 
 protected:
     Vector3 center;

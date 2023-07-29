@@ -1,6 +1,9 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "primitives.h"
-#include "line.h"
+#include "segment.h"
 
 class AABB
 {
@@ -33,7 +36,7 @@ public:
         return aabb.start.x < end.x && aabb.end.x > start.x && aabb.start.y < end.y && aabb.end.y > start.y && aabb.start.z < end.z && aabb.end.z > start.z;
     }
 
-    inline bool test(Line line)
+    inline bool test(Segment line)
     {
         // Point p0, Point p1, AABB b
         Vector3 AABBcenter = (start + end) / 2.0f;     // Box center-point

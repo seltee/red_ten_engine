@@ -95,7 +95,7 @@ public:
         {
             PointWithDirection pointWithDirection = camera->screenToWorld(mouseX, mouseY);
             PhysicsBodyPoint point;
-            if ((layer)->castRaySingleCollision(Line(pointWithDirection.vPosition, pointWithDirection.vPosition + pointWithDirection.vDirection * 100.0f), point))
+            if ((layer)->castRaySingleCollision(Segment(pointWithDirection.vPosition, pointWithDirection.vPosition + pointWithDirection.vDirection * 100.0f), point))
             {
                 if (point.actor->implements("Land"))
                 {
@@ -202,7 +202,7 @@ int main()
         float z = cos(angle) * radius;
 
         PhysicsBodyPoint point;
-        if (layerActors->castRaySingleCollision(Line(Vector3(x, 10.0f, z), Vector3(x, -20.0f, z)), point))
+        if (layerActors->castRaySingleCollision(Segment(Vector3(x, 10.0f, z), Vector3(x, -20.0f, z)), point))
         {
             if (point.actor->implements("Land"))
             {

@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "componentCameraOrto.h"
 #include "stage/layerActors.h"
 
@@ -30,6 +33,7 @@ bool ComponentCameraOrto::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf,
         audio->getAudioBase()->setPosition(transform.getPosition());
         audio->getAudioBase()->setOrientation(transform.getRotation());
     }
+    return true;
 }
 
 CameraOrto *ComponentCameraOrto::getCamera()

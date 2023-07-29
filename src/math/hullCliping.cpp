@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "hullCliping.h"
 
 // Clips a face to the back of a plane, return the number of vertices out, stored in ppVtxOut
@@ -200,13 +203,11 @@ void HullCliping::clipHullAgainstHull(
 
         Vector3 middle(0.0f);
         float depth = 0.0f;
-        manifold->normal = normalOnSurfaceB;
         for (int p = 0; p < numPoints; p++)
         {
             depth = fminf(contactsOut[contacts4[p]].w, depth);
             middle += Vector3(contactsOut[contacts4[p]]) / (float)numPoints;
         }
-        manifold->depth = -depth;
-        manifold->addCollisionPoint(middle, middle);
+        manifold->addCollisionPoint(middle, middle, -depth, normalOnSurfaceB);
     }
 }

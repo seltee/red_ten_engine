@@ -10,6 +10,7 @@
 #include "physics/shapes/shapeBox.h"
 #include "physics/shapes/shapeSphere.h"
 #include "physics/shapes/shapeGeometry.h"
+#include "physics/shapes/shapeCapsule.h"
 #include "common/destroyable.h"
 #include "common/renderer.h"
 #include <list>
@@ -48,6 +49,8 @@ public:
 
     EXPORT ShapeGeometry *addShapeGeometry(Geometry *geometry);
     EXPORT ShapeGeometry *addShapeGeometry(Vector3 center, Geometry *geometry);
+
+    EXPORT ShapeCapsule *addShapeCapsule(float height, float radius);
 
     EXPORT virtual Matrix4 getLocalspaceMatrix();
 

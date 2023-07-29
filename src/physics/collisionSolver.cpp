@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "collisionSolver.h"
 #include "actor/actor.h"
 
@@ -8,8 +11,10 @@ CollisionSolver::CollisionSolver(float simScale)
 
 void CollisionSolver::solve(PhysicsBody *a, PhysicsBody *b, CollisionManifold &manifold, float delta)
 {
-    Vector3 normal = manifold.normal;
-    float depth = manifold.depth;
+    Vector3 normal = manifold.normal[0];
+    float depth = manifold.depth[0];
+    if (depth <= 0.0f)
+        return;
 
     Vector3 translate = (normal * depth) * 0.6f;
     if (a->getMotionType() != MotionType::Static)

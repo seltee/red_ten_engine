@@ -217,7 +217,7 @@ void LayerActors::prepareNewActor(Actor *actor)
     actor->getPhysicsBody();
 }
 
-void LayerActors::enablePhisics(Vector3 gravity, float simScale, int stepsPerSecond)
+void LayerActors::enablePhisics(const Vector3 &gravity, float simScale, int stepsPerSecond)
 {
     if (!physicsWorld)
     {
@@ -241,7 +241,7 @@ void LayerActors::disableSorting()
     bUseSorting = false;
 }
 
-bool LayerActors::castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine, float showTime)
+bool LayerActors::castRaySingleCollision(const Segment &ray, PhysicsBodyPoint &resultPoint, bool viewDebugLine, float showTime)
 {
     if (viewDebugLine)
     {
@@ -266,7 +266,7 @@ bool LayerActors::castRaySingleCollision(Line ray, PhysicsBodyPoint &resultPoint
     return false;
 }
 
-std::vector<PhysicsBodyPoint> LayerActors::castRayCollision(Line ray, bool viewDebugLine, float showTime)
+std::vector<PhysicsBodyPoint> LayerActors::castRayCollision(const Segment &ray, bool viewDebugLine, float showTime)
 {
     if (viewDebugLine)
     {
@@ -292,13 +292,13 @@ std::vector<PhysicsBodyPoint> LayerActors::castRayCollision(Line ray, bool viewD
     return list;
 }
 
-std::list<PhysicsBodyPoint> LayerActors::castSphereCollision(Vector3 p, float radius)
+std::list<PhysicsBodyPoint> LayerActors::castSphereCollision(const Vector3 &p, float radius)
 {
     std::list<PhysicsBodyPoint> list;
     return list;
 }
 
-std::list<PhysicsBodyPoint> LayerActors::castPointCollision(Vector3 p)
+std::list<PhysicsBodyPoint> LayerActors::castPointCollision(const Vector3 &p)
 {
     std::list<PhysicsBodyPoint> list;
     return list;
@@ -405,13 +405,13 @@ PhysicsWorld *LayerActors::getPhysicsWorld()
     return physicsWorld;
 }
 
-void LayerActors::showDebugLine(Line ray, Vector3 color, float showTime)
+void LayerActors::showDebugLine(const Segment &ray, const Vector3 &color, float showTime)
 {
     float thickness = activeCamera->getLineThickness();
     debug->addDebugLine(ray.a, ray.b, showTime, thickness, color);
 }
 
-void LayerActors::showDebugBox(Vector3 p, float size, Vector3 color, float showTime)
+void LayerActors::showDebugBox(const Vector3 &p, float size, const Vector3 &color, float showTime)
 {
     size *= activeCamera->getLineThickness();
     debug->addDebugBox(p, size, showTime, color);

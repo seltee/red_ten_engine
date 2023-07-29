@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once

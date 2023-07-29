@@ -1,4 +1,13 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "shapeConvex.h"
+
+ShapeConvex::~ShapeConvex()
+{
+    if (hull)
+        delete hull;
+}
 
 Hull *ShapeConvex::setNewHull(Vector3 *verticies, int amount)
 {
@@ -36,7 +45,7 @@ ShapeCollisionType ShapeConvex::getType()
 }
 
 // From Christer Ericson - Real-Time Collision Detection
-bool ShapeConvex::testRay(Line line, std::vector<RayCollisionPoint> *points)
+bool ShapeConvex::testRay(const Segment &line, std::vector<RayCollisionPoint> *points)
 {
     // Compute direction vector for the segment
     Hull *hull = getHull();
@@ -182,7 +191,7 @@ EdgeQuery ShapeConvex::queryEdgeDirection(ShapeConvex *foreignShape)
                       axis});
 }
 
-Vector3 ShapeConvex::findFurthestPoint(Vector3 direction)
+Vector3 ShapeConvex::findFurthestPoint(const Vector3 &direction)
 {
 
     Hull *hull = getHull();
@@ -206,7 +215,7 @@ Vector3 ShapeConvex::findFurthestPoint(Vector3 direction)
     return Vector3(0.0f, 0.0f, 0.0f);
 }
 
-Vector3 ShapeConvex::getClosestPointToHull(Vector3 point)
+Vector3 ShapeConvex::getClosestPointToHull(const Vector3 &point)
 {
     float minDistance = MAXFLOAT;
     Vector3 closestPoint(0);
@@ -217,13 +226,15 @@ Vector3 ShapeConvex::getClosestPointToHull(Vector3 point)
     for (auto polygonIt = hull->polies.begin(); polygonIt != hull->polies.end(); polygonIt++)
     {
         Vector3 polyPoints[8];
-        for (int i = 0; i < (*polygonIt).pointsAmount;i++){
+        for (int i = 0; i < (*polygonIt).pointsAmount; i++)
+        {
             polyPoints[i] = hull->absoluteVerticies[(*polygonIt).points[i]];
         }
 
-        Vector3 closestCurrent = getClosestPointOnPolygon(polyPoints, (*polygonIt).pointsAmount, (*polygonIt).absoluteNormal, point);
+        Vector3 closestCurrent = getClosestPointOnPolygon(polyPoints, (*polygonIt).pointsAmount, point);
         float distance = glm::length(point - closestCurrent);
-        if (distance < minDistance){
+        if (distance < minDistance)
+        {
             minDistance = distance;
             closestPoint = closestCurrent;
         }
@@ -242,7 +253,7 @@ void ShapeConvex::renderDebug(Matrix4 *projectionView, Matrix4 *model, float sca
         {
             Vector3 vA = hull->absoluteVerticies[edgeIt->a] * scale;
             Vector3 vB = hull->absoluteVerticies[edgeIt->b] * scale;
-            debug->renderLine(vA, vB, projectionView, thickness, Vector3(0.9f, 0.9f, 0.9f));
+            debug->renderLine(vA, vB, projectionView, thickness, debugColorWireframe);
 
             if (edgeIt->polygon)
             {

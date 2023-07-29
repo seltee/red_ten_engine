@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "componentCameraPerspective.h"
 #include "stage/layerActors.h"
 
@@ -30,6 +33,7 @@ bool ComponentCameraPerspective::onRenderPrepare(Matrix4 &vpMatrix, Transformati
         audio->getAudioBase()->setPosition(transform.getPosition());
         audio->getAudioBase()->setOrientation(transform.getRotation());
     }
+    return true;
 }
 
 CameraPerspective *ComponentCameraPerspective::getCamera()

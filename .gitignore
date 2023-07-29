@@ -20,6 +20,7 @@ bin/12-*
 bin/13-*
 bin/14-*
 bin/15-*
+bin/16-*
 .DS_Store
 *.so
 objects/*.o

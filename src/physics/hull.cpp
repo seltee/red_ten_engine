@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "hull.h"
 
 Hull::Hull(Vector3 *verticies, int amount)
@@ -44,14 +47,7 @@ void Hull::updateAbsoluteForm(Matrix4 *transformation, AABB *aabb)
         aabb->end.z = fmaxf(aPosition.z, aabb->end.z);
     }
 
-    for (auto it = polies.begin(); it != polies.end(); it++)
-    {
-        it->absoluteNormal = getPolygonNormal(
-            absoluteVerticies[it->points[0]],
-            absoluteVerticies[it->points[1]],
-            absoluteVerticies[it->points[2]]);
-   }
-
+    rebuildNormals();
     hullCenter = Vector3(*transformation * Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
@@ -83,5 +79,16 @@ void Hull::rebuildEdges()
             }
         }
         indexp++;
+    }
+}
+
+void Hull::rebuildNormals()
+{
+    for (auto it = polies.begin(); it != polies.end(); it++)
+    {
+        it->absoluteNormal = getPolygonNormal(
+            absoluteVerticies[it->points[0]],
+            absoluteVerticies[it->points[1]],
+            absoluteVerticies[it->points[2]]);
     }
 }

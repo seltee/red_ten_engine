@@ -18,8 +18,8 @@ class Actor;
 class PhysicsWorld
 {
 public:
-    EXPORT PhysicsWorld(Vector3 gravity, float simScale, int stepsPerSecond);
-    EXPORT void setBasicParameters(Vector3 gravity, float simScale, int stepsPerSecond);
+    EXPORT PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerSecond);
+    EXPORT void setBasicParameters(const Vector3 &gravity, float simScale, int stepsPerSecond);
 
     EXPORT float getSimScale();
 
@@ -27,7 +27,7 @@ public:
     EXPORT void process(float delta);
     EXPORT void removeDestroyed();
 
-    EXPORT std::vector<PhysicsBodyPoint> castRay(Line ray);
+    EXPORT std::vector<PhysicsBodyPoint> castRay(const Segment &ray);
 
 protected:
     void prepareBodies();

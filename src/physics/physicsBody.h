@@ -59,7 +59,7 @@ public:
 
     EXPORT void translate(Vector3 v);
 
-    EXPORT void addConstraint6DOF(Constraint6DOFDescriptor descriptor)
+    EXPORT void addConstraint6DOF(const Constraint6DOFDescriptor &descriptor)
     {
         auto constraint = new Constraint6DOF(descriptor);
         constraints.push_back(constraint);
@@ -67,11 +67,11 @@ public:
 
     EXPORT Matrix3 getInvertedInertia();
 
-    EXPORT Vector3 getPointVelocity(Vector3 localPoint);
+    EXPORT Vector3 getPointVelocity(const Vector3 &localPoint);
 
-    EXPORT void process(float delta, Vector3 gravity);
+    EXPORT void process(float delta, const Vector3 &gravity);
 
-    EXPORT void castRay(Line ray, std::vector<PhysicsBodyPoint> *points);
+    EXPORT void castRay(const Segment &ray, std::vector<PhysicsBodyPoint> *points);
 
     inline ShapeCollisionType getType()
     {
@@ -91,11 +91,11 @@ public:
     {
         return actor;
     }
-    inline bool checkAABB(AABB aabb)
+    inline bool checkAABB(const AABB &aabb)
     {
         return getAABB().test(aabb);
     }
-    inline bool checkAABB(Line line)
+    inline bool checkAABB(const Segment &line)
     {
         return getAABB().test(line);
     }
