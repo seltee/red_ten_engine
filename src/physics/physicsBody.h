@@ -7,6 +7,7 @@
 #include "physics/constraint6DOF.h"
 #include <vector>
 #include <thread>
+#include <mutex>
 
 class PhysicsBody;
 class Actor;
@@ -111,6 +112,14 @@ public:
     {
         bIsSleeping = false;
     }
+    inline bool isEnabled()
+    {
+        return this->bIsEnabled;
+    }
+    inline void setEnabled(bool bState)
+    {
+        this->bIsEnabled = bState;
+    }
 
     void setAsleep();
 
@@ -139,4 +148,6 @@ protected:
 
     bool bIsSleeping = false;
     float sleepAccumulator = 0.0f;
+
+    bool bIsEnabled = true;
 };

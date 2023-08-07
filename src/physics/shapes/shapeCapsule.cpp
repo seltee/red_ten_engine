@@ -15,8 +15,8 @@ ShapeCapsule::ShapeCapsule(float height, float radius, PhysicsWorld *world) : Sh
     float dRadius = this->radius * this->radius;
     float dHeight = this->height * this->height;
     float density = 20.0f;
-    float massHalfSphere = (2.0f * dRadius * this->radius * M_PI) / 3.0f * density;
-    float massCilinder = this->height * dRadius * M_PI * density;
+    float massHalfSphere = (2.0f * dRadius * this->radius * CONST_PI) / 3.0f * density;
+    float massCilinder = this->height * dRadius * CONST_PI * density;
     mass = massHalfSphere * 2.0f + massCilinder;
 
     float xz = massCilinder * (dHeight / 12.0f + dRadius / 4.0f) + 2.0f * massHalfSphere * ((2.0f * dRadius) / 5.0f + dHeight / 2.0f + (3.0f * this->height * this->radius) / 8.0f);
@@ -127,8 +127,8 @@ void ShapeCapsule::renderDebug(Matrix4 *projectionView, Matrix4 *model, float sc
 
     for (int i = 0; i < 10; i++)
     {
-        float lA = (float)i / 10.0f * M_PI * 2.0f;
-        float lB = (float)(i + 1) / 10.0f * M_PI * 2.0f;
+        float lA = (float)i / 10.0f * CONST_PI * 2.0f;
+        float lB = (float)(i + 1) / 10.0f * CONST_PI * 2.0f;
 
         debug->renderLine(
             (absoluteCapsule.a + vPerpendicular * radius * sinf(lA) + vSide * radius * cosf(lA)) * scale,
@@ -143,8 +143,8 @@ void ShapeCapsule::renderDebug(Matrix4 *projectionView, Matrix4 *model, float sc
 
     for (int i = 0; i < 6; i++)
     {
-        float lA = (float)i / 6.0f * M_PI;
-        float lB = (float)(i + 1) / 6.0f * M_PI;
+        float lA = (float)i / 6.0f * CONST_PI;
+        float lB = (float)(i + 1) / 6.0f * CONST_PI;
 
         debug->renderLine(
             (absoluteCapsule.a + vPerpendicular * radius * cosf(lA) + vDirection * radius * sinf(lA)) * scale,

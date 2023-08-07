@@ -5,6 +5,8 @@ bin/*.lib
 bin/*.pdb
 bin/*.so
 bin/*.ini
+bin/*.dll
+bin/*.ilk
 bin/1-*
 bin/2-*
 bin/3-*
@@ -23,5 +25,12 @@ bin/15-*
 bin/16-*
 .DS_Store
 *.so
+*.exe
+*.exp
+*.lib
+*.pdb
+*.ini
+*.dll 
+*.ilk  
 objects/*.o
 log.txt

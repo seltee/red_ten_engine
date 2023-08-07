@@ -9,8 +9,8 @@
 class ActorCamera : public Actor
 {
 public:
-    CameraOrto *setupOrtoCamera();
-    CameraPerspective *setupPerspectiveCamera();
+    EXPORT CameraOrto *setupOrtoCamera();
+    EXPORT CameraPerspective *setupPerspectiveCamera();
 
     inline Camera *getCamera() { return camera; };
     inline Component *getCameraComponent() { return componentCamera; }

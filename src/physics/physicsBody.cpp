@@ -44,7 +44,7 @@ void PhysicsBody::finishStep(float delta)
         bIsSleeping = false;
     }
 
-    if (motion && !bIsSleeping)
+    if (motion && !bIsSleeping && bIsEnabled)
     {
         if (constraints.size() > 0)
             for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)

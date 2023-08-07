@@ -257,7 +257,7 @@ inline Vector3 getClosestPointOnTriangle(const Vector3 *tri, const Vector3 &poin
 
 inline Vector3 getClosestPointOnPolygon(const Vector3 *verticies, const int amount, const Vector3 &point)
 {
-    float minDist = MAXFLOAT;
+    float minDist = FLT_MAX;
     Vector3 out(0.0f);
     for (int i = 0; i < amount - 2; i++)
     {
