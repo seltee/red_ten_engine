@@ -52,7 +52,11 @@ COPY = cp -f
 MOVE = mv -f
 endif
 
+ifeq ($(OS),Windows_NT)
 EFLAGS = -L./ -llibrtengine
+else
+EFLAGS = -L./ -lrtengine
+endif
 
 SRCDIR = src
 EXMDIR = examples

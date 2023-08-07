@@ -5,15 +5,15 @@
 
 #ifdef _WIN32
 #include "windows.h"
-#define OPT_THREAD()                                              \
-    {                                                             \
-        int core = 1;                                             \
-        for (auto &th : threads)                                  \
-        {                                                         \
-            SetThreadAffinityMask(th.native_handle(), 1 << core); \
-            SetThreadPriority(th.native_handle(), 2);             \
-            core++;                                               \
-        }                                                         \
+#define OPT_THREAD()                                                        \
+    {                                                                       \
+        int core = 1;                                                       \
+        for (auto &th : threads)                                            \
+        {                                                                   \
+            SetThreadAffinityMask(th.native_handle(), 1 << core);           \
+            SetThreadPriority(th.native_handle(), THREAD_PRIORITY_HIGHEST); \
+            core++;                                                         \
+        }                                                                   \
     }
 #else
 #define OPT_THREAD() \
@@ -130,6 +130,8 @@ PhysicsWorld::PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerS
     // On 24 core i7 CPU this way it works faster
     if (maxThreads >= 12)
         maxThreads = maxThreads / 2;
+    else
+        maxThreads--;
 #else
     if (maxThreads > 1)
         maxThreads--;
@@ -137,8 +139,6 @@ PhysicsWorld::PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerS
 
     if (maxThreads <= 0)
         maxThreads = 1;
-
-    printf("Max threads %i\n", maxThreads);
 }
 
 void PhysicsWorld::setBasicParameters(const Vector3 &gravity, float simScale, int stepsPerSecond)
