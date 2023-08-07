@@ -1,6 +1,25 @@
 #include "physicsWorld.h"
 #include <thread>
+#include <mutex>
 #include <chrono>
+
+#ifdef _WIN32
+#include "windows.h"
+#define OPT_THREAD()                                              \
+    {                                                             \
+        int core = 1;                                             \
+        for (auto &th : threads)                                  \
+        {                                                         \
+            SetThreadAffinityMask(th.native_handle(), 1 << core); \
+            SetThreadPriority(th.native_handle(), 2);             \
+            core++;                                               \
+        }                                                         \
+    }
+#else
+#define OPT_THREAD() \
+    {                \
+    }
+#endif
 
 std::mutex lock;
 
@@ -30,8 +49,13 @@ void _collectPairs(
 {
     for (auto a = bodyStart; a < bodyEnd; a++)
     {
+        if (!(*a)->isEnabled())
+            continue;
         for (auto b = bodyList->begin(); b != bodyList->end(); b++)
         {
+            if (!(*b)->isEnabled())
+                continue;
+
             if (a == b)
                 break;
 
@@ -96,7 +120,25 @@ void _ray(
 PhysicsWorld::PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerSecond)
 {
     setBasicParameters(gravity, simScale, stepsPerSecond);
-    maxThreads = std::thread::hardware_concurrency();
+
+    maxThreads = std::thread::hardware_concurrency() - 1;
+
+    if (maxThreads > 1)
+        maxThreads--;
+
+#ifdef _WIN32
+    // On 24 core i7 CPU this way it works faster
+    if (maxThreads >= 12)
+        maxThreads = maxThreads / 2;
+#else
+    if (maxThreads > 1)
+        maxThreads--;
+#endif
+
+    if (maxThreads <= 0)
+        maxThreads = 1;
+
+    printf("Max threads %i\n", maxThreads);
 }
 
 void PhysicsWorld::setBasicParameters(const Vector3 &gravity, float simScale, int stepsPerSecond)
@@ -123,6 +165,8 @@ PhysicsBody *PhysicsWorld::createPhysicsBody(Shape *shape, Actor *actor)
 
 void PhysicsWorld::process(float delta)
 {
+    // auto start = std::chrono::high_resolution_clock::now();
+
     deltaAccumulator += delta;
     prepareBodies();
     while (deltaAccumulator > subStep)
@@ -138,6 +182,8 @@ void PhysicsWorld::process(float delta)
         solveSollisions(&collisionCollector);
         finishStep();
     }
+
+    // printf("%i\n", std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start).count());
 }
 
 void PhysicsWorld::removeDestroyed()
@@ -157,6 +203,7 @@ std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
 {
     std::vector<PhysicsBodyPoint> points;
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     Segment rayLocal = Segment(ray.a * simScale, ray.b * simScale);
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
@@ -171,9 +218,9 @@ std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
             currentBody += bodiesPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
-
     return points;
 }
 
@@ -181,6 +228,7 @@ std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
 void PhysicsWorld::prepareBodies()
 {
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     for (int i = 0; i < maxThreads; i++)
@@ -193,6 +241,7 @@ void PhysicsWorld::prepareBodies()
             currentBody += bodiesPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
 }
@@ -202,6 +251,7 @@ void PhysicsWorld::applyForces()
 {
     Vector3 localGravity = gravity * simScale;
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     for (int i = 0; i < maxThreads; i++)
@@ -214,6 +264,7 @@ void PhysicsWorld::applyForces()
             currentBody += bodiesPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
 }
@@ -222,6 +273,7 @@ void PhysicsWorld::findCollisionPairs(std::vector<BodyPair> *pairs)
 {
     // find possible collision pairs
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     int bodiesPerThread = bodies.size() / maxThreads;
     for (int i = 0; i < maxThreads; i++)
@@ -234,6 +286,7 @@ void PhysicsWorld::findCollisionPairs(std::vector<BodyPair> *pairs)
             currentBody += bodiesPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
 }
@@ -243,6 +296,7 @@ void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollect
 
     // find exact collisions
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     std::vector<BodyPair>::iterator currentPair = pairs->begin();
     int pairsPerThread = pairs->size() / maxThreads;
     for (int i = 0; i < maxThreads; i++)
@@ -257,6 +311,7 @@ void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollect
             currentPair += pairsPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
 }
@@ -265,6 +320,7 @@ void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
 {
     // solve collision pairs
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     if (collisionCollector->pairs.size() > 0)
     {
         threads.clear();
@@ -282,6 +338,7 @@ void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
                 currentCollisionPair += pairsPerThread;
             }
         }
+        OPT_THREAD()
         for (auto &th : threads)
             th.join();
     }
@@ -290,6 +347,7 @@ void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
 void PhysicsWorld::finishStep()
 {
     std::vector<std::thread> threads;
+    threads.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     for (int i = 0; i < maxThreads; i++)
@@ -302,6 +360,7 @@ void PhysicsWorld::finishStep()
             currentBody += bodiesPerThread;
         }
     }
+    OPT_THREAD()
     for (auto &th : threads)
         th.join();
 }

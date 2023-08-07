@@ -217,7 +217,7 @@ Vector3 ShapeConvex::findFurthestPoint(const Vector3 &direction)
 
 Vector3 ShapeConvex::getClosestPointToHull(const Vector3 &point)
 {
-    float minDistance = MAXFLOAT;
+    float minDistance = FLT_MAX;
     Vector3 closestPoint(0);
     Hull *hull = getHull();
     if (!hull)

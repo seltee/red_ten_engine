@@ -48,7 +48,7 @@ void ShapeGeometry::provideTransformation(Matrix4 *transformation)
 Vector3 ShapeGeometry::getClosestPoint(const Vector3 &point)
 {
     int triCount = verticiesAmount / 3;
-    float minDistance = MAXFLOAT;
+    float minDistance = FLT_MAX;
     Vector3 out(0.0f);
     for (int i = 0; i < triCount; i++)
     {
@@ -67,7 +67,7 @@ Vector3 ShapeGeometry::getClosestPoint(const Vector3 &point)
 float ShapeGeometry::getClosestPoint(const Segment &segment, Vector3 &onSegment, Vector3 &onGeometry)
 {
     int triCount = verticiesAmount / 3;
-    float minDistance = MAXFLOAT;
+    float minDistance = FLT_MAX;
     for (int i = 0; i < triCount; i++)
     {
         int s = i * 3;

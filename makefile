@@ -4,7 +4,7 @@ LD = clang++
 ifeq ($(OS),Windows_NT)
 SDL_LIB_PATH = "../SDL2-2.0.14"
 SDL_TTF_LIB_PATH = "../SDL2_ttf-2.0.15"
-OPENAL_LIB_PATH = "../OpenAL"
+OPENAL_LIB_PATH = "../openal"
 else
 SDL_LIB_PATH = "/opt/homebrew/Cellar/sdl2/2.28.1/"
 SDL_TTF_LIB_PATH = "/opt/homebrew/Cellar/sdl2_ttf/2.20.2/"
@@ -24,9 +24,10 @@ CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
 endif
 
 ifeq ($(OS),Windows_NT)
-LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64 \
+LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64/ \
+			-L${OPENAL_LIB_PATH}/libs/Win64/ \
 			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
-			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32
+			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lOpenAL32.lib
 else
 LIBRARIES = -L${SDL_LIB_PATH}/lib -L${SDL_TTF_LIB_PATH}/lib \
 			-lSDL2 -lSDL2main -lSDL2_ttf -framework OpenGL -framework OpenAL
@@ -43,7 +44,7 @@ LFLAGS = -shared -Wall -g
 # The build target 
 ifeq ($(OS),Windows_NT)
 TARGET = librtengine.dll
-COPY = copy
+COPY = xcopy /Y
 MOVE = move
 else
 TARGET = librtengine.so
@@ -51,9 +52,11 @@ COPY = cp -f
 MOVE = mv -f
 endif
 
-
-
+ifeq ($(OS),Windows_NT)
+EFLAGS = -L./ -llibrtengine
+else
 EFLAGS = -L./ -lrtengine
+endif
 
 SRCDIR = src
 EXMDIR = examples
@@ -371,7 +374,7 @@ ${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
 
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)
-	${COPY} ${TARGET} ${BINDIR}/${TARGET}
+	${COPY} ${TARGET} ${BINDIR}\${TARGET}
 
 
 examples: ${EXAMPLES} engine
@@ -486,8 +489,6 @@ ${OBJDIR}/16-helloFPV.o: ${EXMDIR}/16-helloFPV.cpp
 16-helloFPV${EXT}: ${OBJDIR}/16-helloFPV.o
 	$(LD) ${EFLAGS} ${OBJDIR}/16-helloFPV.o -o 16-helloFPV${EXT}
 	${MOVE} 16-helloFPV${EXT} ${BINDIR}/16-helloFPV${EXT}
-
-
 
 # llvm-objcopy
 clean:

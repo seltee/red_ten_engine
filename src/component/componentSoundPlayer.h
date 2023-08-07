@@ -10,5 +10,5 @@
 class ComponentSoundPlayer : public Component, public SoundPlayer
 {
 public:
-    bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
+    EXPORT bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
 };

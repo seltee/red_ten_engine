@@ -126,7 +126,7 @@ int main()
             float z = randf(-6.0f, 6.0f);
 
             spawn->transform.setPosition(x, y, z);
-            spawn->transform.setRotation(Vector3(randf(-M_PI, M_PI), randf(-M_PI, M_PI), randf(-M_PI, M_PI)));
+            spawn->transform.setRotation(Vector3(randf(-CONST_PI, CONST_PI), randf(-CONST_PI, CONST_PI), randf(-CONST_PI, CONST_PI)));
         }
     }
 
