@@ -369,12 +369,12 @@ ${OBJDIR}/audioBase.o: ${SRCDIR}/audio/audioBase.cpp
 ${OBJDIR}/audioCreator.o: ${SRCDIR}/audio/audioCreator.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioCreator.o ${SRCDIR}/audio/audioCreator.cpp
 
-${OBJDIR}/audioSource.o: ${SRCDIR}\audio/audioSource.cpp
+${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioSource.o ${SRCDIR}/audio/audioSource.cpp
 
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)
-	${COPY} ${TARGET} ${BINDIR}\${TARGET}
+	${COPY} ${TARGET} ${BINDIR}/${TARGET}
 
 
 examples: ${EXAMPLES} engine
