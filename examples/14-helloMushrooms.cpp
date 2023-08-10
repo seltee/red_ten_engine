@@ -75,12 +75,12 @@ ResourceMesh *Mushroom::mushroomMesh = nullptr;
 class Pointer : public ActorPawn
 {
 public:
-    Pointer()
+    Pointer() : ActorPawn(this)
     {
-        auto mousePressInput = registerButtonCallback(this, &Pointer::mousePress);
+        auto mousePressInput = registerButtonCallback(&Pointer::mousePress);
         mousePressInput->addMouseButtonBinding(InputTypeMouse::LEFT_BUTTON, 1.0f);
 
-        auto mouseMoveInput = registerAxisCallback(this, &Pointer::mouseMove);
+        auto mouseMoveInput = registerAxisCallback(&Pointer::mouseMove);
         mouseMoveInput->addMouseMoveBinding(1.0f);
     }
 

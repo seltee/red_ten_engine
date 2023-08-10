@@ -83,3 +83,28 @@ AABB ShapeSphere::getAABB()
 {
     return AABB(absoluteCenter - Vector3(radius, radius, radius), absoluteCenter + Vector3(radius, radius, radius));
 }
+
+void ShapeSphere::renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness)
+{
+
+    for (int i = 0; i < 16; i++)
+    {
+        float lA = (float)i / 16.0f * CONST_PI * 2.0f;
+        float lB = (float)(i + 1) / 16.0f * CONST_PI * 2.0f;
+
+        debug->renderLine(
+            (absoluteCenter + Vector3(radius * sinf(lA), radius * cosf(lA), 0.0f)) * scale,
+            (absoluteCenter + Vector3(radius * sinf(lB), radius * cosf(lB), 0.0f)) * scale,
+            projectionView, thickness, debugColorWireframe);
+
+        debug->renderLine(
+            (absoluteCenter + Vector3(0.0f, radius * sinf(lA), radius * cosf(lA))) * scale,
+            (absoluteCenter + Vector3(0.0f, radius * sinf(lB), radius * cosf(lB))) * scale,
+            projectionView, thickness, debugColorWireframe);
+
+        debug->renderLine(
+            (absoluteCenter + Vector3(radius * cosf(lA), 0.0f, radius * sinf(lA))) * scale,
+            (absoluteCenter + Vector3(radius * cosf(lB), 0.0f, radius * sinf(lB))) * scale,
+            projectionView, thickness, debugColorWireframe);
+    }
+}

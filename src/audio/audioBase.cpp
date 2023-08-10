@@ -35,9 +35,17 @@ AudioBase::AudioBase(Config *config)
 
 void AudioBase::process(float delta)
 {
-    for (auto it = sources.begin(); it != sources.end(); it++)
+    auto it = sources.begin();
+    while (it != sources.end())
     {
         (*it)->process(delta);
+        if ((*it)->isDestroyed())
+        {
+            delete (*it);
+            it = sources.erase(it);
+        }
+        else
+            ++it;
     }
 }
 

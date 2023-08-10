@@ -17,7 +17,7 @@ enum class InputType
 
 enum class InputTypeMouse
 {
-    ALL = 0,
+    ALL = -1,
     LEFT_BUTTON = 1,
     MIDDLE_BUTTON = 2,
     RIGHT_BUTTON = 3,

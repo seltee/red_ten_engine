@@ -10,7 +10,7 @@
 class JoJo : public ActorPawn
 {
 public:
-    JoJo() : ActorPawn()
+    JoJo() : ActorPawn(this)
     {
         registerClassName("JoJo");
         transform.setScale(0.8);
@@ -23,7 +23,7 @@ public:
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(jojoTexture);
 
-        auto inputX = registerAxisCallback(this, &JoJo::controlX);
+        auto inputX = registerAxisCallback(&JoJo::controlX);
         inputX->addKeyboardBinding(KeyboardCodes::D, 400.0f);
         inputX->addKeyboardBinding(KeyboardCodes::A, -400.0f);
         inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 400.0f);

@@ -15,12 +15,12 @@ ifeq ($(OS),Windows_NT)
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
 		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
-		-Wall -c  -std=c++17 -mfpmath=sse -mavx -fdeclspec -g
+		-Wall -c  -std=c++17 -mfpmath=sse -mavx -fdeclspec -g -O2
 else
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
 		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
-		-Wall -c  -std=c++17 -fdeclspec -g
+		-Wall -c  -std=c++17 -fdeclspec -g -O2
 endif
 
 ifeq ($(OS),Windows_NT)

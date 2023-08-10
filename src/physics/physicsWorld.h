@@ -36,6 +36,8 @@ protected:
     void findCollisions(std::vector<BodyPair> *pairs, CollisionCollector *collisionCollector);
     void solveSollisions(CollisionCollector *collisionCollector);
     void finishStep();
+    void triggerCollisionEvents(CollisionCollector *collisionCollector);
+    void removeNotPersistedCollisions();
 
     std::vector<PhysicsBody *> bodies;
     CollisionDispatcher collisionDispatcher;

@@ -104,6 +104,17 @@ void AudioSource::setMaxDistance(float maxDistance)
 {
     alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
 }
+void AudioSource::setVolume(float volume)
+{
+    alSourcef(sourceID, AL_GAIN, volume);
+}
+
+float AudioSource::getVolume()
+{
+    float out;
+    alGetSourcef(sourceID, AL_GAIN, &out);
+    return out;
+}
 
 float AudioSource::getMaxDistance()
 {
@@ -137,21 +148,20 @@ void AudioSource::play(Sound *sound)
     }
     if (sound->isLoaded() && sound->isStreamable())
     {
-
-        /*
         if (soundStream)
-            sound->closeBuffer(soundStream);
+            closeStream();
+        soundStream = new SoundStream();
+        alGenBuffers((ALuint)SOUND_BUFFERS_AMOUNT, soundStream->buffers);
 
-        soundStream = sound->createNewStream();
-        if (soundStream)
+        if (sound->setupStream(soundStream))
         {
-            sound->processBuffers(soundStream);
+            state = AudioSourceState::Playing;
+            repeatStream = false;
+
+            sound->processBuffers(soundStream, processStreamChunk);
             alSourceQueueBuffers(sourceID, SOUND_BUFFERS_AMOUNT, soundStream->buffers);
             alSourcePlay(sourceID);
-            state = AL_PLAYING;
-            repeatStream = false;
         }
-        */
     }
 }
 

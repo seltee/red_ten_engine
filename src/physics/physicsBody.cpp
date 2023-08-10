@@ -1,4 +1,5 @@
 #include "physicsBody.h"
+#include "actor/actor.h"
 
 PhysicsBody::PhysicsBody(Shape *shape, float simScale)
 {
@@ -8,6 +9,10 @@ PhysicsBody::PhysicsBody(Shape *shape, float simScale)
 
 PhysicsBody::~PhysicsBody()
 {
+    for (auto &body : bodyCollisionData)
+    {
+        body.foreignBody->notifyBodyRemoved(this);
+    }
 }
 
 void PhysicsBody::prepareSteps()
@@ -78,10 +83,64 @@ void PhysicsBody::finishStep(float delta)
         else
             sleepAccumulator = 0.0f;
     }
+
+    for (auto &body : bodyCollisionData)
+    {
+        body.reaccuredTimer += delta;
+    }
 }
 
-void PhysicsBody::setRelation(Transformation *transformation)
+void PhysicsBody::triggerPostCollisionEvent(PhysicsBody *foreignBody, Vector3 &point)
 {
+    for (auto it = bodyCollisionData.begin(); it != bodyCollisionData.end(); it++)
+    {
+        if ((*it).foreignBody == foreignBody)
+        {
+            it->point = point;
+            it->reaccuredTimer = 0.0f;
+            if (owner)
+                owner->onCollidePersisted(foreignBody->getOwner(), point);
+            return;
+        }
+    }
+    bodyCollisionData.push_back(BodyCollisionData({foreignBody, point, 0.0f}));
+    if (owner)
+        owner->onCollide(foreignBody->getOwner(), point);
+}
+
+void PhysicsBody::removeNotPersistedCollisions()
+{
+    auto it = bodyCollisionData.begin();
+    while (it != bodyCollisionData.end())
+    {
+        if (it->reaccuredTimer > 0.015f)
+        {
+            it = bodyCollisionData.erase(it);
+            if (owner)
+                owner->onCollideStopped((*it).foreignBody->getOwner());
+        }
+        else
+            ++it;
+    }
+}
+
+void PhysicsBody::notifyBodyRemoved(PhysicsBody *body)
+{
+    for (auto it = bodyCollisionData.begin(); it != bodyCollisionData.end(); it++)
+    {
+        if (it->foreignBody == body)
+        {
+            if (owner)
+                owner->onCollideStopped(it->foreignBody->getOwner());
+            bodyCollisionData.erase(it);
+            break;
+        }
+    }
+}
+
+void PhysicsBody::setRelation(Transformation *transformation, Actor *owner)
+{
+    this->owner = owner;
     this->transformation = transformation;
     position = transformation->getPosition() * simScale;
     orientation = transformation->getRotation();

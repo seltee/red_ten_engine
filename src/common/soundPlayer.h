@@ -14,7 +14,7 @@ class SoundPlayer : public ChildProcess, public WithAudio
 {
 public:
     EXPORT SoundPlayer();
-    EXPORT ~SoundPlayer();
+    EXPORT virtual ~SoundPlayer();
 
     EXPORT void setPosition(Vector3 position);
 

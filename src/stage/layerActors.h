@@ -41,7 +41,7 @@ public:
     EXPORT std::list<Actor *> getActorsByName(std::string name);
     EXPORT std::list<Actor *> getActorsByPartName(std::string partOfName);
     EXPORT static LayerActors *getActorsLayer(Actor *actor);
-    EXPORT void clear(bool destroyCameras = true);
+    EXPORT void clear();
 
     EXPORT void setVisible(bool state);
     EXPORT bool isVisible();

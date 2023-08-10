@@ -35,7 +35,7 @@ Sound::Sound(std::string path)
             (path[length - 3] == 'w' || path[length - 3] == 'W') &&
             path[length - 4] == '.')
         {
-            logger->logf("%s - wav\n", path.c_str());
+            logger->logf("%s - wav", path.c_str());
             extension = Extension::WAV;
             bIsStreamable = false;
         }
@@ -46,7 +46,7 @@ Sound::Sound(std::string path)
             (path[length - 3] == 'o' || path[length - 3] == 'O') &&
             path[length - 4] == '.')
         {
-            logger->logf("%s - ogg\n", path.c_str());
+            logger->logf("%s - ogg", path.c_str());
             extension = Extension::OGG;
         }
     }
@@ -145,14 +145,14 @@ bool Sound::loadWAV()
     FILE *file = fopen(path.c_str(), "rb");
     if (file == nullptr)
     {
-        logger->logff("unable to open file %s\n", path.c_str());
+        logger->logff("unable to open file %s", path.c_str());
         return false;
     }
 
     WavHeader wavHeader;
     fread(&wavHeader, sizeof(WavHeader), 1, file);
 
-    logger->logf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i, data size %i\n",
+    logger->logf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i, data size %i",
                  path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
                  wavHeader.bitsPerSample, wavHeader.dataSize);
 
@@ -160,7 +160,7 @@ bool Sound::loadWAV()
     data = (unsigned char *)malloc(dataSize);
     if (!data)
     {
-        logger->logff("failed to make buffer of %i\n", dataSize);
+        logger->logff("failed to make buffer of %i", dataSize);
         fclose(file);
         return false;
     }
@@ -200,7 +200,7 @@ bool Sound::loadWAV()
     if (format == AudioFormat::UNKNOWN)
     {
         free(data);
-        logger->logff("Unknown sound format in %s\n", path.c_str());
+        logger->logff("Unknown sound format in %s", path.c_str());
         return false;
     }
 
@@ -214,7 +214,7 @@ bool Sound::loadOGG()
     FILE *file = fopen(path.c_str(), "rb");
     if (file == nullptr)
     {
-        logger->logff("unable to open file %s\n", path.c_str());
+        logger->logff("unable to open file %s", path.c_str());
         return false;
     }
     fclose(file);

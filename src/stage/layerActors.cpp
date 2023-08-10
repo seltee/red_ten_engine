@@ -350,18 +350,11 @@ LayerActors *LayerActors::getActorsLayer(Actor *actor)
     return (LayerActors *)actor->getCurrentLayer();
 }
 
-void LayerActors::clear(bool destroyCameras)
+void LayerActors::clear()
 {
     if (actors.size() > 0)
-    {
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
-        {
-            if ((!destroyCameras && !(*actor)->implements("Camera")) || (destroyCameras))
-            {
-                (*actor)->destroy();
-            }
-        }
-    }
+            (*actor)->destroy();
 }
 
 void LayerActors::setVisible(bool state)

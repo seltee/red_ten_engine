@@ -3,8 +3,9 @@
 
 std::vector<Input<Pawn> *> Pawn::inputs;
 
-Pawn::Pawn()
+Pawn::Pawn(void *selfPointer)
 {
+    setSelfPointer(selfPointer);
 }
 
 Pawn::~Pawn()
@@ -21,7 +22,7 @@ void Pawn::removeAllInputs()
 {
     auto it = inputs.begin();
     while (it != inputs.end())
-        if ((*it)->getOwner() == this)
+        if ((*it)->getOwner() == selfPointer)
         {
             delete (*it);
             it = inputs.erase(it);

@@ -85,8 +85,8 @@ int main()
     auto platform = layerActors->createActor<Platform>();
     platform->transform.setPosition(Vector3(0.0f, -3.0f, 0.0f));
 
-    // spawn 500 objects
-    for (int i = 0; i < 500; i++)
+    // spawn 1000 objects
+    for (int i = 0; i < 1000; i++)
     {
         Actor *spawn = nullptr;
         int sp = i % 3;

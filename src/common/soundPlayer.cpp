@@ -106,9 +106,10 @@ float SoundPlayer::getReferenceDistance()
 
 void SoundPlayer::setVolume(float volume)
 {
+    audioSource->setVolume(volume);
 }
 
 float SoundPlayer::getVolume()
 {
-    return 1.0f;
+    return audioSource->getVolume();
 }

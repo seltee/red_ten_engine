@@ -9,10 +9,10 @@
 // It means it loads portions of the song on the go to reduce memory consuption.
 // This works only with OGG format files, wav format is always being loaded entirely
 // Btw, Jojo belongs to it's owner and has no relation to Red Ten Roads
-class JoJo : public ActorPawn
+class JoJo : public Actor
 {
 public:
-    JoJo() : ActorPawn()
+    JoJo()
     {
         registerClassName("JoJo");
     }

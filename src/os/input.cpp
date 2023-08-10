@@ -48,7 +48,7 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
         {
             for (auto it = bindings.begin(); it != bindings.end(); it++)
             {
-                if (it->type == InputType::MOUSE && (it->code == (int)InputTypeMouseMove::MOVE || it->code == code))
+                if (it->type == InputType::MOUSE && (it->code == (int)InputTypeMouseMove::MOVE))
                     updateAbsoluteOutput(InputType::MOUSE, (int)InputTypeMouse::MOVEMENT, code, value);
             }
         }
@@ -70,7 +70,9 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
             for (auto it = bindings.begin(); it != bindings.end(); it++)
             {
                 if (it->type == InputType::MOUSE && (it->code == -1 || it->code == code))
+                {
                     states.push_back(BindingState({InputType::MOUSE, -1, code, value * it->modifier}));
+                }
             }
         }
 
@@ -174,12 +176,12 @@ void InputBase::addKeyboardBinding(KeyboardCodes code, float modifier)
 
 void InputBase::addMouseButtonBinding(float modifier)
 {
-    bindings.push_back(Binding({InputType::MOUSE, (int)InputTypeMouse::ALL, -1, modifier}));
+    bindings.push_back(Binding({InputType::MOUSE, -1, (int)InputTypeMouse::ALL, modifier}));
 }
 
 void InputBase::addMouseButtonBinding(InputTypeMouse button, float modifier)
 {
-    bindings.push_back(Binding({InputType::MOUSE, (int)button, -1, modifier}));
+    bindings.push_back(Binding({InputType::MOUSE, -1, (int)button, modifier}));
 }
 
 void InputBase::addMouseMoveBinding(float modifier)

@@ -25,6 +25,13 @@ struct PhysicsBodyPoint
     float distance;
 };
 
+struct BodyCollisionData
+{
+    PhysicsBody *foreignBody;
+    Vector3 point;
+    float reaccuredTimer;
+};
+
 class PhysicsBody : public Destroyable
 {
 public:
@@ -33,7 +40,11 @@ public:
     EXPORT void prepareSteps();
     EXPORT void finishStep(float delta);
 
-    EXPORT void setRelation(Transformation *transformation);
+    EXPORT void triggerPostCollisionEvent(PhysicsBody *foreignBody, Vector3 &point);
+    EXPORT void removeNotPersistedCollisions();
+    EXPORT void notifyBodyRemoved(PhysicsBody *body);
+
+    EXPORT void setRelation(Transformation *transformation, Actor *owner);
     EXPORT void setStaticMotionType();
     EXPORT void setDynamicMotionType(float linearDamping = 0.15f, float angularDamping = 0.05f, float gravityFactor = 1.0f);
 
@@ -57,6 +68,8 @@ public:
     EXPORT Vector3 getAngularVelocity();
     EXPORT void setAngularVelocity(Vector3 velocity);
     EXPORT void addAngularVelocity(Vector3 velocity);
+
+    inline std::vector<BodyCollisionData> *getCollisionBodies() { return &bodyCollisionData; }
 
     EXPORT void translate(Vector3 v);
 
@@ -83,6 +96,8 @@ public:
     {
         return shape;
     }
+
+    inline Actor *getOwner() { return owner; }
 
     inline void setActor(Actor *actor)
     {
@@ -125,9 +140,12 @@ public:
 
 protected:
     std::vector<Constraint *> constraints;
+    std::vector<BodyCollisionData> bodyCollisionData;
+
     Vector3 translationAccumulator = Vector3(0.0f);
 
     Transformation *transformation = nullptr;
+    Actor *owner = nullptr;
 
     Matrix4 localTransform;
     MotionType motionType = MotionType::Static;

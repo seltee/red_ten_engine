@@ -15,7 +15,7 @@ class AudioSource : public Destroyable
 {
 public:
     AudioSource();
-    ~AudioSource();
+    virtual ~AudioSource();
 
     void process(float delta);
 
@@ -23,6 +23,8 @@ public:
     void setGain(float gain);
     void setPosition(Vector3 p);
     void setVelocity(Vector3 v);
+    void setVolume(float volume);
+    float getVolume();
 
     void setMaxDistance(float maxDistance);
     float getMaxDistance();

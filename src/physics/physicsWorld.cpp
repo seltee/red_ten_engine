@@ -147,6 +147,8 @@ void PhysicsWorld::process(float delta)
         findCollisions(&pairs, &collisionCollector);
         solveSollisions(&collisionCollector);
         finishStep();
+        triggerCollisionEvents(&collisionCollector);
+        removeNotPersistedCollisions();
     }
 }
 
@@ -319,4 +321,19 @@ void PhysicsWorld::finishStep()
     }
     for (auto &ft : futures)
         ft.wait();
+}
+
+void PhysicsWorld::triggerCollisionEvents(CollisionCollector *collisionCollector)
+{
+    for (auto &pair : collisionCollector->pairs)
+    {
+        pair.a->triggerPostCollisionEvent(pair.b, pair.manifold.pointsOnA[0]);
+        pair.b->triggerPostCollisionEvent(pair.a, pair.manifold.pointsOnB[0]);
+    }
+}
+
+void PhysicsWorld::removeNotPersistedCollisions()
+{
+    for (auto &body : bodies)
+        body->removeNotPersistedCollisions();
 }

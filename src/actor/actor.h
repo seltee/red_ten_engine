@@ -63,6 +63,7 @@ public:
     EXPORT virtual void onDestroy();
     EXPORT virtual void onCollide(Actor *hitWith, Vector3 v);
     EXPORT virtual void onCollidePersisted(Actor *hitWith, Vector3 v);
+    EXPORT virtual void onCollideStopped(Actor *hitWith);
 
     EXPORT inline bool hasBlended() { return bHasBlended; };
 

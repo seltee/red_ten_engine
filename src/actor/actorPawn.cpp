@@ -3,7 +3,7 @@
 
 #include "actor/actorPawn.h"
 
-ActorPawn::ActorPawn()
+ActorPawn::ActorPawn(void *selfPointer) : Pawn(selfPointer)
 {
     registerClassName("ActorPawn");
 }

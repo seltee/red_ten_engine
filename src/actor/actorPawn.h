@@ -8,5 +8,5 @@
 class ActorPawn : public Actor, public Pawn
 {
 public:
-    EXPORT ActorPawn();
+    EXPORT ActorPawn(void *selfPointer);
 };

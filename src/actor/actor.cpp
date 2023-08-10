@@ -59,7 +59,8 @@ void Actor::removeComponent(Component *component)
 {
     for (auto it = components.begin(); it != components.end(); it++)
     {
-        if (*it == component){
+        if (*it == component)
+        {
             delete *it;
         }
         return;
@@ -219,6 +220,10 @@ void Actor::onCollidePersisted(Actor *hitWith, Vector3 v)
 {
 }
 
+void Actor::onCollideStopped(Actor *hitWith)
+{
+}
+
 void Actor::childUpdated()
 {
     bPhysicsNeedsToBeRebuild = true;
@@ -254,7 +259,7 @@ void Actor::updatePhysics()
             if (shapesList.size() > 0)
             {
                 physicsBody = physicsWorld->createPhysicsBody(shapesList.at(0), this);
-                physicsBody->setRelation(&transform);
+                physicsBody->setRelation(&transform, this);
                 physicsBody->setRestitution(restitution);
                 physicsBody->setFriction(friction);
                 physicsBody->getShape()->setDebugName(this->getActorName());
