@@ -463,7 +463,7 @@ void CollisionDispatcher::collideConvexVsGeometry(PhysicsBody *convex, PhysicsBo
     if (!convexHull)
         return;
 
-    ShapeConvex geometryToConvex(Vector3(0.0f));
+    ShapeConvex geometryToConvex(Vector3(0.0f), nullptr);
     Vector3 verticies[3] = {Vector3(0.0f), Vector3(1.0f), Vector3(2.0f)};
     Hull *hull = geometryToConvex.setNewHull(verticies, 3);
     int pointsA[3] = {0, 1, 2};

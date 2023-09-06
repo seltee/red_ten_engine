@@ -3,7 +3,7 @@
 
 #include "hull.h"
 
-Hull::Hull(Vector3 *verticies, int amount)
+Hull::Hull(Vector3 *verticies, int amount, float simScale)
 {
     this->amountOfVertices = amount;
     this->verticies = new Vector3[amount];
@@ -11,8 +11,8 @@ Hull::Hull(Vector3 *verticies, int amount)
 
     for (int i = 0; i < amount; i++)
     {
-        this->verticies[i] = verticies[i];
-        this->absoluteVerticies[i] = verticies[i];
+        this->verticies[i] = verticies[i] * simScale;
+        this->absoluteVerticies[i] = verticies[i] * simScale;
     }
 }
 
@@ -31,6 +31,14 @@ HullPolygon Hull::addPolygon(int *points, int numOfVerticies)
     polygon.absoluteNormal = polygon.normal;
     polies.push_back(polygon);
     return polygon;
+}
+
+void Hull::addPolygons(std::vector<HullPolygonSimple> *polygons)
+{
+    for (auto &it : *polygons)
+    {
+        addPolygon(it.points, it.numbOfVerticies);
+    }
 }
 
 void Hull::updateAbsoluteForm(Matrix4 *transformation, AABB *aabb)
@@ -54,7 +62,6 @@ void Hull::updateAbsoluteForm(Matrix4 *transformation, AABB *aabb)
 void Hull::rebuildEdges()
 {
     edges.clear();
-    int indexp = 0;
     for (auto it = polies.begin(); it != polies.end(); it++)
     {
         for (int edgeIndex = 0; edgeIndex < it->pointsAmount; edgeIndex++)
@@ -78,7 +85,6 @@ void Hull::rebuildEdges()
                 edges.push_back(HullEdge({edge.b, edge.a, nullptr}));
             }
         }
-        indexp++;
     }
 }
 
@@ -91,4 +97,26 @@ void Hull::rebuildNormals()
             absoluteVerticies[it->points[1]],
             absoluteVerticies[it->points[2]]);
     }
+}
+
+bool Hull::checkConvexity()
+{
+    for (auto it = polies.begin(); it != polies.end(); it++)
+    {
+        Vector3 plainNormal = it->normal;
+        Vector3 plainPoint = verticies[it->points[0]];
+        float length = glm::dot(plainNormal, plainPoint);
+
+        for (int i = 0; i < amountOfVertices; i++)
+        {
+            if (!isVertexInPolygon(i, &(*it)))
+            {
+                Vector3 checkPoint = verticies[i];
+                float distance = glm::dot(plainNormal, checkPoint);
+                if (distance > length + 0.000001f)
+                    return false;
+            }
+        }
+    }
+    return true;
 }

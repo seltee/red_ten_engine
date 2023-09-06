@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "motion.h"
 
 Motion::Motion()
@@ -19,6 +22,14 @@ void Motion::setInertia(Matrix3 &interia)
 void Motion::setMass(float mass)
 {
     this->invMass = 1.0f / mass;
+}
+
+void Motion::checkLimits()
+{
+    if (glm::length(linearVelocity) > 10.0f)
+    {
+        linearVelocity = glm::normalize(linearVelocity) * 10.0f;
+    }
 }
 
 void Motion::process(float delta, Vector3 gravity, Quat &orientation)

@@ -8,7 +8,8 @@ ShapeSphere::ShapeSphere(const Vector3 &center, float radius, PhysicsWorld *worl
 {
     this->radius = radius * world->getSimScale();
 
-    mass = 0.2f;
+    mass = (4.0f / 3.0f) * CONST_PI * this->radius * this->radius * this->radius * 25.0f;
+
     float tenValue = 2.0f / 5.0f * mass * this->radius * this->radius;
     inertia[0] = Vector3(tenValue, 0.0f, 0.0f);
     inertia[1] = Vector3(0.0f, tenValue, 0.0f);

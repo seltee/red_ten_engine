@@ -21,6 +21,8 @@ public:
     }
     EXPORT inline Matrix3 getInvertedInteria() { return invertedInteria; }
 
+    void checkLimits();
+
     EXPORT void process(float delta, Vector3 gravity, Quat &orientation);
 
     Vector3 linearVelocity = Vector3(0.0f, 0.0f, 0.0f);

@@ -29,6 +29,9 @@ public:
     EXPORT void setFramedRender(int framesInLine, int frameRows);
     EXPORT void setFrame(int frame);
 
+    EXPORT inline int getFramesTotalCount() { return framesTotal; };
+    EXPORT inline int getFramesInLineCount() { return framesInLine; };
+
     EXPORT Matrix4 getLocalspaceMatrix();
 
 protected:
@@ -45,5 +48,4 @@ protected:
     Texture *texture = nullptr;
     Shader *shader = nullptr;
     Matrix4 mAnchor;
-
 };

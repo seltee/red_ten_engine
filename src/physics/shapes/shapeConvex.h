@@ -7,6 +7,7 @@
 #include "shape.h"
 #include "physics/hull.h"
 #include "connector/withDebug.h"
+#include "physics/physicsWorld.h"
 #include <string>
 
 struct FaceQuery
@@ -28,12 +29,18 @@ class ShapeConvex : public Shape,
                     public WithDebug
 {
 public:
-    ShapeConvex(Vector3 center) : Shape(center) {}
+    ShapeConvex(Vector3 center, PhysicsWorld *world) : Shape(center)
+    {
+        simScale = world ? world->getSimScale() : 1.0f;
+        mass = 1.0f;
+    }
     ~ShapeConvex();
 
     EXPORT virtual Hull *getHull() { return hull; }
 
     EXPORT Hull *setNewHull(Vector3 *verticies, int amount);
+
+    EXPORT void calcMassByHull(float density = 0.1f);
 
     EXPORT void provideTransformation(Matrix4 *transformation);
     EXPORT void updateTransformation();
@@ -48,7 +55,9 @@ public:
     EXPORT EdgeQuery queryEdgeDirection(ShapeConvex *foreignShape);
 
     EXPORT Vector3 findFurthestPoint(const Vector3 &inDirection);
-    EXPORT Vector3 getClosestPointToHull(const Vector3 & point);
+    EXPORT Vector3 getClosestPointToHull(const Vector3 &point);
+
+    EXPORT bool checkHullConvexity();
 
     EXPORT void renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness);
     EXPORT inline Vector3 getHullCenter() { return getHull()->hullCenter; }
@@ -58,4 +67,5 @@ protected:
     Matrix4 transformation;
     bool isDirty = true;
     AABB aabb;
+    float simScale = 0.0f;
 };

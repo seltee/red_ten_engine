@@ -13,8 +13,13 @@ Hull *ShapeConvex::setNewHull(Vector3 *verticies, int amount)
 {
     if (hull)
         delete hull;
-    hull = new Hull(verticies, amount);
+    hull = new Hull(verticies, amount, simScale);
     return hull;
+}
+
+void ShapeConvex::calcMassByHull(float density)
+{
+    this->mass = 1.0f;
 }
 
 void ShapeConvex::provideTransformation(Matrix4 *transformation)
@@ -49,6 +54,8 @@ bool ShapeConvex::testRay(const Segment &line, std::vector<RayCollisionPoint> *p
 {
     // Compute direction vector for the segment
     Hull *hull = getHull();
+    if (!hull)
+        return false;
     Vector3 d = line.b - line.a;
 
     // Set initial interval to being the whole segment.
@@ -148,8 +155,8 @@ EdgeQuery ShapeConvex::queryEdgeDirection(ShapeConvex *foreignShape)
 
     for (auto edgeIt = hull->edges.begin(); edgeIt != hull->edges.end(); edgeIt += 2)
     {
-        HullEdge edge = *edgeIt;
-        HullEdge twin = *(edgeIt + 1);
+        HullEdge edge = edgeIt[0];
+        HullEdge twin = edgeIt[1];
 
         Vector3 P1 = hull->absoluteVerticies[edge.a];
         Vector3 Q1 = hull->absoluteVerticies[twin.a];
@@ -160,8 +167,8 @@ EdgeQuery ShapeConvex::queryEdgeDirection(ShapeConvex *foreignShape)
 
         for (auto foreignEdgeIt = foreignHull->edges.begin(); foreignEdgeIt != foreignHull->edges.end(); foreignEdgeIt += 2)
         {
-            HullEdge edgeForeign = *foreignEdgeIt;
-            HullEdge twinForeign = *(foreignEdgeIt + 1);
+            HullEdge edgeForeign = foreignEdgeIt[0];
+            HullEdge twinForeign = foreignEdgeIt[1];
 
             Vector3 P2 = foreignHull->absoluteVerticies[edgeForeign.a];
             Vector3 Q2 = foreignHull->absoluteVerticies[twinForeign.a];
@@ -242,6 +249,12 @@ Vector3 ShapeConvex::getClosestPointToHull(const Vector3 &point)
     return closestPoint;
 }
 
+bool ShapeConvex::checkHullConvexity()
+{
+    Hull *hull = getHull();
+    return hull ? hull->checkConvexity() : false;
+}
+
 void ShapeConvex::renderDebug(Matrix4 *projectionView, Matrix4 *model, float scale, float thickness)
 {
     Hull *hull = getHull();
@@ -259,7 +272,7 @@ void ShapeConvex::renderDebug(Matrix4 *projectionView, Matrix4 *model, float sca
             {
                 Vector3 center = (vA + vB) / 2.0f;
                 Vector3 normal = edgeIt->polygon->absoluteNormal;
-                debug->renderLine(center, center + normal * 0.2f, projectionView, thickness, Vector3(0.2f, 0.2f, 0.9f));
+                debug->renderLine(center, center + normal * thickness * 20.0f, projectionView, thickness, Vector3(0.2f, 0.2f, 0.9f));
             }
         }
     }

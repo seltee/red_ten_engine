@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "physicsBody.h"
 #include "actor/actor.h"
 
@@ -51,6 +54,8 @@ void PhysicsBody::finishStep(float delta)
 
     if (motion && !bIsSleeping && bIsEnabled)
     {
+        motion->checkLimits();
+
         if (constraints.size() > 0)
             for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
                 (*constraint)->processMotion(motion);

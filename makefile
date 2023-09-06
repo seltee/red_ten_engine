@@ -374,116 +374,116 @@ ${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
 
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)
-	${COPY} ${TARGET} ${BINDIR}/${TARGET}
+	${COPY} ${TARGET} "${BINDIR}/${TARGET}"
 
 
 examples: ${EXAMPLES} engine
-${OBJDIR}/1-helloWorld.o: ${EXMDIR}/1-helloWorld.cpp
+${OBJDIR}/1-helloWorld.o: ${EXMDIR}/1-helloWorld.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/1-helloWorld.o ${EXMDIR}/1-helloWorld.cpp
 
 1-helloWorld${EXT}: ${OBJDIR}/1-helloWorld.o
 	$(LD) ${EFLAGS} ${OBJDIR}/1-helloWorld.o -o 1-helloWorld${EXT}
 	${MOVE} 1-helloWorld${EXT} ${BINDIR}/1-helloWorld${EXT}
 
-${OBJDIR}/2-helloActors.o: ${EXMDIR}/2-helloActors.cpp
+${OBJDIR}/2-helloActors.o: ${EXMDIR}/2-helloActors.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/2-helloActors.o ${EXMDIR}/2-helloActors.cpp
 
 2-helloActors${EXT}: ${OBJDIR}/2-helloActors.o
 	$(LD) ${EFLAGS} ${OBJDIR}/2-helloActors.o -o 2-helloActors${EXT}
 	${MOVE} 2-helloActors${EXT} ${BINDIR}/2-helloActors${EXT}
 	
-${OBJDIR}/3-helloPhysics.o: ${EXMDIR}/3-helloPhysics.cpp
+${OBJDIR}/3-helloPhysics.o: ${EXMDIR}/3-helloPhysics.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/3-helloPhysics.o ${EXMDIR}/3-helloPhysics.cpp
 
 3-helloPhysics${EXT}: ${OBJDIR}/3-helloPhysics.o
 	$(LD) ${EFLAGS} ${OBJDIR}/3-helloPhysics.o -o 3-helloPhysics${EXT}
 	${MOVE} 3-helloPhysics${EXT} ${BINDIR}/3-helloPhysics${EXT}
 
-${OBJDIR}/4-helloSorting.o: ${EXMDIR}/4-helloSorting.cpp
+${OBJDIR}/4-helloSorting.o: ${EXMDIR}/4-helloSorting.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/4-helloSorting.o ${EXMDIR}/4-helloSorting.cpp
 
 4-helloSorting${EXT}: ${OBJDIR}/4-helloSorting.o
 	$(LD) ${EFLAGS} ${OBJDIR}/4-helloSorting.o -o 4-helloSorting${EXT}
 	${MOVE} 4-helloSorting${EXT} ${BINDIR}/4-helloSorting${EXT}
 
-${OBJDIR}/5-helloInput.o: ${EXMDIR}/5-helloInput.cpp
+${OBJDIR}/5-helloInput.o: ${EXMDIR}/5-helloInput.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/5-helloInput.o ${EXMDIR}/5-helloInput.cpp
 
 5-helloInput${EXT}: ${OBJDIR}/5-helloInput.o
 	$(LD) ${EFLAGS} ${OBJDIR}/5-helloInput.o -o 5-helloInput${EXT}
 	${MOVE} 5-helloInput${EXT} ${BINDIR}/5-helloInput${EXT}
 
-${OBJDIR}/6-helloBytemap.o: ${EXMDIR}/6-helloBytemap.cpp
+${OBJDIR}/6-helloBytemap.o: ${EXMDIR}/6-helloBytemap.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/6-helloBytemap.o ${EXMDIR}/6-helloBytemap.cpp
 
 6-helloBytemap${EXT}: ${OBJDIR}/6-helloBytemap.o
 	$(LD) ${EFLAGS} ${OBJDIR}/6-helloBytemap.o -o 6-helloBytemap${EXT}
 	${MOVE} 6-helloBytemap${EXT} ${BINDIR}/6-helloBytemap${EXT}
 
-${OBJDIR}/7-helloSound.o: ${EXMDIR}/7-helloSound.cpp
+${OBJDIR}/7-helloSound.o: ${EXMDIR}/7-helloSound.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/7-helloSound.o ${EXMDIR}/7-helloSound.cpp
 
 7-helloSound${EXT}: ${OBJDIR}/7-helloSound.o
 	$(LD) ${EFLAGS} ${OBJDIR}/7-helloSound.o -o 7-helloSound${EXT}
 	${MOVE} 7-helloSound${EXT} ${BINDIR}/7-helloSound${EXT}
 
-${OBJDIR}/8-helloGUI.o: ${EXMDIR}/8-helloGUI.cpp
+${OBJDIR}/8-helloGUI.o: ${EXMDIR}/8-helloGUI.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/8-helloGUI.o ${EXMDIR}/8-helloGUI.cpp
 
 8-helloGUI${EXT}: ${OBJDIR}/8-helloGUI.o
 	$(LD) ${EFLAGS} ${OBJDIR}/8-helloGUI.o -o 8-helloGUI${EXT}
 	${MOVE} 8-helloGUI${EXT} ${BINDIR}/8-helloGUI${EXT}
 
-${OBJDIR}/9-helloEffects.o: ${EXMDIR}/9-helloEffects.cpp
+${OBJDIR}/9-helloEffects.o: ${EXMDIR}/9-helloEffects.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/9-helloEffects.o ${EXMDIR}/9-helloEffects.cpp
 
 9-helloEffects${EXT}: ${OBJDIR}/9-helloEffects.o
 	$(LD) ${EFLAGS} ${OBJDIR}/9-helloEffects.o -o 9-helloEffects${EXT}
 	${MOVE} 9-helloEffects${EXT} ${BINDIR}/9-helloEffects${EXT}
 
-${OBJDIR}/10-helloAnimation.o: ${EXMDIR}/10-helloAnimation.cpp
+${OBJDIR}/10-helloAnimation.o: ${EXMDIR}/10-helloAnimation.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/10-helloAnimation.o ${EXMDIR}/10-helloAnimation.cpp
 
 10-helloAnimation${EXT}: ${OBJDIR}/10-helloAnimation.o
 	$(LD) ${EFLAGS} ${OBJDIR}/10-helloAnimation.o -o 10-helloAnimation${EXT}
 	${MOVE} 10-helloAnimation${EXT} ${BINDIR}/10-helloAnimation${EXT}
 
-${OBJDIR}/11-helloMusic.o: ${EXMDIR}/11-helloMusic.cpp
+${OBJDIR}/11-helloMusic.o: ${EXMDIR}/11-helloMusic.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/11-helloMusic.o ${EXMDIR}/11-helloMusic.cpp
 
 11-helloMusic${EXT}: ${OBJDIR}/11-helloMusic.o
 	$(LD) ${EFLAGS} ${OBJDIR}/11-helloMusic.o -o 11-helloMusic${EXT}
 	${MOVE} 11-helloMusic${EXT} ${BINDIR}/11-helloMusic${EXT}
 
-${OBJDIR}/12-hello3d.o: ${EXMDIR}/12-hello3d.cpp
+${OBJDIR}/12-hello3d.o: ${EXMDIR}/12-hello3d.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/12-hello3d.o ${EXMDIR}/12-hello3d.cpp
 
 12-hello3d${EXT}: ${OBJDIR}/12-hello3d.o
 	$(LD) ${EFLAGS} ${OBJDIR}/12-hello3d.o -o 12-hello3d${EXT}
 	${MOVE} 12-hello3d${EXT} ${BINDIR}/12-hello3d${EXT}
 
-${OBJDIR}/13-hello3dPhysics.o: ${EXMDIR}/13-hello3dPhysics.cpp
+${OBJDIR}/13-hello3dPhysics.o: ${EXMDIR}/13-hello3dPhysics.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/13-hello3dPhysics.o ${EXMDIR}/13-hello3dPhysics.cpp
 
 13-hello3dPhysics${EXT}: ${OBJDIR}/13-hello3dPhysics.o
 	$(LD) ${EFLAGS} ${OBJDIR}/13-hello3dPhysics.o -o 13-hello3dPhysics${EXT}
 	${MOVE} 13-hello3dPhysics${EXT} ${BINDIR}/13-hello3dPhysics${EXT}
 
-${OBJDIR}/14-helloMushrooms.o: ${EXMDIR}/14-helloMushrooms.cpp
+${OBJDIR}/14-helloMushrooms.o: ${EXMDIR}/14-helloMushrooms.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/14-helloMushrooms.o ${EXMDIR}/14-helloMushrooms.cpp
 
 14-helloMushrooms${EXT}: ${OBJDIR}/14-helloMushrooms.o
 	$(LD) ${EFLAGS} ${OBJDIR}/14-helloMushrooms.o -o 14-helloMushrooms${EXT}
 	${MOVE} 14-helloMushrooms${EXT} ${BINDIR}/14-helloMushrooms${EXT}
 
-${OBJDIR}/15-helloPlainsAndRays.o: ${EXMDIR}/15-helloPlainsAndRays.cpp
+${OBJDIR}/15-helloPlainsAndRays.o: ${EXMDIR}/15-helloPlainsAndRays.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/15-helloPlainsAndRays.o ${EXMDIR}/15-helloPlainsAndRays.cpp
 
 15-helloPlainsAndRays${EXT}: ${OBJDIR}/15-helloPlainsAndRays.o
 	$(LD) ${EFLAGS} ${OBJDIR}/15-helloPlainsAndRays.o -o 15-helloPlainsAndRays${EXT}
 	${MOVE} 15-helloPlainsAndRays${EXT} ${BINDIR}/15-helloPlainsAndRays${EXT}
 
-${OBJDIR}/16-helloFPV.o: ${EXMDIR}/16-helloFPV.cpp
+${OBJDIR}/16-helloFPV.o: ${EXMDIR}/16-helloFPV.cpp ${EXMDIR}/helpers.h
 	$(CC) $(CFLAGS) -o ${OBJDIR}/16-helloFPV.o ${EXMDIR}/16-helloFPV.cpp
 
 16-helloFPV${EXT}: ${OBJDIR}/16-helloFPV.o

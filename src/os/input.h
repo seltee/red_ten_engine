@@ -4,6 +4,7 @@
 #pragma once
 #include "common/utils.h"
 #include "common/keyboard.h"
+#include "common/gamepad.h"
 #include <vector>
 
 enum class InputType
@@ -78,10 +79,12 @@ public:
     EXPORT void addMouseMoveBinding(float modifier);
     EXPORT void addMouseMoveBinding(InputTypeMouseMove direction, float modifier);
 
-    EXPORT void addGamepadButtonBinding(int code, float modifier);
-    EXPORT void addGamepadAxisBinding(int code, float modifier);
-    EXPORT void addGamepadButtonBinding(int code, int deviceIndex, float modifier);
-    EXPORT void addGamepadAxisBinding(int code, int deviceIndex, float modifier);
+    EXPORT void addGamepadButtonBinding(float modifier);
+    EXPORT void addGamepadAxisBinding(float modifier);
+    EXPORT void addGamepadButtonBinding(GamepadButtonCode code, float modifier);
+    EXPORT void addGamepadAxisBinding(GamepadAxisCode code, float modifier);
+    EXPORT void addGamepadButtonBinding(GamepadButtonCode code, int deviceIndex, float modifier);
+    EXPORT void addGamepadAxisBinding(GamepadAxisCode code, int deviceIndex, float modifier);
 
     EXPORT void *getOwner() { return owner; }
 

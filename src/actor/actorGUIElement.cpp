@@ -119,14 +119,14 @@ void ActorGUIElement::setSelectiveIndex(int selectiveIndex)
     }
 }
 
-void ActorGUIElement::setPressID(int pressID)
-{
-    this->pressID = pressID;
-}
-
 void ActorGUIElement::clearPressIDStack()
 {
     pressIDStack.clear();
+}
+
+void ActorGUIElement::addPressID(int id)
+{
+    pressIDStack.push_back(id);
 }
 
 int ActorGUIElement::getFirstPressID()

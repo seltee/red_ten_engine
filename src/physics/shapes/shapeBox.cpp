@@ -4,11 +4,12 @@
 #include "shapeBox.h"
 #include "physics/physicsWorld.h"
 
-ShapeBox::ShapeBox(Vector3 center, Vector3 size, PhysicsWorld *world) : ShapeConvex(center)
+ShapeBox::ShapeBox(Vector3 center, Vector3 size, PhysicsWorld *world) : ShapeConvex(center, world)
 {
-    this->size = size * world->getSimScale();
+    this->worldSize = size;
+    this->size = size * simScale;
 
-    mass = 0.2f;
+    mass = this->size.x * this->size.y * this->size.z * 20.0f;
     float width2 = this->size.x * this->size.x;
     float height2 = this->size.y * this->size.y;
     float depth2 = this->size.z * this->size.z;
@@ -18,14 +19,14 @@ ShapeBox::ShapeBox(Vector3 center, Vector3 size, PhysicsWorld *world) : ShapeCon
     inertia[2] = Vector3(0.0f, 0.0f, (1.0f / 12.0f) * mass * (width2 + height2));
 }
 
-ShapeBox::ShapeBox(Vector2 center, Vector2 size, PhysicsWorld *world) : ShapeConvex(Vector3(center.x, center.y, 0.0f))
+ShapeBox::ShapeBox(Vector2 center, Vector2 size, PhysicsWorld *world) : ShapeConvex(Vector3(center.x, center.y, 0.0f), world)
 {
-    Vector3 center3 = Vector3(center.x, center.y, 0.0f);
     Vector3 size3 = Vector3(size.x, size.y, (size.x + size.y) / 2.0f);
 
-    this->size = size3 * world->getSimScale();
+    this->worldSize = size3;
+    this->size = size3 * simScale;
+    mass = this->size.x * this->size.y * this->size.z * 16.0f;
 
-    mass = 0.2f;
     float width2 = this->size.x * this->size.x;
     float height2 = this->size.y * this->size.y;
     float depth2 = this->size.z * this->size.z;
@@ -81,7 +82,7 @@ Hull *ShapeBox::getHull()
 {
     if (!hull)
     {
-        Vector3 halfSize = this->size / 2.0f;
+        Vector3 halfSize = worldSize / 2.0f;
         Vector3 verticies[8] = {
             -halfSize,
             halfSize,

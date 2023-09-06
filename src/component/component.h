@@ -47,6 +47,9 @@ public:
     EXPORT ShapeBox *addShape3dBox(Vector3 size);
     EXPORT ShapeBox *addShape3dBox(Vector3 center, Vector3 size);
 
+    EXPORT ShapeConvex *addShapeConvex(Vector3 *verticies, int amount, std::vector<HullPolygonSimple> *polygons, float density = 0.1f);
+    EXPORT ShapeConvex *addShapeConvex(Vector3 center, Vector3 *verticies, int amount, std::vector<HullPolygonSimple> *polygons, float density = 0.1f);
+
     EXPORT ShapeGeometry *addShapeGeometry(Geometry *geometry);
     EXPORT ShapeGeometry *addShapeGeometry(Vector3 center, Geometry *geometry);
 

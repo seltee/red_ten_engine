@@ -27,7 +27,7 @@ ShapeCapsule::ShapeCapsule(float height, float radius, PhysicsWorld *world) : Sh
     inertia[2] = Vector3(0.0f, 0.0f, xz);
 
     Vector3 points[2] = {absoluteCapsule.a, absoluteCapsule.b};
-    convex = new ShapeConvex(Vector3(0.0f));
+    convex = new ShapeConvex(Vector3(0.0f), world);
     convex->setNewHull(points, 2);
 }
 

@@ -27,8 +27,10 @@ public:
 
     EXPORT void setSelectiveIndex(int selectiveIndex);
 
-    EXPORT void setPressID(int pressID);
+    EXPORT inline void setPressID(int pressID) { this->pressID = pressID; }
+    EXPORT inline int getPressID() { return pressID; }
     EXPORT static void clearPressIDStack();
+    EXPORT static void addPressID(int id);
     EXPORT static int getFirstPressID();
 
 protected:

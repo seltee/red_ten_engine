@@ -36,18 +36,18 @@ public:
         inputX->addKeyboardBinding(KeyboardCodes::A, -5.0f);
         inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 5.0f);
         inputX->addKeyboardBinding(KeyboardCodes::LEFT, -5.0f);
-        inputX->addGamepadAxisBinding(0, 5.0f);
+        inputX->addGamepadAxisBinding(GamepadAxisCode::LEFT_AXIS_X, 5.0f);
 
         auto inputY = registerAxisCallback(&CratePlayer::controlY);
         inputY->addKeyboardBinding(KeyboardCodes::S, -5.0f);
         inputY->addKeyboardBinding(KeyboardCodes::W, 5.0f);
         inputY->addKeyboardBinding(KeyboardCodes::DOWN, -5.0f);
         inputY->addKeyboardBinding(KeyboardCodes::UP, 5.0f);
-        inputY->addGamepadAxisBinding(1, -5.0f);
+        inputY->addGamepadAxisBinding(GamepadAxisCode::LEFT_AXIS_Y, -5.0f);
 
         auto inputHide = registerButtonCallback(&CratePlayer::hideSurrounding);
         inputHide->addKeyboardBinding(KeyboardCodes::SPACE, 1.0f);
-        inputHide->addGamepadButtonBinding(0, 1.0f);
+        inputHide->addGamepadButtonBinding(GamepadButtonCode::A, 1.0f);
     }
 
     void onProcess(float delta)

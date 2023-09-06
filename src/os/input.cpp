@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "input.h"
 
 void InputBase::provideInput(InputType type, int deviceIndex, int code, float value)
@@ -194,22 +197,32 @@ void InputBase::addMouseMoveBinding(InputTypeMouseMove direction, float modifier
     bindings.push_back(Binding({InputType::MOUSE, (int)InputTypeMouse::MOVEMENT, (int)direction, modifier}));
 }
 
-void InputBase::addGamepadButtonBinding(int code, float modifier)
+void InputBase::addGamepadButtonBinding(float modifier)
 {
-    bindings.push_back(Binding({InputType::GAMEPAD_BUTTON, -1, code, modifier}));
+    bindings.push_back(Binding({InputType::GAMEPAD_BUTTON, -1, -1, modifier}));
 }
 
-void InputBase::addGamepadAxisBinding(int code, float modifier)
+void InputBase::addGamepadAxisBinding(float modifier)
 {
-    bindings.push_back(Binding({InputType::GAMEPAD_AXIS, -1, code, modifier}));
+    bindings.push_back(Binding({InputType::GAMEPAD_AXIS, -1, -1, modifier}));
 }
 
-void InputBase::addGamepadButtonBinding(int code, int deviceIndex, float modifier)
+void InputBase::addGamepadButtonBinding(GamepadButtonCode code, float modifier)
 {
-    bindings.push_back(Binding({InputType::GAMEPAD_BUTTON, deviceIndex, code, modifier}));
+    bindings.push_back(Binding({InputType::GAMEPAD_BUTTON, -1, (int)code, modifier}));
 }
 
-void InputBase::addGamepadAxisBinding(int code, int deviceIndex, float modifier)
+void InputBase::addGamepadAxisBinding(GamepadAxisCode code, float modifier)
 {
-    bindings.push_back(Binding({InputType::GAMEPAD_AXIS, deviceIndex, code, modifier}));
+    bindings.push_back(Binding({InputType::GAMEPAD_AXIS, -1, (int)code, modifier}));
+}
+
+void InputBase::addGamepadButtonBinding(GamepadButtonCode code, int deviceIndex, float modifier)
+{
+    bindings.push_back(Binding({InputType::GAMEPAD_BUTTON, deviceIndex, (int)code, modifier}));
+}
+
+void InputBase::addGamepadAxisBinding(GamepadAxisCode code, int deviceIndex, float modifier)
+{
+    bindings.push_back(Binding({InputType::GAMEPAD_AXIS, deviceIndex, (int)code, modifier}));
 }

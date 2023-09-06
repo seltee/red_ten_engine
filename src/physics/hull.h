@@ -3,17 +3,28 @@
 
 #pragma once
 #include "math/math.h"
+#include "common/utils.h"
+
+struct HullPolygonSimple
+{
+    int *points;
+    int numbOfVerticies;
+};
 
 class Hull
 {
 public:
-    Hull(Vector3 *verticies, int amount);
+    EXPORT Hull(Vector3 *verticies, int amount, float simScale = 1.0f);
 
-    HullPolygon addPolygon(int *points, int numOfVerticies);
-    void updateAbsoluteForm(Matrix4 *transformation, AABB *aabb);
-    void rebuildEdges();
+    EXPORT HullPolygon addPolygon(int *points, int numOfVerticies);
+    EXPORT void addPolygons(std::vector<HullPolygonSimple> *polygons);
 
-    void rebuildNormals();
+    EXPORT void updateAbsoluteForm(Matrix4 *transformation, AABB *aabb);
+    EXPORT void rebuildEdges();
+
+    EXPORT void rebuildNormals();
+
+    EXPORT bool checkConvexity();
 
     Vector3 *verticies = nullptr;
     Vector3 *absoluteVerticies = nullptr;
@@ -23,4 +34,15 @@ public:
     std::vector<HullPolygon> polies;
 
     Vector3 hullCenter = Vector3(0.0f);
+
+protected:
+    bool inline isVertexInPolygon(int v, HullPolygon *p)
+    {
+        for (int i = 0; i < p->pointsAmount; i++)
+        {
+            if (v == p->points[i])
+                return true;
+        }
+        return false;
+    }
 };

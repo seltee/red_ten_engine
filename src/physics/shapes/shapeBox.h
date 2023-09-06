@@ -25,5 +25,6 @@ public:
 
 protected:
     Vector3 size;
+    Vector3 worldSize;
     Matrix3 inertia;
 };

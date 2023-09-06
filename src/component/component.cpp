@@ -152,6 +152,35 @@ ShapeBox *Component::addShape3dBox(Vector3 center, Vector3 size)
     return nullptr;
 }
 
+ShapeConvex *Component::addShapeConvex(Vector3 *verticies, int amount, std::vector<HullPolygonSimple> *polygons, float density)
+{
+    return addShapeConvex(Vector3(0.0f), verticies, amount, polygons, density);
+}
+
+ShapeConvex *Component::addShapeConvex(Vector3 center, Vector3 *verticies, int amount, std::vector<HullPolygonSimple> *polygons, float density)
+{
+    auto world = owner->getCurrentLayer()->getPhysicsWorld();
+    if (world)
+    {
+        auto newPhysicsEntity = new ShapeConvex(center, world);
+        auto hull = newPhysicsEntity->setNewHull(verticies, amount);
+        if (polygons)
+        {
+            hull->addPolygons(polygons);
+            hull->rebuildEdges();
+            newPhysicsEntity->calcMassByHull(density);
+        }
+        else
+            newPhysicsEntity->setMass(1.0f);
+
+        shapes.push_back(newPhysicsEntity);
+        if (owner)
+            owner->childUpdated();
+        return newPhysicsEntity;
+    }
+    return nullptr;
+}
+
 ShapeGeometry *Component::addShapeGeometry(Geometry *geometry)
 {
     return addShapeGeometry(Vector3(0.0f), geometry);
