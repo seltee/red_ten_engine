@@ -59,6 +59,19 @@ bool View::makeWindow()
         version = (char *)glGetString(GL_VERSION);     // version as a string
 
         SDL_GL_GetDrawableSize((SDL_Window *)window, &drawableWidth, &drawableHeight);
+        if (SDL_GL_SetSwapInterval(-1) == 0)
+            logger->logff("Adaptive V-Sync enabled");
+        else
+        {
+            if (SDL_GL_SetSwapInterval(1) == 0)
+                logger->logff("V-Sync enabled");
+            else
+            {
+                SDL_GL_SetSwapInterval(0);
+                logger->logff("No frame sync enabled");
+            }
+        }
+
         updateFrameBuffer();
 
         return true;

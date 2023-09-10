@@ -15,12 +15,12 @@ ifeq ($(OS),Windows_NT)
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
 		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
-		-Wall -c  -std=c++17 -mfpmath=sse -mavx -fdeclspec -g -O2
+		-Wall -c -std=c++17 -mfpmath=sse -fdeclspec -g -O3
 else
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
 		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
-		-Wall -c  -std=c++17 -fdeclspec -g -O2
+		-Wall -c -std=c++17 -fdeclspec -g -O3
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -67,7 +67,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
 			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o \
 			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o \
-			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o \
+			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o ${OBJDIR}/profilerController.o \
 			${OBJDIR}/inputController.o ${OBJDIR}/logController.o ${OBJDIR}/configController.o \
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o \
 			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
@@ -81,7 +81,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/stb_image.o ${OBJDIR}/fbx_loader.o ${OBJDIR}/stb_vorbis.o \
 			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
 			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o \
-			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o \
+			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o ${OBJDIR}/withProfiler.o \
 			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
 			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
 			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
@@ -94,7 +94,7 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
-			16-helloFPV${EXT}
+			16-helloFPV${EXT} 17-helloProfiler${EXT}
 
 all: engine examples
 
@@ -110,6 +110,9 @@ ${OBJDIR}/stageController.o: ${SRCDIR}/controller/stageController.cpp
 
 ${OBJDIR}/resourceController.o: ${SRCDIR}/controller/resourceController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceController.o ${SRCDIR}/controller/resourceController.cpp
+
+${OBJDIR}/profilerController.o: ${SRCDIR}/controller/profilerController.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/profilerController.o ${SRCDIR}/controller/profilerController.cpp
 
 ${OBJDIR}/audioController.o: ${SRCDIR}/controller/audioController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioController.o ${SRCDIR}/controller/audioController.cpp
@@ -303,6 +306,9 @@ ${OBJDIR}/withMeshMaker.o: ${SRCDIR}/connector/withMeshMaker.cpp
 ${OBJDIR}/withAudio.o: ${SRCDIR}/connector/withAudio.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withAudio.o ${SRCDIR}/connector/withAudio.cpp
 
+${OBJDIR}/withProfiler.o: ${SRCDIR}/connector/withProfiler.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withProfiler.o ${SRCDIR}/connector/withProfiler.cpp
+
 ${OBJDIR}/soundPlayer.o: ${SRCDIR}/common/soundPlayer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundPlayer.o ${SRCDIR}/common/soundPlayer.cpp
 
@@ -489,6 +495,14 @@ ${OBJDIR}/16-helloFPV.o: ${EXMDIR}/16-helloFPV.cpp ${EXMDIR}/helpers.h
 16-helloFPV${EXT}: ${OBJDIR}/16-helloFPV.o
 	$(LD) ${EFLAGS} ${OBJDIR}/16-helloFPV.o -o 16-helloFPV${EXT}
 	${MOVE} 16-helloFPV${EXT} ${BINDIR}/16-helloFPV${EXT}
+
+${OBJDIR}/17-helloProfiler.o: ${EXMDIR}/17-helloProfiler.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/17-helloProfiler.o ${EXMDIR}/17-helloProfiler.cpp
+
+17-helloProfiler${EXT}: ${OBJDIR}/17-helloProfiler.o
+	$(LD) ${EFLAGS} ${OBJDIR}/17-helloProfiler.o -o 17-helloProfiler${EXT}
+	${MOVE} 17-helloProfiler${EXT} ${BINDIR}/17-helloProfiler${EXT}
+
 
 # llvm-objcopy
 clean:

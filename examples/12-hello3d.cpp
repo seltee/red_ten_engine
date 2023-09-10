@@ -104,10 +104,10 @@ protected:
 };
 ResourceFont *GUISimpleButton::font = nullptr;
 
-int main()
+APPMAIN
 {
     // Engine setup
-    auto engine = RTEngine::createInstance("ex12cfg.ini");
+    auto engine = RTEngine::getInstance("ex12cfg.ini");
 
     // We need view controller to get resolution
     auto viewController = engine->getViewController();
@@ -261,4 +261,6 @@ int main()
         stage->process(delta);
         stage->present(view);
     }
+
+    return 0;
 }

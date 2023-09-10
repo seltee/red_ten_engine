@@ -8,10 +8,11 @@
 #include "connector/withLogger.h"
 #include "audio/audioBase.h"
 #include "resource/sound.h"
+#include "connector/withProfiler.h"
 #include <vector>
 #include <string>
 
-class AudioController : WithLogger
+class AudioController : public WithLogger, public WithProfiler
 {
 public:
     AudioController(Config *config);
@@ -33,4 +34,6 @@ protected:
     void *listenerCamera = nullptr;
 
     AudioBase *audioBase = nullptr;
+
+    int audioProcessingTrackerId = 0;
 };

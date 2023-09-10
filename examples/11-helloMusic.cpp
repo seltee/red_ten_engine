@@ -33,10 +33,10 @@ protected:
 };
 Texture *JoJo::jojoTexture = nullptr;
 
-int main()
+APPMAIN
 {
     // Engine setup
-    auto engine = RTEngine::createInstance();
+    auto engine = RTEngine::getInstance();
 
     // Set fullscreen through configuration controller
     auto configController = engine->getConfigController();
@@ -86,4 +86,6 @@ int main()
         stage->process(delta);
         stage->present(view);
     }
+
+    return 0;
 }

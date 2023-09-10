@@ -5,9 +5,10 @@
 #include "common/utils.h"
 #include "shaders/effect.h"
 #include "stage/layer.h"
+#include "connector/withProfiler.h"
 #include <vector>
 
-class LayerEffects : public Layer
+class LayerEffects : public Layer, public WithProfiler
 {
 public:
     LayerEffects(std::string name, int index);
@@ -20,4 +21,6 @@ protected:
     std::vector<Effect *> effects;
     unsigned int framebuffer = 0;
     unsigned int renderedTexture = 0;
+
+    int renderTrackerId = 0;
 };

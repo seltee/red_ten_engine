@@ -4,10 +4,11 @@
 #pragma once
 #include "common/utils.h"
 #include "common/renderer.h"
+#include "connector/withLogger.h"
 #include "controller/logController.h"
 #include <string>
 
-class View
+class View : public WithLogger
 {
 public:
     View(Config *config);

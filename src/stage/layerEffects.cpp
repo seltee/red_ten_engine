@@ -17,6 +17,8 @@ LayerEffects::LayerEffects(std::string name, int index) : Layer(name, index)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    renderTrackerId = profiler->addTracker("layer effects \"" + name + "\" render");
 }
 
 void LayerEffects::addEffect(Effect *effect)
@@ -41,6 +43,7 @@ void LayerEffects::clearEffects()
 
 void LayerEffects::render(View *view)
 {
+    profiler->startTracking(renderTrackerId);
     if (effects.size() > 0)
     {
         int width = view->getDrawableWidth();
@@ -81,4 +84,5 @@ void LayerEffects::render(View *view)
             }
         }
     }
+    profiler->stopTracking(renderTrackerId);
 }

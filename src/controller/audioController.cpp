@@ -31,6 +31,8 @@ AudioController::AudioController(Config *config)
 
     bSoundEnabled = true;
     logger->logff("Sound Enabled using %s", prefferedDevice.c_str());
+
+    audioProcessingTrackerId = profiler->addTracker("Audio processing");
 }
 
 void AudioController::update()
@@ -39,7 +41,9 @@ void AudioController::update()
 
 void AudioController::process(float delta)
 {
+    profiler->startTracking(audioProcessingTrackerId);
     audioBase->process(delta);
+    profiler->stopTracking(audioProcessingTrackerId);
 }
 
 AudioBase *AudioController::getAudioBase()

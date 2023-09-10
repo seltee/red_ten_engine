@@ -14,6 +14,9 @@ Stage::Stage(std::string name)
     debugLayer = new LayerDebug(debugLayerIndex);
     layers.push_back(debugLayer);
     sortLayers();
+
+    presentTrackerId = profiler->addTracker("stage \"" + name + "\" final render");
+    buffersSwapTrackerId = profiler->addTracker("stage \"" + name + "\" buffer swap");
 }
 
 LayerActors *Stage::createLayerActors(std::string name, int index)
@@ -42,9 +45,11 @@ void Stage::process(float delta)
 
 void Stage::present(View *view)
 {
+    profiler->startTracking(presentTrackerId);
     view->useFrameBuffer();
     glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    profiler->stopTracking(presentTrackerId);
 
     Matrix4 m;
     for (auto it = layers.begin(); it != layers.end(); ++it)
@@ -52,6 +57,7 @@ void Stage::present(View *view)
         (*it)->render(view);
     }
 
+    profiler->startTracking(presentTrackerId);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     glDisable(GL_DEPTH_TEST);
@@ -65,7 +71,11 @@ void Stage::present(View *view)
     CommonShaders::getScreenMesh()->use();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
+    profiler->stopTracking(presentTrackerId);
+
+    profiler->startTracking(buffersSwapTrackerId);
     view->swapBuffers();
+    profiler->stopTracking(buffersSwapTrackerId);
 }
 
 void Stage::sortLayers()

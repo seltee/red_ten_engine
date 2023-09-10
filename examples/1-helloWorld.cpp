@@ -3,10 +3,10 @@
 
 #include "../src/rtengine.h"
 
-int main()
+APPMAIN
 {
     // Engine instance is the source of controllers and settings of the engine
-    auto engine = RTEngine::createInstance();
+    auto engine = RTEngine::getInstance();
 
     // Set fullscreen through configuration controller
     auto configController = engine->getConfigController();
@@ -47,7 +47,7 @@ int main()
     auto component = sprite->createComponent<ComponentSprite>();
     component->setTexture(helloTexture);
     // We want to put picture on the bottom of the screen and to avoid calculating shift depending on the size of the texture
-    // We can simply move anchor drawing point from center to bottom 
+    // We can simply move anchor drawing point from center to bottom
     // (second parameter is vertical axis Y, first is horizontal - sprite will stay in the center)
     component->setAnchor(0.5f, 0.0f);
 
@@ -68,4 +68,6 @@ int main()
         // Renders all actor components on all layers
         stage->present(view);
     }
+
+    return 0;
 }

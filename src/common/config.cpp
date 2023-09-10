@@ -44,7 +44,7 @@ bool Config::loadConfig()
         fclose(cfgFile);
         return true;
     }
-    logger->logff("Error happend on conf file open\n");
+    logger->logff("No config file found\n");
     return false;
 }
 

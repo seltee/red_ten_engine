@@ -13,6 +13,7 @@
 #include "connector/withRepository.h"
 #include "connector/withMeshMaker.h"
 #include "connector/withAudio.h"
+#include "connector/withProfiler.h"
 #include "resource/resourceMesh.h"
 #include "resource/resourceFont.h"
 #include "resource/sound.h"
@@ -39,6 +40,7 @@
 #include "controller/logController.h"
 #include "controller/configController.h"
 #include "controller/debugController.h"
+#include "controller/profilerController.h"
 #include "component/component.h"
 #include "component/componentSprite.h"
 #include "component/componentFramedSprite.h"
@@ -54,10 +56,21 @@
 #include "shaders/rawShader.h"
 #include "shaders/effect.h"
 
+#ifdef _WIN32
+#include <shellscalingapi.h>
+#include <windows.h>
+#endif
+
+#ifdef _WIN32
+#define APPMAIN int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+#else
+#define APPMAIN int main(int argc, char *argv[])
+#endif
+
 class RTEngine
 {
 protected:
-    RTEngine(std::string configFilePath);
+    RTEngine(std::string configFilePath, bool showConsole);
 
     static ViewController *viewController;
     static StageController *stageController;
@@ -67,6 +80,7 @@ protected:
     static LogController *logController;
     static ConfigController *configController;
     static DebugController *debugController;
+    static ProfilerController *profilerController;
 
     static MeshMaker *meshMaker;
 
@@ -75,11 +89,12 @@ protected:
     Stage *currentStage = nullptr;
 
     unsigned int tick = 0;
-    int fps = 0, fpsLastCheckTick = 0, fpsCounter = 0;
     bool bTerminationRequested = false;
 
+    static RTEngine *instance;
+
 public:
-    EXPORT static RTEngine *createInstance(std::string configFilePath = "./cfg");
+    EXPORT static RTEngine *getInstance(std::string configFilePath = "./cfg", bool showConsole = true);
 
     EXPORT static ViewController *getViewController();
     EXPORT static StageController *getStageController();
@@ -88,6 +103,7 @@ public:
     EXPORT static LogController *getLogController();
     EXPORT static ConfigController *getConfigController();
     EXPORT static DebugController *getDebugController();
+    EXPORT static ProfilerController *getProfilerController();
 
     EXPORT static MeshMaker *getMeshMaker();
 

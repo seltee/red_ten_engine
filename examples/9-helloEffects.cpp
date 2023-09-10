@@ -162,10 +162,10 @@ extern const char *fragmentBWShader;
 extern const char *fragmentJoJoShader;
 
 // Effects are technically shaders applied to the whole rendered layer
-int main()
+APPMAIN
 {
     // Engine setup
-    auto engine = RTEngine::createInstance();
+    auto engine = RTEngine::getInstance();
 
     // Set fullscreen through configuration controller
     auto configController = engine->getConfigController();
@@ -297,6 +297,8 @@ int main()
                 effectJoJo->bHelloEnabled = !effectJoJo->bHelloEnabled;
         }
     }
+
+    return 0;
 }
 
 // Our fragment OpenGL shaders for effects.

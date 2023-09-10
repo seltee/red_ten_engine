@@ -45,7 +45,7 @@ public:
         // Our bytemap depends on Alpha, bytemap is represented by 1 byte per pixel, not full color.
         // It makes it more compact
         jojoTexture->setMakeBytemapAlpha(true);
-        // In addition if we don't need high precision we can scale it down. 
+        // In addition if we don't need high precision we can scale it down.
         // For example 4 times in both dimensions reduces memory consumption 16 times
         jojoTexture->setBytemapScale(4);
         // We need to reload texture so bytemap will be created
@@ -104,10 +104,10 @@ protected:
 Texture *JoJo::jojoTexture = nullptr;
 
 // Bytemap is an interesting way of creating effects, where you can detect existance of pixels on certain points of your actor
-int main()
+APPMAIN
 {
     // Engine setup
-    auto engine = RTEngine::createInstance();
+    auto engine = RTEngine::getInstance();
 
     // Set fullscreen through configuration controller
     auto configController = engine->getConfigController();
@@ -151,4 +151,6 @@ int main()
         stage->process(delta);
         stage->present(view);
     }
+
+    return 0;
 }

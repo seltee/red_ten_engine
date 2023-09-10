@@ -9,10 +9,12 @@
 #include "camera/camera.h"
 #include "math/math.h"
 #include "physics/physicsWorld.h"
+#include "connector/withProfiler.h"
 #include <list>
 
 class LayerActors : public Layer,
-                    public WithDebug
+                    public WithDebug,
+                    public WithProfiler
 {
 public:
     LayerActors(std::string name, int index);
@@ -68,4 +70,8 @@ protected:
     PhysicsWorld *physicsWorld = nullptr;
     bool bUseSorting = false;
     Camera *activeCamera = nullptr;
+
+    int renderingTrackerId = 0;
+    int processingTrackerId = 0;
+    int physicsTrackerId = 0;
 };

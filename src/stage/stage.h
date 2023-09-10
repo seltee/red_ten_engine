@@ -10,17 +10,16 @@
 #include "stage/layerDebug.h"
 #include "os/view.h"
 #include "controller/debugController.h"
+#include "connector/withProfiler.h"
 #include <list>
 
-class Stage
+class Stage : public WithProfiler
 {
 public:
     Stage(std::string name);
 
     EXPORT LayerActors *createLayerActors(std::string name, int index);
     EXPORT LayerEffects *createLayerEffects(std::string name, int index);
-
-    EXPORT void updateDebugLayer();
 
     EXPORT void process(float delta);
     EXPORT void present(View *view);
@@ -42,4 +41,7 @@ protected:
     Color clearColor{0.15f, 0.15f, 0.15f};
 
     LayerDebug *debugLayer;
+
+    int presentTrackerId = 0;
+    int buffersSwapTrackerId = 0;
 };

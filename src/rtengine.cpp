@@ -7,11 +7,11 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <cmath>
+#include <cstdio>
+#include <fcntl.h>
+#include <io.h>
 
-#ifdef _WIN32
-#include <shellscalingapi.h>
-#include <windows.h>
-#endif
+RTEngine *RTEngine::instance = nullptr;
 
 ViewController *RTEngine::viewController = nullptr;
 StageController *RTEngine::stageController = nullptr;
@@ -21,18 +21,32 @@ AudioController *RTEngine::audioController = nullptr;
 LogController *RTEngine::logController = nullptr;
 ConfigController *RTEngine::configController = nullptr;
 DebugController *RTEngine::debugController = nullptr;
+ProfilerController *RTEngine::profilerController = nullptr;
 
 MeshMaker *RTEngine::meshMaker = nullptr;
 
 bool RTEngine::isSDLInitDone = false;
 
-RTEngine::RTEngine(std::string configFilePath)
+RTEngine::RTEngine(std::string configFilePath, bool showConsole)
 {
+    if (showConsole)
+    {
+        AllocConsole();
+        freopen("conin$", "r", stdin);
+        freopen("conout$", "w", stdout);
+        freopen("conout$", "w", stderr);
+    }
+
     Config *config = nullptr;
     if (!logController)
     {
         logController = new LogController("log.txt");
         WithLogger::setLogController(logController);
+    }
+    if (!profilerController)
+    {
+        profilerController = new ProfilerController(logController);
+        WithProfiler::setProfilerController(profilerController);
     }
     if (!debugController)
     {
@@ -62,26 +76,22 @@ RTEngine::RTEngine(std::string configFilePath)
         viewController = new ViewController(config);
         configController->setViewController(viewController);
     }
-
     if (!stageController)
     {
         stageController = new StageController();
     }
-
     if (!resourceController)
     {
         resourceController = new ResourceController();
         LayerDebug::setFont(resourceController->addFont(28));
         WithRepository::setResourceController(resourceController);
     }
-
     if (!audioController)
     {
         audioController = new AudioController(config);
         configController->setAudioController(audioController);
         WithAudio::setAudioController(audioController);
     }
-
     if (!meshMaker)
     {
         meshMaker = new MeshMaker();
@@ -89,25 +99,25 @@ RTEngine::RTEngine(std::string configFilePath)
     }
 
     tick = SDL_GetTicks();
-    fpsLastCheckTick = tick;
 }
 
-RTEngine *RTEngine::createInstance(std::string configFilePath)
+RTEngine *RTEngine::getInstance(std::string configFilePath, bool showConsole)
 {
     if (!isSDLInitDone)
     {
+        isSDLInitDone = true;
 
 #ifdef _WIN32
         SetProcessDPIAware();
 #endif
 
-        isSDLInitDone = true;
         if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
             return nullptr;
         TTF_Init();
     }
 
-    auto instance = new RTEngine(configFilePath);
+    if (!instance)
+        instance = new RTEngine(configFilePath, showConsole);
     return instance;
 }
 
@@ -131,6 +141,11 @@ InputController *RTEngine::getInputController()
     return inputController;
 }
 
+LogController *RTEngine::getLogController()
+{
+    return logController;
+}
+
 ConfigController *RTEngine::getConfigController()
 {
     return configController;
@@ -139,6 +154,11 @@ ConfigController *RTEngine::getConfigController()
 DebugController *RTEngine::getDebugController()
 {
     return debugController;
+}
+
+ProfilerController *RTEngine::getProfilerController()
+{
+    return profilerController;
 }
 
 MeshMaker *RTEngine::getMeshMaker()
@@ -156,18 +176,11 @@ float RTEngine::syncFrame()
     unsigned int newTick = SDL_GetTicks();
     float delta = fmin((float)(newTick - tick) / 1000.0f, 0.1f);
     tick = newTick;
-    fpsCounter++;
-
-    if (newTick - fpsLastCheckTick > 1000)
-    {
-        fpsLastCheckTick = newTick;
-        fps = fpsCounter;
-        fpsCounter = 0;
-        logController->logConsole("FPS %i", fps);
-    }
 
     audioController->process(delta);
     debugController->process(delta);
+
+    profilerController->frameSync();
     return delta;
 }
 

@@ -80,10 +80,10 @@ protected:
     ResourceMesh *platformMesh = nullptr;
 };
 
-int main()
+APPMAIN
 {
     // Engine setup
-    auto engine = RTEngine::createInstance();
+    auto engine = RTEngine::getInstance();
 
     // We need view controller to get resolution
     auto viewController = engine->getViewController();
@@ -108,7 +108,6 @@ int main()
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
     layerActors->enablePhisics(Vector3(0.0f, -4.0f, 0.0f));
 
-
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
     camera->transform.setPosition(2.0f, 7.0f, 8.0f);
@@ -124,7 +123,7 @@ int main()
     sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(0.9f, 0.9f, 0.9f), true);
 
     float spawnCounter = (float)spawnPerSecond;
-    
+
     while (!engine->isTerminationIntended())
     {
         float delta = engine->syncFrame();
@@ -141,4 +140,6 @@ int main()
         stage->process(delta);
         stage->present(view);
     }
+
+    return 0;
 }

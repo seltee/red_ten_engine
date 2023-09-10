@@ -10,7 +10,13 @@
 #include <math.h>
 #include <algorithm>
 
-LayerActors::LayerActors(std::string name, int index) : Layer(name, index) {}
+LayerActors::LayerActors(std::string name, int index) : Layer(name, index)
+{
+    renderingTrackerId = profiler->addTracker("layer actors \"" + name + "\" rendering");
+    processingTrackerId = profiler->addTracker("layer actors \"" + name + "\" processing");
+    physicsTrackerId = profiler->addTracker("layer actors \"" + name + "\" physics");
+    profiler->setInactive(physicsTrackerId);
+}
 
 bool compareBodyPoints(PhysicsBodyPoint a, PhysicsBodyPoint b)
 {
@@ -22,11 +28,15 @@ void LayerActors::process(float delta)
     if (!bProcessingEnabled)
         return;
 
+    profiler->startTracking(processingTrackerId);
+
     for (auto actor = actors.begin(); actor != actors.end(); ++actor)
         (*actor)->process(delta);
 
+    profiler->startTracking(physicsTrackerId);
     if (physicsWorld)
         physicsWorld->process(delta);
+    profiler->stopTracking(physicsTrackerId);
 
     auto actor = actors.begin();
     while (actor != actors.end())
@@ -38,18 +48,24 @@ void LayerActors::process(float delta)
         else
             ++actor;
 
+    profiler->startTracking(physicsTrackerId);
     if (physicsWorld)
         physicsWorld->removeDestroyed();
+    profiler->stopTracking(physicsTrackerId);
 
     if (bUseSorting)
     {
         actors.sort([](const Actor *player1, const Actor *player2)
                     { return player1->zDepth < player2->zDepth; });
     }
+
+    profiler->stopTracking(processingTrackerId);
 }
 
 void LayerActors::render(View *view)
 {
+    profiler->startTracking(renderingTrackerId);
+
     Matrix4 m1, m2;
     auto renderer = view->getRenderer();
     // Clear light renderer
@@ -204,6 +220,8 @@ void LayerActors::render(View *view)
     CommonShaders::getScreenMesh()->use();
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    profiler->stopTracking(renderingTrackerId);
 }
 
 void LayerActors::prepareNewActor(Actor *actor)
@@ -229,6 +247,8 @@ void LayerActors::enablePhisics(const Vector3 &gravity, float simScale, int step
     {
         physicsWorld->setBasicParameters(gravity, simScale, stepsPerSecond);
     }
+
+    profiler->setActive(physicsTrackerId);
 }
 
 void LayerActors::enableSorting()
