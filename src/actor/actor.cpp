@@ -12,6 +12,9 @@ Actor::Actor()
 Actor::~Actor()
 {
     removeComponents();
+    if (physicsBody){
+        physicsBody->clearOwner();
+    }
 }
 
 void Actor::setActorName(std::string name)

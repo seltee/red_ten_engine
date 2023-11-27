@@ -98,6 +98,7 @@ public:
     }
 
     inline Actor *getOwner() { return owner; }
+    inline void clearOwner() { owner = nullptr; }
 
     inline void setActor(Actor *actor)
     {
