@@ -75,7 +75,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/sound.o ${OBJDIR}/texture.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
-			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderer.o \
+			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/fbx_loader.o ${OBJDIR}/stb_vorbis.o \
@@ -94,7 +94,7 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
-			16-helloFPV${EXT} 17-helloProfiler${EXT}
+			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT}
 
 all: engine examples
 
@@ -288,8 +288,8 @@ ${OBJDIR}/commonShaders.o: ${SRCDIR}/common/commonShaders.cpp
 ${OBJDIR}/meshDescriptor.o: ${SRCDIR}/common/meshDescriptor.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/meshDescriptor.o ${SRCDIR}/common/meshDescriptor.cpp
 	
-${OBJDIR}/renderer.o: ${SRCDIR}/common/renderer.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/renderer.o ${SRCDIR}/common/renderer.cpp
+${OBJDIR}/renderTarget.o: ${SRCDIR}/common/renderTarget.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/renderTarget.o ${SRCDIR}/common/renderTarget.cpp
 
 ${OBJDIR}/withLogger.o: ${SRCDIR}/connector/withLogger.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withLogger.o ${SRCDIR}/connector/withLogger.cpp
@@ -502,6 +502,13 @@ ${OBJDIR}/17-helloProfiler.o: ${EXMDIR}/17-helloProfiler.cpp ${EXMDIR}/helpers.h
 17-helloProfiler${EXT}: ${OBJDIR}/17-helloProfiler.o
 	$(LD) ${EFLAGS} ${OBJDIR}/17-helloProfiler.o -o 17-helloProfiler${EXT}
 	${MOVE} 17-helloProfiler${EXT} ${BINDIR}/17-helloProfiler${EXT}
+
+${OBJDIR}/18-helloRenderingToTexture.o: ${EXMDIR}/18-helloRenderingToTexture.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/18-helloRenderingToTexture.o ${EXMDIR}/18-helloRenderingToTexture.cpp
+
+18-helloRenderingToTexture${EXT}: ${OBJDIR}/18-helloRenderingToTexture.o
+	$(LD) ${EFLAGS} ${OBJDIR}/18-helloRenderingToTexture.o -o 18-helloRenderingToTexture${EXT}
+	${MOVE} 18-helloRenderingToTexture${EXT} ${BINDIR}/18-helloRenderingToTexture${EXT}
 
 
 # llvm-objcopy

@@ -4,8 +4,9 @@
 #pragma once
 #include "common/utils.h"
 #include "common/config.h"
-#include "connector/withLogger.h"
+#include "common/renderTarget.h"
 #include "os/view.h"
+#include "connector/withLogger.h"
 #include "controller/inputController.h"
 #include <list>
 
@@ -28,6 +29,8 @@ public:
     ViewController(Config *config);
 
     EXPORT View *createView(std::string name);
+    EXPORT RenderTarget *createRenderTarget(int width, int height, RenderQuality renderQuality);
+    EXPORT void destroyRenderTarget(RenderTarget *renderTarget);
     EXPORT void update();
 
     EXPORT void getAvailableResolutions(std::vector<DisplayMode> *modes, bool onlyNative = true);

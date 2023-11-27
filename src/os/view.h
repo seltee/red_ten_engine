@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/renderer.h"
+#include "common/renderTarget.h"
 #include "connector/withLogger.h"
 #include "controller/logController.h"
 #include <string>
@@ -30,9 +30,7 @@ public:
 
     EXPORT void minimize();
 
-    EXPORT unsigned int getTexture();
-    EXPORT Renderer *getRenderer();
-    EXPORT void useFrameBuffer();
+    EXPORT RenderTarget *getRenderTarget();
 
     std::string windowName = "unnamed";
 
@@ -52,8 +50,6 @@ protected:
     const char *oglVersion = nullptr;
     const char *version = nullptr;
 
-    unsigned int framebuffer = 0;
-    unsigned int renderedTexture = 0;
-    Renderer *renderer = nullptr;
+    RenderTarget *renderTarget = nullptr;
     Config *config = nullptr;
 };

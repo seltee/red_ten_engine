@@ -18,6 +18,7 @@ LayerEffects::LayerEffects(std::string name, int index) : Layer(name, index)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+    processTrackerId = profiler->addTracker("layer effects \"" + name + "\" process");
     renderTrackerId = profiler->addTracker("layer effects \"" + name + "\" render");
 }
 
@@ -41,13 +42,27 @@ void LayerEffects::clearEffects()
     effects.clear();
 }
 
-void LayerEffects::render(View *view)
+void LayerEffects::process(float delta)
+{
+    profiler->startTracking(processTrackerId);
+    if (effects.size() > 0)
+    {
+        for (auto it = effects.begin(); it != effects.end(); it++)
+        {
+            auto effect = *it;
+            effect->process(delta);
+        }
+    }
+    profiler->stopTracking(processTrackerId);
+}
+
+void LayerEffects::render(RenderTarget *renderTarget)
 {
     profiler->startTracking(renderTrackerId);
     if (effects.size() > 0)
     {
-        int width = view->getDrawableWidth();
-        int height = view->getDrawableHeight();
+        int width = renderTarget->getWidth();
+        int height = renderTarget->getHeight();
         glBindTexture(GL_TEXTURE_2D, renderedTexture);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
@@ -70,11 +85,11 @@ void LayerEffects::render(View *view)
 
                 effect->use(m, m);
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, view->getTexture());
+                glBindTexture(GL_TEXTURE_2D, renderTarget->getResultTexture());
                 CommonShaders::getScreenMesh()->use();
                 glDrawArrays(GL_TRIANGLES, 0, 6);
 
-                view->useFrameBuffer();
+                renderTarget->useResultBuffer();
                 effectShader->use(m, m);
                 effectShader->setOpacity(effect->getOpacity());
 

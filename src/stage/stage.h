@@ -4,6 +4,7 @@
 #pragma once
 #include "common/utils.h"
 #include "common/color.h"
+#include "common/renderTarget.h"
 #include "stage/layer.h"
 #include "stage/layerActors.h"
 #include "stage/layerEffects.h"
@@ -23,6 +24,7 @@ public:
 
     EXPORT void process(float delta);
     EXPORT void present(View *view);
+    EXPORT void present(RenderTarget *renderTarget);
 
     EXPORT void setClearColor(Color color)
     {
@@ -34,7 +36,7 @@ public:
 protected:
     void sortLayers();
 
-    Renderer *renderer = nullptr;
+    RenderTarget *renderTarget = nullptr;
     std::string name;
     std::list<Layer *> layers;
 

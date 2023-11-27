@@ -53,6 +53,7 @@ class Texture : public WithLogger
 {
 public:
     EXPORT Texture(std::string path);
+    EXPORT Texture(unsigned int internalId);
     EXPORT ~Texture();
 
     EXPORT void bind();

@@ -12,6 +12,17 @@ Texture::Texture(std::string path)
     list.push_back(this);
 }
 
+Texture::Texture(unsigned int internalId)
+{
+    this->textureID = internalId;
+    if (internalId)
+    {
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &width);
+        glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &height);
+        bIsLoaded = true;
+    }
+}
+
 Texture::~Texture()
 {
     unload();

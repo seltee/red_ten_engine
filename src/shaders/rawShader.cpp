@@ -117,7 +117,7 @@ int RawShader::getUniformLocation(const char *name)
 {
     if (programm != -1)
         return glGetUniformLocation(programm, name);
-    return 0;
+    return -1;
 }
 
 void RawShader::provideFloatValue(int uniform, int amount, float *value)

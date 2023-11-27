@@ -13,11 +13,6 @@ void Layer::process(float delta)
 {
 }
 
-void Layer::render(View *view)
+void Layer::render(RenderTarget *renderTarget)
 {
-}
-
-int Layer::getIndex()
-{
-    return index;
 }

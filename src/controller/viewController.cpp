@@ -50,6 +50,17 @@ View *ViewController::createView(std::string name)
     return nullptr;
 }
 
+RenderTarget *ViewController::createRenderTarget(int width, int height, RenderQuality renderQuality)
+{
+    return new RenderTarget(width, height, renderQuality);
+}
+
+void ViewController::destroyRenderTarget(RenderTarget *renderTarget)
+{
+    if (renderTarget)
+        delete renderTarget;
+}
+
 void ViewController::update()
 {
     if (mainView)

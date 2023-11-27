@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "os/view.h"
+#include "common/renderTarget.h"
 #include "stage/layer.h"
 #include "math/math.h"
 #include "controller/audioController.h"
@@ -22,15 +22,15 @@ class Camera : public WithAudio
 {
 public:
     EXPORT Camera();
-    EXPORT virtual void prepareToRender(View *view);
+    EXPORT virtual void prepareToRender(RenderTarget *renderTarget);
     EXPORT virtual void finishRender();
     EXPORT Matrix4 *getProjectionMatrix();
     EXPORT Matrix4 *getViewMatrix();
     EXPORT void setViewMatrix(Matrix4 &view);
     EXPORT virtual int getWidth();
     EXPORT virtual int getHeight();
-    EXPORT virtual float getWidthViewProportion();
-    EXPORT virtual float getHeightViewProportion();
+    EXPORT virtual float getWidthTargetProportion();
+    EXPORT virtual float getHeightTargetProportion();
 
     EXPORT Transformation *getOwnerTransform();
     EXPORT void setOwnerTransform(Transformation *transform);

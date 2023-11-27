@@ -62,17 +62,16 @@ void LayerActors::process(float delta)
     profiler->stopTracking(processingTrackerId);
 }
 
-void LayerActors::render(View *view)
+void LayerActors::render(RenderTarget *renderTarget)
 {
     profiler->startTracking(renderingTrackerId);
 
     Matrix4 m1, m2;
-    auto renderer = view->getRenderer();
     // Clear light renderer
-    renderer->setupLightning();
+    renderTarget->setupLightning();
 
     // Clear deffered buffer and set this as primary
-    renderer->setupNewFrame();
+    renderTarget->setupNewFrame();
 
     std::vector<Component *> sceneLights;
     std::vector<Actor *> blends;
@@ -86,7 +85,7 @@ void LayerActors::render(View *view)
     Matrix4 mProjectionView = *activeCamera->getProjectionMatrix() * mView;
 
     // G Buffer phase
-    activeCamera->prepareToRender(view);
+    activeCamera->prepareToRender(renderTarget);
 
     for (auto actor = actors.begin(); actor != actors.end(); ++actor)
     {
@@ -102,6 +101,7 @@ void LayerActors::render(View *view)
             debugView.push_back(*actor);
         }
     }
+
     activeCamera->finishRender();
 
     // light phase
@@ -112,11 +112,11 @@ void LayerActors::render(View *view)
     glDepthMask(GL_TRUE);
 
     auto initialLightningShader = CommonShaders::getInitialLightningShader();
-    renderer->setupLightning(false);
+    renderTarget->setupLightning(false);
     initialLightningShader->use(m1, m2);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderer->getAlbedoTexture());
+    glBindTexture(GL_TEXTURE_2D, renderTarget->getAlbedoTexture());
     glUniform3fv(initialLightningShader->locV3AmbientColor, 1, ambientColor);
     CommonShaders::getScreenMesh()->use();
 
@@ -135,13 +135,13 @@ void LayerActors::render(View *view)
             {
                 glEnable(GL_DEPTH_TEST);
                 glEnable(GL_CULL_FACE);
-                if (renderer->getShadowMapSize() < 2048)
+                if (renderTarget->getShadowMapSize() < 2048)
                     glFrontFace(GL_CW);
                 glDisable(GL_BLEND);
 
                 // prepare shadowed render
                 Matrix4 mLightViewProjection = (*light)->preparePreShadowPhase(activeCamera->getOwnerTransform()->getPosition());
-                renderer->setupShadowHQ();
+                renderTarget->setupShadowHQ();
 
                 for (auto actor = shadowCasters.begin(); actor != shadowCasters.end(); ++actor)
                 {
@@ -149,34 +149,34 @@ void LayerActors::render(View *view)
                 }
                 setupLightningFrame = true;
 
-                if (renderer->getShadowMapSize() < 2048)
+                if (renderTarget->getShadowMapSize() < 2048)
                     glFrontFace(GL_CCW);
             }
             if (setupLightningFrame)
             {
                 setupLightningFrame = false;
-                renderer->setupLightning(false);
+                renderTarget->setupLightning(false);
 
                 glDisable(GL_DEPTH_TEST);
                 glDisable(GL_CULL_FACE);
                 glEnable(GL_BLEND);
 
                 glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, renderer->getAlbedoTexture());
+                glBindTexture(GL_TEXTURE_2D, renderTarget->getAlbedoTexture());
 
                 glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, renderer->getNormalTexture());
+                glBindTexture(GL_TEXTURE_2D, renderTarget->getNormalTexture());
 
                 glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, renderer->getPositionTexture());
+                glBindTexture(GL_TEXTURE_2D, renderTarget->getPositionTexture());
             }
 
-            (*light)->renderLightPhase(mProjectionView, renderer->getShadowTexture());
+            (*light)->renderLightPhase(mProjectionView, renderTarget->getShadowTexture());
         }
     }
 
     // Blending phase
-    renderer->setupLightning(false);
+    renderTarget->setupLightning(false);
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -210,12 +210,12 @@ void LayerActors::render(View *view)
     debug->renderAll(&mProjectionView);
 
     // Final phase
-    view->useFrameBuffer();
+    renderTarget->useResultBuffer();
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderer->getLightningTexture());
+    glBindTexture(GL_TEXTURE_2D, renderTarget->getLightningTexture());
     CommonShaders::getScreenShader()->use(m1, m2);
     CommonShaders::getScreenMesh()->use();
 

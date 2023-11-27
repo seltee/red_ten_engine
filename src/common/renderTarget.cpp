@@ -1,20 +1,33 @@
 // SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "renderer.h"
+#include "common/renderTarget.h"
 #include "opengl/glew.h"
 #include "common/commonShaders.h"
 
-Renderer::Renderer(int width, int height, Config *config)
+RenderTarget::RenderTarget(int width, int height, RenderQuality quality)
 {
     this->width = width;
     this->height = height;
 
-    shadowMapSize = 1024;
-    if (config->getShadowQuality() == RenderQuality::High)
+    switch (quality)
+    {
+    case RenderQuality::High:
         shadowMapSize = 4096;
-    if (config->getShadowQuality() == RenderQuality::Balanced)
+        break;
+    case RenderQuality::Balanced:
         shadowMapSize = 2048;
+        break;
+
+    case RenderQuality::SuperFast:
+        shadowMapSize = 512;
+        break;
+
+    case RenderQuality::Fast:
+    default:
+        shadowMapSize = 1024;
+        break;
+    }
 
     // Rendering images
     glGenTextures(1, &gAlbedoSpec);
@@ -35,14 +48,20 @@ Renderer::Renderer(int width, int height, Config *config)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glGenTextures(1, &lightningPicture);
-    glBindTexture(GL_TEXTURE_2D, lightningPicture);
+    glGenTextures(1, &lightningTexture);
+    glBindTexture(GL_TEXTURE_2D, lightningTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glGenTextures(1, &shadowPicture);
-    glBindTexture(GL_TEXTURE_2D, shadowPicture);
+    glGenTextures(1, &resultTexture);
+    glBindTexture(GL_TEXTURE_2D, resultTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glGenTextures(1, &shadowTexture);
+    glBindTexture(GL_TEXTURE_2D, shadowTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, shadowMapSize, shadowMapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -65,7 +84,7 @@ Renderer::Renderer(int width, int height, Config *config)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, gPosition, 0);
 
     // - light emission buffer
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, lightningPicture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT3, GL_TEXTURE_2D, lightningTexture, 0);
 
     // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
     unsigned int attachments[4] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
@@ -84,7 +103,7 @@ Renderer::Renderer(int width, int height, Config *config)
     glBindFramebuffer(GL_FRAMEBUFFER, lightningBuffer);
 
     // We draw to lightning picture only
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightningPicture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, lightningTexture, 0);
 
     // - tell OpenGL which color attachments we'll use (of this framebuffer) for rendering
     unsigned int lightningAttachments[1] = {GL_COLOR_ATTACHMENT0};
@@ -92,57 +111,77 @@ Renderer::Renderer(int width, int height, Config *config)
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+    // Result buffer
+    glGenFramebuffers(1, &resultBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, resultBuffer);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, resultTexture, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // Shadow buffer
     glGenFramebuffers(1, &shadowBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
 
     // Shadowmap
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowPicture, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowTexture, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    resultTextureAsClass = new Texture(resultTexture);
 }
 
-Renderer::~Renderer()
+RenderTarget::~RenderTarget()
 {
     // Deleting buffers
     glDeleteFramebuffers(1, &gBuffer);
     glDeleteFramebuffers(1, &lightningBuffer);
     glDeleteFramebuffers(1, &shadowBuffer);
+    glDeleteFramebuffers(1, &resultBuffer);
 
     glDeleteTextures(1, &gAlbedoSpec);
     glDeleteTextures(1, &gNormal);
     glDeleteTextures(1, &gPosition);
-    glDeleteTextures(1, &lightningPicture);
-    glDeleteTextures(1, &shadowPicture);
+    glDeleteTextures(1, &lightningTexture);
+    glDeleteTextures(1, &shadowTexture);
+    glDeleteTextures(1, &resultTexture);
 }
 
-unsigned int Renderer::getPositionTexture()
+unsigned int RenderTarget::getPositionTexture()
 {
     return gPosition;
 }
 
-unsigned int Renderer::getNormalTexture()
+unsigned int RenderTarget::getNormalTexture()
 {
     return gNormal;
 }
 
-unsigned int Renderer::getAlbedoTexture()
+unsigned int RenderTarget::getAlbedoTexture()
 {
     return gAlbedoSpec;
 }
 
-unsigned int Renderer::getLightningTexture()
+unsigned int RenderTarget::getLightningTexture()
 {
-    return lightningPicture;
+    return lightningTexture;
 }
 
-unsigned int Renderer::getShadowTexture()
+unsigned int RenderTarget::getShadowTexture()
 {
-    return shadowPicture;
+    return shadowTexture;
 }
 
-void Renderer::setupNewFrame(bool clear)
+unsigned int RenderTarget::getResultTexture()
+{
+    return resultTexture;
+}
+
+void RenderTarget::useResultBuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, resultBuffer);
+}
+
+void RenderTarget::setupNewFrame(bool clear)
 {
     glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
@@ -153,7 +192,7 @@ void Renderer::setupNewFrame(bool clear)
     }
 }
 
-void Renderer::setupLightning(bool clear)
+void RenderTarget::setupLightning(bool clear)
 {
     glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, lightningBuffer);
@@ -164,7 +203,7 @@ void Renderer::setupLightning(bool clear)
     }
 }
 
-void Renderer::setupShadowHQ(bool clear)
+void RenderTarget::setupShadowHQ(bool clear)
 {
     glViewport(0, 0, shadowMapSize, shadowMapSize);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowBuffer);
@@ -172,7 +211,7 @@ void Renderer::setupShadowHQ(bool clear)
         glClear(GL_DEPTH_BUFFER_BIT);
 }
 
-int Renderer::getShadowMapSize()
+int RenderTarget::getShadowMapSize()
 {
     return shadowMapSize;
 }

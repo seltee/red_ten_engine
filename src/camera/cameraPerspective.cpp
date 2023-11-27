@@ -5,7 +5,7 @@
 #include "opengl/glew.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
-void CameraPerspective::prepareToRender(View *view)
+void CameraPerspective::prepareToRender(RenderTarget *renderTarget)
 {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -14,12 +14,12 @@ void CameraPerspective::prepareToRender(View *view)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 
-    float aspect = (float)view->getWidth() / (float)view->getHeight();
+    float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
 
     projectionMatrix = glm::perspective(distance, (float)targetWidth / (float)targetHeight, nearDistance, farDistance);
-    this->view = view;
+    this->renderTarget = renderTarget;
 }
 
 void CameraPerspective::finishRender()
@@ -28,9 +28,9 @@ void CameraPerspective::finishRender()
 
 int CameraPerspective::getWidth()
 {
-    if (view && view->getHeight() > 0 && view->getWidth() > 0)
+    if (renderTarget && renderTarget->getHeight() > 0 && renderTarget->getWidth() > 0)
     {
-        float aspect = (float)view->getWidth() / (float)view->getHeight();
+        float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
         return (int)(useWidthBasedProportion ? mainLine : mainLine * aspect);
     }
     return 0;
@@ -38,26 +38,26 @@ int CameraPerspective::getWidth()
 
 int CameraPerspective::getHeight()
 {
-    if (view && view->getHeight() > 0 && view->getWidth() > 0)
+    if (renderTarget && renderTarget->getHeight() > 0 && renderTarget->getWidth() > 0)
     {
-        float aspect = (float)view->getWidth() / (float)view->getHeight();
+        float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
         return (int)(useWidthBasedProportion ? mainLine / aspect : mainLine);
     }
     return 0;
 }
 
-float CameraPerspective::getWidthViewProportion()
+float CameraPerspective::getWidthTargetProportion()
 {
-    float aspect = (float)view->getWidth() / (float)view->getHeight();
+    float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
-    return targetWidth / (float)view->getWidth();
+    return targetWidth / (float)renderTarget->getWidth();
 }
 
-float CameraPerspective::getHeightViewProportion()
+float CameraPerspective::getHeightTargetProportion()
 {
-    float aspect = (float)view->getWidth() / (float)view->getHeight();
+    float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
-    return targetHeight / (float)view->getHeight();
+    return targetHeight / (float)renderTarget->getHeight();
 }
 
 void CameraPerspective::setWidthBasedResolution(float width)
@@ -90,11 +90,11 @@ void CameraPerspective::setFov(float fov)
 PointWithDirection CameraPerspective::screenToWorld(float x, float y)
 {
     PointWithDirection out;
-    if (!view)
+    if (!renderTarget)
         return out;
 
-    float halfWidth = view->getWidth() / 2.0f;
-    float halfHeight = view->getHeight() / 2.0f;
+    float halfWidth = renderTarget->getWidth() / 2.0f;
+    float halfHeight = renderTarget->getHeight() / 2.0f;
 
     Matrix4 mView = glm::inverse(projectionMatrix * *getViewMatrix());
 

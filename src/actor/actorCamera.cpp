@@ -1,4 +1,5 @@
 #include "actorCamera.h"
+#include "stage/layerActors.h"
 
 CameraOrto *ActorCamera::setupOrtoCamera()
 {
@@ -16,4 +17,13 @@ CameraPerspective *ActorCamera::setupPerspectiveCamera()
     componentCamera = createComponent<ComponentCameraPerspective>();
     camera = ((ComponentCameraPerspective *)componentCamera)->getCamera();
     return (CameraPerspective *)camera;
+}
+
+bool ActorCamera::setActive()
+{
+    if (camera && layer)
+    {
+        layer->setActiveCamera(camera);
+    }
+    return false;
 }

@@ -5,14 +5,14 @@
 #include "math/glm/gtc/type_ptr.hpp"
 #include "opengl/glew.h"
 
-void CameraOrto::prepareToRender(View *view)
+void CameraOrto::prepareToRender(RenderTarget *renderTarget)
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 
-    float aspect = (float)view->getWidth() / (float)view->getHeight();
+    float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
 
@@ -24,7 +24,7 @@ void CameraOrto::prepareToRender(View *view)
     float n = -1400.0f;
 
     projectionMatrix = glm::ortho(l, r, b, t, n, f);
-    this->view = view;
+    this->renderTarget = renderTarget;
 }
 
 void CameraOrto::finishRender()
@@ -33,9 +33,9 @@ void CameraOrto::finishRender()
 
 int CameraOrto::getWidth()
 {
-    if (view && view->getHeight() > 0 && view->getWidth() > 0)
+    if (renderTarget && renderTarget->getHeight() > 0 && renderTarget->getWidth() > 0)
     {
-        float aspect = (float)view->getWidth() / (float)view->getHeight();
+        float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
         return (int)(useWidthBasedProportion ? mainLine : mainLine * aspect);
     }
     return 0;
@@ -43,30 +43,30 @@ int CameraOrto::getWidth()
 
 int CameraOrto::getHeight()
 {
-    if (view && view->getHeight() && view->getWidth() > 0)
+    if (renderTarget && renderTarget->getHeight() && renderTarget->getWidth() > 0)
     {
-        float aspect = (float)view->getWidth() / (float)view->getHeight();
+        float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
         return (int)(useWidthBasedProportion ? mainLine / aspect : mainLine);
     }
     return 0;
 }
 
-float CameraOrto::getWidthViewProportion()
+float CameraOrto::getWidthTargetProportion()
 {
-    if (view)
+    if (renderTarget)
     {
-        float aspect = (float)view->getWidth() / (float)view->getHeight();
+        float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
         float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
-        return targetWidth / (float)view->getWidth();
+        return targetWidth / (float)renderTarget->getWidth();
     }
     return 0;
 }
 
-float CameraOrto::getHeightViewProportion()
+float CameraOrto::getHeightTargetProportion()
 {
-    float aspect = (float)view->getWidth() / (float)view->getHeight();
+    float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
-    return targetHeight / (float)view->getHeight();
+    return targetHeight / (float)renderTarget->getHeight();
 }
 
 void CameraOrto::setWidthBasedResolution(float width)

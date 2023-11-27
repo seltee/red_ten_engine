@@ -45,18 +45,11 @@ void Stage::process(float delta)
 
 void Stage::present(View *view)
 {
-    profiler->startTracking(presentTrackerId);
-    view->useFrameBuffer();
-    glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    profiler->stopTracking(presentTrackerId);
+    auto viewRenderTarget = view->getRenderTarget();
+    present(viewRenderTarget);
 
+    // present the framebuffer on the screen
     Matrix4 m;
-    for (auto it = layers.begin(); it != layers.end(); ++it)
-    {
-        (*it)->render(view);
-    }
-
     profiler->startTracking(presentTrackerId);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -66,7 +59,7 @@ void Stage::present(View *view)
     auto screenShader = CommonShaders::getScreenShader();
     screenShader->use(m, m);
 
-    glBindTexture(GL_TEXTURE_2D, view->getTexture());
+    glBindTexture(GL_TEXTURE_2D, viewRenderTarget->getResultTexture());
 
     CommonShaders::getScreenMesh()->use();
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -76,6 +69,23 @@ void Stage::present(View *view)
     profiler->startTracking(buffersSwapTrackerId);
     view->swapBuffers();
     profiler->stopTracking(buffersSwapTrackerId);
+}
+
+void Stage::present(RenderTarget *renderTarget)
+{
+    profiler->startTracking(presentTrackerId);
+    renderTarget->useResultBuffer();
+    glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    profiler->stopTracking(presentTrackerId);
+
+    for (auto it = layers.begin(); it != layers.end(); ++it)
+    {
+        if ((*it)->isVisible())
+        {
+            (*it)->render(renderTarget);
+        }
+    }
 }
 
 void Stage::sortLayers()

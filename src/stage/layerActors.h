@@ -28,7 +28,7 @@ public:
     }
 
     EXPORT void process(float delta);
-    EXPORT void render(View *view);
+    EXPORT void render(RenderTarget *renderTarget);
     EXPORT void prepareNewActor(Actor *actor);
     EXPORT void enablePhisics(const Vector3 &gravity, float simScale = 1.0f, int stepsPerSecond = 100);
     EXPORT void enableSorting();

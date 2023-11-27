@@ -148,7 +148,7 @@ public:
         opacity = 0.0f;
     }
 
-    void update(float delta)
+    void process(float delta)
     {
         opacity = bHelloEnabled ? fmin(opacity + delta, 1.0f) : fmax(opacity - delta, 0.0f);
     }
@@ -271,11 +271,6 @@ APPMAIN
         float delta = engine->syncFrame();
         viewController->processEvents();
         stage->process(delta);
-
-        effectInverse->update(delta);
-        effectShift->update(delta);
-        effectBW->update(delta);
-        effectJoJo->update(delta);
 
         if (effectJoJo->getOpacity() > 0.0f && effectInverse->getOpacity() > 0.0f)
             dioSprite->setOpacity(effectInverse->getOpacity());

@@ -149,19 +149,9 @@ void View::minimize()
         SDL_MinimizeWindow((SDL_Window *)window);
 }
 
-unsigned int View::getTexture()
+RenderTarget *View::getRenderTarget()
 {
-    return renderedTexture;
-}
-
-Renderer *View::getRenderer()
-{
-    return renderer;
-}
-
-void View::useFrameBuffer()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    return renderTarget;
 }
 
 void View::updateSuitableDisplayMode()
@@ -183,26 +173,7 @@ void View::updateSuitableDisplayMode()
 
 void View::updateFrameBuffer()
 {
-    if (framebuffer)
-        glDeleteFramebuffers(1, &framebuffer);
-    if (renderedTexture)
-        glDeleteTextures(1, &renderedTexture);
-
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    // Color texture
-    glGenTextures(1, &renderedTexture);
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, drawableWidth, drawableHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    if (renderer)
-        delete renderer;
-    renderer = new Renderer(drawableWidth, drawableHeight, config);
+    if (renderTarget)
+        delete renderTarget;
+    renderTarget = new RenderTarget(drawableWidth, drawableHeight, config->getShadowQuality());
 }

@@ -19,6 +19,8 @@ public:
     EXPORT void setOpacity(float opacity);
     EXPORT float getOpacity();
 
+    EXPORT virtual void process(float delta);
+
 protected:
     int index = 0;
     bool bIsEnabled = true;

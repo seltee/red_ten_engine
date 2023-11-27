@@ -50,3 +50,7 @@ EXPORT float Effect::getOpacity()
 {
     return opacity;
 }
+
+void Effect::process(float delta)
+{
+}

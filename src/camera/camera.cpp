@@ -12,7 +12,7 @@ Camera::Camera()
         setAsListenerCamera();
 }
 
-void Camera::prepareToRender(View *view)
+void Camera::prepareToRender(RenderTarget *renderTarget)
 {
 }
 
@@ -45,12 +45,12 @@ int Camera::getHeight()
     return 0;
 }
 
-float Camera::getWidthViewProportion()
+float Camera::getWidthTargetProportion()
 {
     return 0;
 }
 
-float Camera::getHeightViewProportion()
+float Camera::getHeightTargetProportion()
 {
     return 0;
 }

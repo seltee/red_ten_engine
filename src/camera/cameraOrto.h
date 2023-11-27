@@ -2,19 +2,19 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#include "common/renderTarget.h"
 #include "camera/camera.h"
 #include "stage/layer.h"
-#include "os/view.h"
 
 class CameraOrto : public Camera
 {
 public:
-    EXPORT void prepareToRender(View *view);
+    EXPORT void prepareToRender(RenderTarget *renderTarget);
     EXPORT void finishRender();
     EXPORT int getWidth();
     EXPORT int getHeight();
-    EXPORT float getWidthViewProportion();
-    EXPORT float getHeightViewProportion();
+    EXPORT float getWidthTargetProportion();
+    EXPORT float getHeightTargetProportion();
 
     EXPORT void setWidthBasedResolution(float width);
     EXPORT void setHeightBasedResolution(float height);
@@ -23,7 +23,7 @@ public:
 
     EXPORT CameraType getCameraType();
 
-    View *view = nullptr;
+    RenderTarget *renderTarget = nullptr;
 
 protected:
     Layer *layer;

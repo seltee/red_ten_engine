@@ -64,8 +64,8 @@ void ActorGUIElement::onProcess(float delta)
     int x, y;
     SDL_GetMouseState(&x, &y);
 
-    float mouseX = (float)x * camera->getWidthViewProportion() - ((float)camera->getWidth() / 2.0f);
-    float mouseY = -((float)y * camera->getHeightViewProportion() - ((float)camera->getHeight() / 2.0f));
+    float mouseX = (float)x * camera->getWidthTargetProportion() - ((float)camera->getWidth() / 2.0f);
+    float mouseY = -((float)y * camera->getHeightTargetProportion() - ((float)camera->getHeight() / 2.0f));
 
     Vector4 position(0, 0, 0, 1.0f);
     Vector4 screenPosition = *transform.getModelMatrix() * position;

@@ -60,6 +60,7 @@ std::string LogController::formatString(const char *format, va_list arg)
     const char *iterator = format;
     char *s;
     unsigned int i;
+    double f;
 
     for (; *iterator != 0; iterator++)
     {
@@ -104,6 +105,12 @@ std::string LogController::formatString(const char *format, va_list arg)
                 case 's':
                     s = va_arg(arg, char *); // Fetch string
                     out += s;
+                    break;
+
+                    // Fetch float/double
+                case 'f':
+                    f = va_arg(arg, double); // Fetch double
+                    out += std::to_string(f);
                     break;
 
                 default:

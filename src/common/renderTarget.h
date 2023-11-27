@@ -3,17 +3,27 @@
 
 #pragma once
 #include "common/config.h"
-class Renderer
+#include "resource/texture.h"
+
+class RenderTarget
 {
 public:
-    Renderer(int width, int height, Config *config);
-    ~Renderer();
+    RenderTarget(int width, int height, RenderQuality quality);
+    ~RenderTarget();
+
+    inline int getWidth() { return width; }
+    inline int getHeight() { return height; }
 
     unsigned int getPositionTexture();
     unsigned int getNormalTexture();
     unsigned int getAlbedoTexture();
     unsigned int getLightningTexture();
     unsigned int getShadowTexture();
+    unsigned int getResultTexture();
+
+    Texture *getResultTextureAsClass() { return resultTextureAsClass; }
+
+    void useResultBuffer();
 
     void setupNewFrame(bool clear = true);
     void setupLightning(bool clear = true);
@@ -25,11 +35,16 @@ protected:
     unsigned int gPosition, gNormal, gAlbedoSpec;
 
     unsigned int lightningBuffer;
-    unsigned int lightningPicture;
+    unsigned int lightningTexture;
 
     unsigned int shadowBuffer;
-    unsigned int shadowPicture;
+    unsigned int shadowTexture;
+
+    unsigned int resultBuffer;
+    unsigned int resultTexture;
 
     int width, height;
     int shadowMapSize;
+
+    Texture *resultTextureAsClass = nullptr;
 };

@@ -15,6 +15,8 @@ public:
     inline Camera *getCamera() { return camera; };
     inline Component *getCameraComponent() { return componentCamera; }
 
+    EXPORT bool setActive();
+
 protected:
     Component *componentCamera = nullptr;
     Camera *camera = nullptr;

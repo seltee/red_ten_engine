@@ -78,9 +78,9 @@ void LayerDebug::process(float delta)
             debugActors.push_back(actor);
         }
 
-    if (debugActors.size() > 0 && camera->view && camera->view->getWidth() > 0)
+    if (debugActors.size() > 0 && camera && camera->renderTarget && camera->renderTarget->getWidth() > 0)
     {
-        camera->setWidthBasedResolution(camera->view->getWidth());
+        camera->setWidthBasedResolution(camera->renderTarget->getWidth());
 
         float shift = 0.0f;
         auto it = debugActors.begin();

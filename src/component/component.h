@@ -12,7 +12,6 @@
 #include "physics/shapes/shapeGeometry.h"
 #include "physics/shapes/shapeCapsule.h"
 #include "common/destroyable.h"
-#include "common/renderer.h"
 #include <list>
 
 enum class ComponentColorMode

@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "os/view.h"
+#include "common/renderTarget.h"
 
 class Layer
 {
@@ -11,10 +11,14 @@ protected:
     Layer(std::string name, int index);
     int index = 0;
     std::string name;
+    bool bIsVisible = true;
 
 public:
     virtual void process(float delta);
-    virtual void render(View *view);
+    virtual void render(RenderTarget *renderTarget);
 
-    int getIndex();
+    inline void setVisible(bool state) { bIsVisible = state; }
+    inline bool isVisible() { return bIsVisible; }
+
+    inline int getIndex() { return index; }
 };
