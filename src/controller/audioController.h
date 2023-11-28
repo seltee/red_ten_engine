@@ -16,6 +16,7 @@ class AudioController : public WithLogger, public WithProfiler
 {
 public:
     AudioController(Config *config);
+    ~AudioController();
     void update();
 
     void process(float delta);

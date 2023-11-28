@@ -112,4 +112,6 @@ public:
     EXPORT float syncFrame();
     EXPORT void terminate();
     EXPORT bool isTerminationIntended();
+
+    EXPORT void destroy();
 };

@@ -2,13 +2,12 @@
 // SPDX-License-Identifier: MIT
 
 #include "audioController.h"
-#include "audio/audioCreator.h"
 #include <stdio.h>
 #include <string>
 
 AudioController::AudioController(Config *config)
 {
-    audioBase = AudioCreator::createAudio(config);
+    audioBase = new AudioBase(config);
     audioBase->getDevicesList(&devicesList);
     std::string prefferedDevice;
 
@@ -33,6 +32,11 @@ AudioController::AudioController(Config *config)
     logger->logff("Sound Enabled using %s", prefferedDevice.c_str());
 
     audioProcessingTrackerId = profiler->addTracker("Audio processing");
+}
+
+AudioController::~AudioController()
+{
+    delete audioBase;
 }
 
 void AudioController::update()

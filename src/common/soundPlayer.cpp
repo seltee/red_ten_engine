@@ -13,9 +13,6 @@ SoundPlayer::SoundPlayer()
 
 SoundPlayer::~SoundPlayer()
 {
-    if (soundStream)
-        sound->closeBuffer(soundStream);
-
     audioSource->destroy();
 }
 
@@ -65,51 +62,9 @@ bool SoundPlayer::isPlaying()
 
 bool SoundPlayer::isLooping()
 {
-    /*
     if (sound)
     {
-        if (sound->getBuffer() && !sound->isStreamable())
-        {
-            // int isLooping;
-            // alGetSourcei(sourceID, AL_LOOPING, &isLooping);
-            // alGetSourcei(sourceID, AL_SOURCE_STATE, &state);
-            // return (isLooping != AL_FALSE) && (state == AL_PLAYING);
-        }
-        if (sound->isStreamable() && repeatStream && isPlaying())
-        {
-            return true;
-        }
+        return audioSource->getState() == AudioSourceState::Playing && audioSource->isLooping();
     }
-    */
     return false;
-}
-
-void SoundPlayer::setMaxDistance(float maxDistance)
-{
-    audioSource->setMaxDistance(maxDistance);
-}
-
-float SoundPlayer::getMaxDistance()
-{
-    return audioSource->getMaxDistance();
-}
-
-void SoundPlayer::setRefereneceDistance(float referenceDistance)
-{
-    audioSource->setReferenceDistance(referenceDistance);
-}
-
-float SoundPlayer::getReferenceDistance()
-{
-    return audioSource->getReferenceDistance();
-}
-
-void SoundPlayer::setVolume(float volume)
-{
-    audioSource->setVolume(volume);
-}
-
-float SoundPlayer::getVolume()
-{
-    return audioSource->getVolume();
 }

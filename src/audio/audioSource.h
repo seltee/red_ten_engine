@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
+
 #pragma once
 #include "math/math.h"
 #include "common/destroyable.h"
@@ -11,25 +15,31 @@ enum class AudioSourceState
     Playing
 };
 
-class AudioSource : public Destroyable
+class AudioSource : public Destroyable, WithLogger
 {
 public:
-    AudioSource();
+    AudioSource(int format, int freq, int channels);
     virtual ~AudioSource();
+
+    void fillBuffer(unsigned char *buffer, int lengthInSamples);
 
     void process(float delta);
 
-    void setPitch(float pitch);
-    void setGain(float gain);
-    void setPosition(Vector3 p);
-    void setVelocity(Vector3 v);
-    void setVolume(float volume);
-    float getVolume();
+    inline void setPosition(Vector3 vPosition) { this->vPosition = vPosition; }
+    inline Vector3 getPosition() { return this->vPosition; }
 
-    void setMaxDistance(float maxDistance);
-    float getMaxDistance();
-    void setReferenceDistance(float referenceDistance);
-    float getReferenceDistance();
+    inline void setVolume(float volume) { this->volume = volume; }
+    inline float getVolume() { return this->volume; }
+
+    inline void setMaxDistance(float maxDistance) { this->maxDistance = maxDistance; }
+    inline float getMaxDistance() { return this->maxDistance; }
+    inline void setReferenceDistance(float referenceDistance) { this->refDistance = referenceDistance; }
+    inline float getReferenceDistance() { return this->refDistance; }
+
+    inline void setAllow3dPositioning(bool state) { this->bAllow3dPositioning = state; }
+    inline bool is3dPositioningAllowed() { return this->bAllow3dPositioning; }
+
+    inline bool isLooping() { return this->bIsLooping; }
 
     inline AudioSourceState getState() { return state; }
     inline Sound *getSound() { return this->sound; }
@@ -38,9 +48,11 @@ public:
     void loop(Sound *sound);
     void stop();
 
+    // bAllow3dPositioning is true and sound format is mono
+    bool is3dPositionable();
+
 protected:
-    void processNewSound(Sound *sound);
-    void closeStream();
+    void setupBuffers(int bufferSize);
 
     bool bIsLooping = false;
 
@@ -51,5 +63,26 @@ protected:
     static std::vector<unsigned int> buffers;
 
     SoundStream *soundStream = nullptr;
-    bool repeatStream = false;
+    float playPosition = 0.0f;
+    float playStep = 0.0f;
+
+    int format = 0;
+    int freq = 0;
+    int channels = 0;
+
+    float volume = 1.0f;
+
+    float maxDistance = 100.0f;
+    float refDistance = 10.0f;
+
+    bool bAllow3dPositioning = true;
+
+    Vector3 vPosition = Vector3(0.0f, 0.0f, 0.0f);
+
+    unsigned char *streamBuffers[2] = {nullptr, nullptr};
+    int bufferAudioBytes[2] = {0, 0};
+
+    int bufferSize = 0;
+    int currentBuffer = 0;
+    int lastLoadedBuffer = 0;
 };

@@ -25,16 +25,17 @@ public:
     EXPORT bool isPlaying();
     EXPORT bool isLooping();
 
-    EXPORT void setMaxDistance(float maxDistance);
-    EXPORT float getMaxDistance();
-    EXPORT void setRefereneceDistance(float referenceDistance);
-    EXPORT float getReferenceDistance();
-    EXPORT void setVolume(float volume);
-    EXPORT float getVolume();
+    inline void setMaxDistance(float maxDistance) { this->audioSource->setMaxDistance(maxDistance); }
+    inline float getMaxDistance() { return this->audioSource->getMaxDistance(); }
+
+    inline void setReferenceDistance(float refDistance) { this->audioSource->setReferenceDistance(refDistance); }
+    inline float getReferenceDistance() { return this->audioSource->getReferenceDistance(); }
+
+    inline void setVolume(float volume) { this->audioSource->setVolume(volume); }
+    inline float getVolume() { return this->audioSource->getVolume(); }
 
 protected:
     Sound *sound = nullptr;
-    SoundStream *soundStream = nullptr;
     AudioSource *audioSource = nullptr;
 
     bool repeatStream = false;

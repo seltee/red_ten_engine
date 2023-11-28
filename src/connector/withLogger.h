@@ -10,6 +10,8 @@ public:
     EXPORT WithLogger();
     static void setLogController(LogController *logController);
 
+    LogController *getLogger() { return logger; }
+
 protected:
     LogController *logger;
 

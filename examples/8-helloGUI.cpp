@@ -288,5 +288,6 @@ APPMAIN
         }
     }
     
+    engine->destroy();
     return 0;
 }

@@ -11,16 +11,17 @@
 #include "audio/audioBase.h"
 #include <string>
 
-#define SOUND_BUFFER_SIZE (1024 * 128)
-#define SOUND_BUFFERS_AMOUNT 4
-
 enum class AudioFormat
 {
     UNKNOWN = 0,
     MONO_8,
     MONO_16,
+    MONO_32,
+    MONO_32Float,
     STEREO_8,
-    STEREO_16
+    STEREO_16,
+    STEREO_32,
+    STEREO_32Float
 };
 
 enum Extension
@@ -33,12 +34,7 @@ enum Extension
 struct SoundStream
 {
     void *fileReader;
-    short *loadBuffer;
-    unsigned int buffers[SOUND_BUFFERS_AMOUNT];
     int numChannels;
-    int sampleRate;
-    AudioFormat format;
-    int lastLoaded;
 };
 
 class Sound : public WithLogger
@@ -51,8 +47,8 @@ public:
     EXPORT bool isLoaded();
     EXPORT void setForceMono(bool state);
     EXPORT bool setupStream(SoundStream *stream);
-    EXPORT bool processBuffers(SoundStream *stream, void (*processBuffer) (SoundStream *stream, int buffer, int amount));
-    EXPORT void closeBuffer(SoundStream *stream);
+    EXPORT int processStream(SoundStream *stream, unsigned char *buffer, int bufferSize);
+    EXPORT void closeStream(SoundStream *stream);
     EXPORT void load();
 
     inline void setId(int id) { this->id = id; }

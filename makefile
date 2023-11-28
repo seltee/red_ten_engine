@@ -2,35 +2,30 @@ CC = clang++
 LD = clang++
 
 ifeq ($(OS),Windows_NT)
-SDL_LIB_PATH = "../SDL2-2.0.14"
+SDL_LIB_PATH = "../SDL2-2.28.5"
 SDL_TTF_LIB_PATH = "../SDL2_ttf-2.0.15"
-OPENAL_LIB_PATH = "../openal"
 else
-SDL_LIB_PATH = "/opt/homebrew/Cellar/sdl2/2.28.1/"
+SDL_LIB_PATH = "/opt/homebrew/Cellar/sdl2/SDL2-2.28.5/"
 SDL_TTF_LIB_PATH = "/opt/homebrew/Cellar/sdl2_ttf/2.20.2/"
-OPENAL_LIB_PATH = "/opt/homebrew/opt/openal-soft/"
 endif
 
 ifeq ($(OS),Windows_NT)
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
-		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
 		-Wall -c -std=c++17 -mfpmath=sse -fdeclspec -g -O3
 else
 CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
 		-I${SDL_TTF_LIB_PATH}/include -I${SDL_TTF_LIB_PATH}/include/SDL2 \
-		-I${OPENAL_LIB_PATH}/include -I${OPENAL_LIB_PATH}/include/AL \
 		-Wall -c -std=c++17 -fdeclspec -g -O3
 endif
 
 ifeq ($(OS),Windows_NT)
 LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64/ \
-			-L${OPENAL_LIB_PATH}/libs/Win64/ \
 			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
-			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lOpenAL32.lib
+			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32
 else
 LIBRARIES = -L${SDL_LIB_PATH}/lib -L${SDL_TTF_LIB_PATH}/lib \
-			-lSDL2 -lSDL2main -lSDL2_ttf -framework OpenGL -framework OpenAL
+			-lSDL2 -lSDL2main -lSDL2_ttf -framework OpenGL -framework
 endif
 
 ifeq ($(OS),Windows_NT)
@@ -88,7 +83,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/collisionSolver.o ${OBJDIR}/collisionMesh.o \
 			${OBJDIR}/meshMaker.o ${OBJDIR}/motion.o ${OBJDIR}/collisionDispatcher.o ${OBJDIR}/collisionCollector.o \
 			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o \
-			${OBJDIR}/audioBase.o ${OBJDIR}/audioCreator.o ${OBJDIR}/audioSource.o
+			${OBJDIR}/audioBase.o ${OBJDIR}/audioSource.o
 
 EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
 			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
@@ -371,9 +366,6 @@ ${OBJDIR}/meshMaker.o: ${SRCDIR}/common/meshMaker.cpp
 
 ${OBJDIR}/audioBase.o: ${SRCDIR}/audio/audioBase.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioBase.o ${SRCDIR}/audio/audioBase.cpp
-
-${OBJDIR}/audioCreator.o: ${SRCDIR}/audio/audioCreator.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/audioCreator.o ${SRCDIR}/audio/audioCreator.cpp
 
 ${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioSource.o ${SRCDIR}/audio/audioSource.cpp

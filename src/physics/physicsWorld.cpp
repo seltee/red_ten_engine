@@ -107,6 +107,8 @@ PhysicsWorld::PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerS
     maxThreads = std::thread::hardware_concurrency() - 1;
     if (maxThreads <= 0)
         maxThreads = 1;
+
+    logger->logff("Max threads supported: %i (%i)", maxThreads, std::thread::hardware_concurrency());
 }
 
 void PhysicsWorld::setBasicParameters(const Vector3 &gravity, float simScale, int stepsPerSecond)

@@ -80,7 +80,7 @@ std::string LogController::formatString(const char *format, va_list arg)
                 // Fetch Decimal/Integer argument
                 case 'i':
                 case 'd':
-                    i = va_arg(arg, int);
+                    i = va_arg(arg, long int);
                     if (i < 0)
                     {
                         i = -i;

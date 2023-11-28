@@ -19,6 +19,10 @@ struct WavHeader
     int byteRate;
     unsigned short int bytesPerSample;
     unsigned short int bitsPerSample;
+};
+
+struct WavChapterHeader
+{
     char data[4];
     unsigned int dataSize;
 };
@@ -86,42 +90,31 @@ bool Sound::setupStream(SoundStream *stream)
     stb_vorbis_info info = stb_vorbis_get_info(vorbis);
 
     stream->fileReader = vorbis;
-    stream->loadBuffer = (short *)malloc(sizeof(short) * SOUND_BUFFER_SIZE * info.channels);
-
     stream->numChannels = info.channels;
-    stream->sampleRate = info.sample_rate;
     if (info.channels == 1)
-        stream->format = AudioFormat::MONO_16;
+        format = AudioFormat::MONO_16;
     if (info.channels == 2)
-        stream->format = AudioFormat::STEREO_16;
-    stream->lastLoaded = 0;
+        format = AudioFormat::STEREO_16;
+    this->sampleRate = info.sample_rate;
 
     return true;
 }
 
-bool Sound::processBuffers(SoundStream *stream, void (*processBuffer) (SoundStream *stream, int buffer, int amount))
+int Sound::processStream(SoundStream *stream, unsigned char *buffer, int bufferSize)
 {
     if (!bIsLoaded || !isStreamable())
-        return false;
+        return 0;
 
-    int amount = stream->lastLoaded == 0 ? SOUND_BUFFERS_AMOUNT : 1;
+    int shortsRead = stb_vorbis_get_samples_short_interleaved(
+        (stb_vorbis *)stream->fileReader,
+        stream->numChannels,
+        reinterpret_cast<short *>(buffer),
+        bufferSize / 2);
 
-    for (int i = 0; i < amount; i++)
-    {
-        int loaded = stb_vorbis_get_samples_short_interleaved((stb_vorbis *)stream->fileReader, stream->numChannels, stream->loadBuffer, SOUND_BUFFER_SIZE);
-        if (loaded)
-        {
-            processBuffer(stream, stream->lastLoaded % SOUND_BUFFERS_AMOUNT, loaded * stream->numChannels * 2);
-        }
-        else
-            return false;
-        stream->lastLoaded++;
-    }
-
-    return true;
+    return shortsRead * 2 * stream->numChannels;
 }
 
-void Sound::closeBuffer(SoundStream *stream)
+void Sound::closeStream(SoundStream *stream)
 {
     if (!stream)
         return;
@@ -152,11 +145,37 @@ bool Sound::loadWAV()
     WavHeader wavHeader;
     fread(&wavHeader, sizeof(WavHeader), 1, file);
 
-    logger->logf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i, data size %i",
+    logger->logf("wav loader - %s\nformat %i, num of channels %i, sampleRate %i, byteRate %i, bytesPerSample %i, bitsPerSample %i",
                  path.c_str(), wavHeader.format, wavHeader.numOfChannels, wavHeader.sampleRate, wavHeader.byteRate, wavHeader.bytesPerSample,
-                 wavHeader.bitsPerSample, wavHeader.dataSize);
+                 wavHeader.bitsPerSample);
 
-    dataSize = wavHeader.dataSize;
+    int bitsPerSample = wavHeader.bitsPerSample;
+    int numOfChannels = wavHeader.numOfChannels;
+
+    // Looking for wav data chapter
+    WavChapterHeader wch;
+    while (true)
+    {
+        fread(&wch, sizeof(WavChapterHeader), 1, file);
+        if (wch.data[0] == 'd' && wch.data[1] == 'a' && wch.data[2] == 't' && wch.data[3] == 'a')
+        {
+            dataSize = wch.dataSize;
+            break;
+        }
+        else
+        {
+            fseek(file, wch.dataSize, SEEK_CUR);
+        }
+
+        // Data section wasn't found
+        if (feof(file))
+        {
+            fclose(file);
+            return false;
+        }
+    }
+
+    // Buffer to store the whole file
     data = (unsigned char *)malloc(dataSize);
     if (!data)
     {
@@ -167,35 +186,74 @@ bool Sound::loadWAV()
     fread(data, dataSize, 1, file);
     fclose(file);
 
-    if (bForceMono && wavHeader.numOfChannels == 2)
+    bool bIsUsingFloat = wavHeader.format == 3;
+
+    // convert 24 mono to 32 mono
+    if (bitsPerSample == 24 && numOfChannels == 1)
     {
-        wavHeader.numOfChannels = 1;
+        bitsPerSample = 32;
+        unsigned char *newData = (unsigned char *)malloc(dataSize + dataSize / 3);
+        int *newDataInt = reinterpret_cast<int *>(newData);
+        for (int i = 0; i < dataSize / 3; i++)
+        {
+            newDataInt[i] = ((int)(data[i * 3]) + (int)(data[i * 3 + 1] << 8) + (int)(data[i * 3 + 2] << 16)) << 8;
+        }
+        free(data);
+        data = newData;
+        dataSize = dataSize + dataSize / 3;
+    }
+
+    // convert 24 stereo to 32 stereo
+    if (bitsPerSample == 24 && numOfChannels == 2)
+    {
+        bitsPerSample = 32;
+        unsigned char *newData = (unsigned char *)malloc(dataSize + dataSize / 3);
+        int *newDataInt = reinterpret_cast<int *>(newData);
+        for (int i = 0; i < dataSize / 6; i++)
+        {
+            newDataInt[(i << 1)] = ((int)(data[i * 6]) + (int)(data[i * 6 + 1] << 8) + (int)(data[i * 6 + 2] << 16)) << 8;
+            newDataInt[(i << 1) + 1] = ((int)(data[i * 6 + 3]) + (int)(data[i * 6 + 4] << 8) + (int)(data[i * 6 + 5] << 16)) << 8;
+        }
+        free(data);
+        data = newData;
+        dataSize = dataSize + dataSize / 3;
+    }
+
+    if (bForceMono && numOfChannels == 2)
+    {
+        numOfChannels = 1;
         int newDataSize = dataSize / 2;
-        if (wavHeader.bitsPerSample == 8)
+        if (bitsPerSample == 8)
+        {
             for (int i = 0; i < newDataSize; i++)
                 data[i] = data[i << 1];
-        else
+        }
+        if (bitsPerSample == 16)
+        {
+            short int *dataSInt = reinterpret_cast<short int *>(data);
             for (int i = 0; i < newDataSize / 2; i++)
-                *(short int *)(&data[i << 1]) = *(short int *)(&data[(i << 2) + 2]);
+                dataSInt[i] = dataSInt[i << 1];
+        }
+        if (bitsPerSample == 32)
+        {
+            int *dataInt = reinterpret_cast<int *>(data);
+            for (int i = 0; i < newDataSize / 4; i++)
+                dataInt[i] = dataInt[i << 1];
+        }
 
         dataSize = newDataSize;
     }
 
     format = AudioFormat::UNKNOWN;
-    if (wavHeader.numOfChannels == 1)
-    {
-        if (wavHeader.bitsPerSample == 8)
-            format = AudioFormat::MONO_8;
-        if (wavHeader.bitsPerSample == 16)
-            format = AudioFormat::MONO_16;
-    }
-    if (wavHeader.numOfChannels == 2)
-    {
-        if (wavHeader.bitsPerSample == 8)
-            format = AudioFormat::STEREO_8;
-        if (wavHeader.bitsPerSample == 16)
-            format = AudioFormat::STEREO_16;
-    }
+
+    if (bitsPerSample == 8)
+        format = numOfChannels == 2 ? AudioFormat::STEREO_8 : AudioFormat::MONO_8;
+    if (bitsPerSample == 16)
+        format = numOfChannels == 2 ? AudioFormat::STEREO_16 : AudioFormat::MONO_16;
+    if (bitsPerSample == 32 && !bIsUsingFloat)
+        format = numOfChannels == 2 ? AudioFormat::STEREO_32 : AudioFormat::MONO_32;
+    if (bitsPerSample == 32 && bIsUsingFloat)
+        format = numOfChannels == 2 ? AudioFormat::STEREO_32Float : AudioFormat::MONO_32Float;
 
     if (format == AudioFormat::UNKNOWN)
     {

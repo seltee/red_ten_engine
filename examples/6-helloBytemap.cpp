@@ -152,5 +152,6 @@ APPMAIN
         stage->present(view);
     }
 
+    engine->destroy();
     return 0;
 }

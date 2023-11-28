@@ -111,7 +111,7 @@ RTEngine *RTEngine::getInstance(std::string configFilePath, bool showConsole)
         SetProcessDPIAware();
 #endif
 
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK) < 0)
             return nullptr;
         TTF_Init();
     }
@@ -192,4 +192,30 @@ void RTEngine::terminate()
 bool RTEngine::isTerminationIntended()
 {
     return viewController->getIsExitIntended() | bTerminationRequested;
+}
+
+void RTEngine::destroy()
+{
+    instance = nullptr;
+
+    delete viewController;
+    viewController = nullptr;
+    delete stageController;
+    stageController = nullptr;
+    delete resourceController;
+    resourceController = nullptr;
+    delete inputController;
+    inputController = nullptr;
+    delete audioController;
+    audioController = nullptr;
+    delete logController;
+    logController = nullptr;
+    delete configController;
+    configController = nullptr;
+    delete debugController;
+    debugController = nullptr;
+    delete profilerController;
+    profilerController = nullptr;
+
+    delete this;
 }

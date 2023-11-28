@@ -1,250 +1,261 @@
-#include "audioSource.h"
-#include <AL/al.h>
-#include <AL/alc.h>
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
 
-std::vector<unsigned int> AudioSource::buffers;
+#include <SDL.h>
+#include "audio/audioConversion.h"
+#include "audio/audioSource.h"
 
-void processStreamChunk(SoundStream *stream, int buffer, int amount)
+AudioSource::AudioSource(int format, int freq, int channels)
 {
-    int format = 0;
-    if (stream->format == AudioFormat::MONO_8)
-        format = AL_FORMAT_MONO8;
-    if (stream->format == AudioFormat::MONO_16)
-        format = AL_FORMAT_MONO16;
-    if (stream->format == AudioFormat::STEREO_8)
-        format = AL_FORMAT_STEREO8;
-    if (stream->format == AudioFormat::STEREO_16)
-        format = AL_FORMAT_STEREO16;
-
-    alBufferData(
-        stream->buffers[buffer],
-        format,
-        stream->loadBuffer,
-        amount,
-        stream->sampleRate);
-}
-
-AudioSource::AudioSource()
-{
-    alGenSources((ALuint)1, &sourceID);
-    alSourcef(sourceID, AL_PITCH, 1.0f);
-    alSourcef(sourceID, AL_GAIN, 1.0f);
-    alSource3f(sourceID, AL_POSITION, 0.0f, 0.0f, 0.0f);
-    alSource3f(sourceID, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-    alSourcei(sourceID, AL_LOOPING, AL_FALSE);
-
-    alSourcei(sourceID, AL_SOURCE_RELATIVE, AL_FALSE);
-    alSourcef(sourceID, AL_MAX_DISTANCE, 100.0f);
-    alSourcef(sourceID, AL_REFERENCE_DISTANCE, 1.0f);
+    this->format = format;
+    this->freq = freq;
+    this->channels = channels;
 }
 
 AudioSource::~AudioSource()
 {
-    alDeleteSources(1, &sourceID);
+    if (streamBuffers[0])
+        delete streamBuffers[0];
+    if (streamBuffers[1])
+        delete streamBuffers[1];
+}
+
+void AudioSource::fillBuffer(unsigned char *buffer, int lengthInSamples)
+{
+    float *fbuffer = reinterpret_cast<float *>(buffer);
+    bool isFinished = false;
+    int sample = 0;
+
+    if (format == AUDIO_F32 && sound)
+    {
+        unsigned char *dataSource = soundStream ? streamBuffers[currentBuffer] : sound->getData();
+        int dataSize = soundStream ? bufferAudioBytes[currentBuffer] : sound->getDataSize();
+
+        while (sample < lengthInSamples)
+        {
+            switch (sound->getAudioFormat())
+            {
+            case AudioFormat::MONO_8:
+                isFinished = fillFloatStereoBufferFromMono8(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::MONO_16:
+                isFinished = fillFloatStereoBufferFromMono16(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::MONO_32:
+                isFinished = fillFloatStereoBufferFromMono32(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::MONO_32Float:
+                isFinished = fillFloatStereoBufferFromMono32Float(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::STEREO_8:
+                isFinished = fillFloatStereoBufferFromStereo8(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::STEREO_16:
+            {
+                isFinished = fillFloatStereoBufferFromStereo16(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            }
+            case AudioFormat::STEREO_32:
+                isFinished = fillFloatStereoBufferFromStereo32(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+            case AudioFormat::STEREO_32Float:
+                isFinished = fillFloatStereoBufferFromStereo32Float(dataSource, dataSize, playPosition, sample, playStep, fbuffer, lengthInSamples, volume);
+                break;
+
+            default:
+                state = AudioSourceState::Stopped;
+                break;
+            }
+
+            if (isFinished)
+            {
+                if (soundStream)
+                {
+                    if (bufferSize == dataSize)
+                    {
+                        // Switch buffer
+                        playPosition = 0.0f;
+                        currentBuffer = lastLoadedBuffer;
+                        dataSource = streamBuffers[currentBuffer];
+                        dataSize = bufferAudioBytes[currentBuffer];
+                        isFinished = false;
+                    }
+                    else
+                    {
+                        // Main process will restart the song
+                        state = AudioSourceState::Stopped;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (bIsLooping)
+                    {
+                        playPosition = 0.0f;
+                    }
+                    else
+                    {
+                        state = AudioSourceState::Stopped;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // feel the rest with zeros, both channels
+        lengthInSamples <<= 1;
+        sample <<= 1;
+        while (sample < lengthInSamples)
+        {
+            fbuffer[sample] = 0;
+            fbuffer[sample + 1] = 0;
+            sample += 2;
+        }
+    }
 }
 
 void AudioSource::process(float delta)
 {
-    if (state == AudioSourceState::Playing)
-    {
-        int internalState;
-        alGetSourcei(sourceID, AL_SOURCE_STATE, &internalState);
-        if (internalState != AL_PLAYING)
-        {
-            state = AudioSourceState::Stopped;
-        }
-    }
-
     if (sound && sound->isStreamable() && state == AudioSourceState::Playing)
     {
-        ALint buffersProcessed = 0;
-        alGetSourcei(sourceID, AL_BUFFERS_PROCESSED, &buffersProcessed);
-
-        while (buffersProcessed > 0)
+        if (currentBuffer == lastLoadedBuffer)
         {
-            alSourceUnqueueBuffers(sourceID, 1, &soundStream->buffers[soundStream->lastLoaded % SOUND_BUFFERS_AMOUNT]);
-            bool res = sound->processBuffers(soundStream, processStreamChunk);
-            if (res)
-            {
-                alSourceQueueBuffers(sourceID, 1, &soundStream->buffers[(soundStream->lastLoaded - 1) % SOUND_BUFFERS_AMOUNT]);
-            }
-            buffersProcessed--;
+            lastLoadedBuffer = lastLoadedBuffer == 0 ? 1 : 0;
+            bufferAudioBytes[lastLoadedBuffer] = sound->processStream(soundStream, streamBuffers[lastLoadedBuffer], bufferSize);
         }
     }
-
-    if (sound && sound->isStreamable() && state == AudioSourceState::Stopped && soundStream)
+    if (sound && sound->isStreamable() && soundStream && state == AudioSourceState::Stopped)
     {
-        closeStream();
-        if (repeatStream)
-            loop(this->sound);
+        if (bIsLooping)
+        {
+            sound->closeStream(soundStream);
+            if (sound->setupStream(soundStream))
+            {
+                currentBuffer = 0;
+                lastLoadedBuffer = 0;
+                playPosition = 0.0f;
+
+                bufferAudioBytes[currentBuffer] = sound->processStream(soundStream, streamBuffers[currentBuffer], bufferSize);
+                state = AudioSourceState::Playing;
+            }
+            else
+            {
+                delete soundStream;
+                soundStream = nullptr;
+            }
+        }
+        else
+        {
+            sound->closeStream(soundStream);
+            delete soundStream;
+            soundStream = nullptr;
+        }
     }
-}
-
-void AudioSource::setPitch(float pitch)
-{
-    alSourcef(sourceID, AL_PITCH, pitch);
-}
-
-void AudioSource::setGain(float gain)
-{
-    alSourcef(sourceID, AL_GAIN, gain);
-}
-
-void AudioSource::setPosition(Vector3 p)
-{
-    alSource3f(sourceID, AL_POSITION, -p.x, p.y, p.z);
-}
-
-void AudioSource::setVelocity(Vector3 v)
-{
-    alSource3f(sourceID, AL_VELOCITY, v.x, v.y, v.z);
-}
-
-void AudioSource::setMaxDistance(float maxDistance)
-{
-    alSourcef(sourceID, AL_MAX_DISTANCE, maxDistance);
-}
-void AudioSource::setVolume(float volume)
-{
-    alSourcef(sourceID, AL_GAIN, volume);
-}
-
-float AudioSource::getVolume()
-{
-    float out;
-    alGetSourcef(sourceID, AL_GAIN, &out);
-    return out;
-}
-
-float AudioSource::getMaxDistance()
-{
-    float out;
-    alGetSourcef(sourceID, AL_MAX_DISTANCE, &out);
-    return out;
-}
-
-void AudioSource::setReferenceDistance(float referenceDistance)
-{
-    alSourcef(sourceID, AL_REFERENCE_DISTANCE, referenceDistance);
-}
-
-float AudioSource::getReferenceDistance()
-{
-    float out;
-    alGetSourcef(sourceID, AL_REFERENCE_DISTANCE, &out);
-    return out;
 }
 
 void AudioSource::play(Sound *sound)
 {
-    processNewSound(sound);
+    this->sound = sound;
+    sound->load();
+    state = AudioSourceState::Stopped;
 
     if (sound->isLoaded() && !sound->isStreamable())
     {
-        alSourcei(sourceID, AL_BUFFER, buffers.at(sound->getId()));
-        alSourcei(sourceID, AL_LOOPING, AL_FALSE);
-        alSourcePlay(sourceID);
+        playPosition = 0;
+        playStep = (float)sound->getSampleRate() / (float)freq;
+        bIsLooping = false;
+        soundStream = nullptr;
         state = AudioSourceState::Playing;
     }
+
     if (sound->isLoaded() && sound->isStreamable())
     {
-        if (soundStream)
-            closeStream();
         soundStream = new SoundStream();
-        alGenBuffers((ALuint)SOUND_BUFFERS_AMOUNT, soundStream->buffers);
 
         if (sound->setupStream(soundStream))
         {
-            state = AudioSourceState::Playing;
-            repeatStream = false;
+            playPosition = 0;
+            playStep = (float)sound->getSampleRate() / (float)freq;
+            bIsLooping = false;
 
-            sound->processBuffers(soundStream, processStreamChunk);
-            alSourceQueueBuffers(sourceID, SOUND_BUFFERS_AMOUNT, soundStream->buffers);
-            alSourcePlay(sourceID);
+            setupBuffers(1024 * 256);
+
+            currentBuffer = 0;
+            lastLoadedBuffer = 0;
+
+            bufferAudioBytes[currentBuffer] = sound->processStream(soundStream, streamBuffers[currentBuffer], bufferSize);
+            state = AudioSourceState::Playing;
         }
     }
 }
 
 void AudioSource::loop(Sound *sound)
 {
-    processNewSound(sound);
+    this->sound = sound;
+    sound->load();
 
     if (sound->isLoaded() && !sound->isStreamable())
     {
-        alSourcei(sourceID, AL_BUFFER, buffers.at(sound->getId()));
-        alSourcei(sourceID, AL_LOOPING, AL_TRUE);
-        alSourcePlay(sourceID);
+        playPosition = 0;
+        playStep = (float)sound->getSampleRate() / (float)freq;
+        bIsLooping = true;
+        soundStream = nullptr;
         state = AudioSourceState::Playing;
     }
+
     if (sound->isLoaded() && sound->isStreamable())
     {
-        if (soundStream)
-            closeStream();
         soundStream = new SoundStream();
-        alGenBuffers((ALuint)SOUND_BUFFERS_AMOUNT, soundStream->buffers);
 
         if (sound->setupStream(soundStream))
         {
-            state = AudioSourceState::Playing;
-            repeatStream = true;
+            playPosition = 0;
+            playStep = (float)sound->getSampleRate() / (float)freq;
+            bIsLooping = true;
 
-            sound->processBuffers(soundStream, processStreamChunk);
-            alSourceQueueBuffers(sourceID, SOUND_BUFFERS_AMOUNT, soundStream->buffers);
-            alSourcePlay(sourceID);
+            setupBuffers(1024 * 256);
+
+            currentBuffer = 0;
+            lastLoadedBuffer = 0;
+
+            bufferAudioBytes[currentBuffer] = sound->processStream(soundStream, streamBuffers[currentBuffer], bufferSize);
+            state = AudioSourceState::Playing;
         }
     }
 }
 
 void AudioSource::stop()
 {
-    alSourceStop(sourceID);
-}
-
-void AudioSource::processNewSound(Sound *sound)
-{
-    if (sound->getId() == -1 && !sound->isStreamable())
-    {
-        sound->load();
-        if (sound->isLoaded())
-        {
-            int newId = buffers.size();
-            sound->setId(newId);
-            unsigned int newBufferId;
-            alGenBuffers((ALuint)1, &newBufferId);
-            buffers.push_back(newBufferId);
-
-            int format = 0;
-            if (sound->getAudioFormat() == AudioFormat::MONO_8)
-                format = AL_FORMAT_MONO8;
-            if (sound->getAudioFormat() == AudioFormat::MONO_16)
-                format = AL_FORMAT_MONO16;
-            if (sound->getAudioFormat() == AudioFormat::STEREO_8)
-                format = AL_FORMAT_STEREO8;
-            if (sound->getAudioFormat() == AudioFormat::STEREO_16)
-                format = AL_FORMAT_STEREO16;
-
-            alBufferData(
-                newBufferId,
-                format,
-                sound->getData(),
-                sound->getDataSize(),
-                sound->getSampleRate());
-        }
-    }
-    if (sound->isStreamable())
-    {
-        sound->load();
-    }
-    this->sound = sound;
-}
-
-void AudioSource::closeStream()
-{
+    state = AudioSourceState::Stopped;
     if (soundStream)
     {
-        sound->closeBuffer(soundStream);
-        alDeleteBuffers(SOUND_BUFFERS_AMOUNT, soundStream->buffers);
+        sound->closeStream(soundStream);
         delete soundStream;
         soundStream = nullptr;
+    }
+}
+
+bool AudioSource::is3dPositionable()
+{
+    if (sound)
+    {
+        AudioFormat format = sound->getAudioFormat();
+        return (format == AudioFormat::MONO_8 || format == AudioFormat::MONO_16 || format == AudioFormat::MONO_32 || format == AudioFormat::MONO_32Float) && bAllow3dPositioning;
+    }
+    return false;
+}
+
+void AudioSource::setupBuffers(int bufferSize)
+{
+    if (this->bufferSize != bufferSize)
+    {
+        if (streamBuffers[0])
+            delete streamBuffers[0];
+        if (streamBuffers[1])
+            delete streamBuffers[1];
+
+        this->bufferSize = bufferSize;
+        streamBuffers[0] = new unsigned char[bufferSize * 2];
+        streamBuffers[1] = new unsigned char[bufferSize * 2];
     }
 }

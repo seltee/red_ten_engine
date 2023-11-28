@@ -4,6 +4,7 @@
 #include "physics/collisionSolver.h"
 #include "physics/collisionDispatcher.h"
 #include "physics/shapes/shape.h"
+#include "connector/withLogger.h"
 #include <vector>
 
 struct BodyPair
@@ -15,7 +16,7 @@ struct BodyPair
 
 class Actor;
 
-class PhysicsWorld
+class PhysicsWorld : public WithLogger
 {
 public:
     EXPORT PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerSecond);
