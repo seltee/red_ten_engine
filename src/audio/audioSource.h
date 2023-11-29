@@ -5,7 +5,7 @@
 #pragma once
 #include "math/math.h"
 #include "common/destroyable.h"
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 
 class AudioBase;
 
@@ -42,10 +42,10 @@ public:
     inline bool isLooping() { return this->bIsLooping; }
 
     inline AudioSourceState getState() { return state; }
-    inline Sound *getSound() { return this->sound; }
+    inline ResourceSound *getSound() { return this->sound; }
 
-    void play(Sound *sound);
-    void loop(Sound *sound);
+    void play(ResourceSound *sound);
+    void loop(ResourceSound *sound);
     void stop();
 
     // bAllow3dPositioning is true and sound format is mono
@@ -57,7 +57,7 @@ protected:
     bool bIsLooping = false;
 
     AudioSourceState state = AudioSourceState::Stopped;
-    Sound *sound = nullptr;
+    ResourceSound *sound = nullptr;
 
     unsigned int sourceID;
     static std::vector<unsigned int> buffers;

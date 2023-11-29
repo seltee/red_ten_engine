@@ -4,8 +4,8 @@
 #pragma once
 #include "rtengine.h"
 #include "common/utils.h"
+#include "common/texture.h"
 #include "component/component.h"
-#include "resource/texture.h"
 #include "shaders/shader.h"
 
 class ComponentFramedSprite : public Component

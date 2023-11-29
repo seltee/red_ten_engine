@@ -116,9 +116,6 @@ bool PhongShader::build()
 
 void PhongShader::setTexture(TextureType type, Texture *texture)
 {
-    if (texture)
-        texture->reload();
-
     switch (type)
     {
     case TextureType::Albedo:

@@ -7,7 +7,7 @@
 #include "common/config.h"
 #include "connector/withLogger.h"
 #include "audio/audioBase.h"
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 #include "connector/withProfiler.h"
 #include <vector>
 #include <string>
@@ -17,6 +17,7 @@ class AudioController : public WithLogger, public WithProfiler
 public:
     AudioController(Config *config);
     ~AudioController();
+
     void update();
 
     void process(float delta);

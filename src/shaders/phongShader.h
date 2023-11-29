@@ -3,7 +3,7 @@
 
 #pragma once
 #include "shader.h"
-#include "resource/texture.h"
+#include "common/texture.h"
 
 enum TextureType
 {

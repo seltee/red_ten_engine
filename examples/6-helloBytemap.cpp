@@ -40,19 +40,8 @@ public:
         registerClassName("JoJo");
         transform.setScale(0.8);
         transform.setPosition(0.0f, -50.0f);
-
-        // To be able to use bytemaps we first need to setup them
-        // Our bytemap depends on Alpha, bytemap is represented by 1 byte per pixel, not full color.
-        // It makes it more compact
-        jojoTexture->setMakeBytemapAlpha(true);
-        // In addition if we don't need high precision we can scale it down.
-        // For example 4 times in both dimensions reduces memory consumption 16 times
-        jojoTexture->setBytemapScale(4);
-        // We need to reload texture so bytemap will be created
-        jojoTexture->reload();
-
         sprite = createComponent<ComponentSprite>();
-        sprite->setTexture(jojoTexture);
+        sprite->setTexture(jojoImage->getAsTexture());
     }
 
     void onProcess(float delta)
@@ -65,21 +54,22 @@ public:
             unsigned char probe = 0;
             int randomX = 0, randomY = 0;
 
-            // first we need to take random point inside texture, that actually has pixel.
+            // first we need to take random point inside the image, that actually has pixel.
             // So we will use this position to put a star on it. This way stars will appear only on JoJo
             while (probe < 128)
             {
-                randomX = rand() % jojoTexture->getWidth();
-                randomY = rand() % jojoTexture->getHeight();
-                probe = jojoTexture->getProbeBytemapAlpha(randomX, randomY);
+                randomX = rand() % jojoImage->getWidth();
+                randomY = rand() % jojoImage->getHeight();
+                probe = jojoImage->getProbeBytemapAlpha(randomX, randomY);
             }
 
             auto star = layerActors->createActor<Star>();
+
             // local space operates points position between 0 and 1, it's already stores texture size transofrmation
             // We need to create vector that holds 0 to 1 positions of our randoms. So just divide it on texture sizes
             Vector4 v(
-                (float)randomX / (float)jojoTexture->getWidth(),
-                (float)randomY / (float)jojoTexture->getHeight(),
+                (float)randomX / (float)jojoImage->getWidth(),
+                (float)randomY / (float)jojoImage->getHeight(),
                 0.0f,
                 1.0f);
 
@@ -94,14 +84,14 @@ public:
         }
     }
 
-    static Texture *jojoTexture;
+    static ResourceImage *jojoImage;
     float counter = 0.0f;
     LayerActors *layerActors = nullptr;
 
 protected:
     ComponentSprite *sprite;
 };
-Texture *JoJo::jojoTexture = nullptr;
+ResourceImage *JoJo::jojoImage = nullptr;
 
 // Bytemap is an interesting way of creating effects, where you can detect existance of pixels on certain points of your actor
 APPMAIN
@@ -129,11 +119,17 @@ APPMAIN
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
-    // Textures setup
+    // Textures and images setup
     auto resourceController = engine->getResourceController();
-    JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
-    Star::starTexture = resourceController->addTexture("./data/star.png");
-    auto background = resourceController->addTexture("./data/background.jpg");
+
+    // Second parameter makes image to create bytemap, Alpha means it will store only alpha per pixel
+    // Third parameter allows you to reduce the size of the bytemap: width / scale, height / scale
+    // This helps to save up some ram if needed and lower accuracy if acceptable
+    JoJo::jojoImage = resourceController->addImage("./data/jojo.png", ByteMap::Alpha, 4);
+    
+    // Other images are used as textures
+    Star::starTexture = resourceController->addImage("./data/star.png")->getAsTexture();
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
 
     // Just a background for better look
     auto backgroundActor = layerActors->createActor<Actor>();
@@ -141,6 +137,7 @@ APPMAIN
     auto backgroundActorSprite = backgroundActor->createComponent<ComponentSprite>();
     backgroundActorSprite->setTexture(background);
 
+    // Sparks creation happens in the JoJo actor class
     auto jojo = layerActors->createActor<JoJo>();
     jojo->layerActors = layerActors;
 

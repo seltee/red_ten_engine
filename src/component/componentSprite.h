@@ -3,8 +3,8 @@
 
 #pragma once
 #include "common/utils.h"
+#include "common/texture.h"
 #include "component/component.h"
-#include "resource/texture.h"
 #include "shaders/shader.h"
 
 class ComponentSprite : public Component

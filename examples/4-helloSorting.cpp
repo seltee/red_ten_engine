@@ -66,11 +66,13 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    Figure::ballTexture = resourceController->addTexture("./data/plate.png");
-    Figure::crateTexture = resourceController->addTexture("./data/crate.jpg");
+    Figure::ballTexture = resourceController->addImage("./data/plate.png")->getAsTexture();
+    Figure::crateTexture = resourceController->addImage("./data/crate.jpg")->getAsTexture();
 
-    int figuresAmount = 20;
-    float period = (CONST_PI * 2.0f) / (float)figuresAmount;
+    // We will use fixed 20 actors
+    // We also pass their starting angle to shape a circle from this actors
+    const int figuresAmount = 20;
+    float period = (CONST_PI * 2.0f) / static_cast<float>(figuresAmount);
     for (int i = 0; i < figuresAmount; i++)
     {
         auto figure = layerActors->createActor<Figure>();

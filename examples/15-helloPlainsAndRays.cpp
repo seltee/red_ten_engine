@@ -54,8 +54,8 @@ APPMAIN
     plainBody->setFriction(0.7f);
 
     auto plainMesh = engine->getMeshMaker()->createPlane({20.0f, 20.0f}, 4.0f);
-    auto plainTextureAlbedo = engine->getResourceController()->addTexture("./data/3d/pavement_albedo.jpg");
-    auto plainTextureNormal = engine->getResourceController()->addTexture("./data/3d/pavement_normal.jpg");
+    auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
+    auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
     auto plainShader = new PhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
@@ -68,7 +68,7 @@ APPMAIN
 
     // Rotating boxes
     auto boxMesh = engine->getMeshMaker()->createBox({0.4f, 0.4f, 0.4f});
-    auto boxTexture = engine->getResourceController()->addTexture("./data/crate.jpg");
+    auto boxTexture = engine->getResourceController()->addImage("./data/crate.jpg")->getAsTexture();
     auto boxShader = new PhongShader();
     boxShader->setTexture(TextureType::Albedo, boxTexture);
 

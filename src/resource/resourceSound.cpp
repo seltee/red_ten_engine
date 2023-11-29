@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 #include "loaders/stb_vorbis.h"
 #include <stdio.h>
 #include <string>
@@ -27,7 +27,7 @@ struct WavChapterHeader
     unsigned int dataSize;
 };
 
-Sound::Sound(std::string path)
+ResourceSound::ResourceSound(std::string path) : Resource(path)
 {
     this->path = path;
     int length = path.length();
@@ -56,27 +56,27 @@ Sound::Sound(std::string path)
     }
 }
 
-bool Sound::isPath(std::string path)
+bool ResourceSound::isPath(std::string path)
 {
     return this->path == path;
 }
 
-bool Sound::isStreamable()
+bool ResourceSound::isStreamable()
 {
     return bIsStreamable;
 }
 
-bool Sound::isLoaded()
+bool ResourceSound::isLoaded()
 {
     return bIsLoaded;
 }
 
-void Sound::setForceMono(bool state)
+void ResourceSound::setForceMono(bool state)
 {
     bForceMono = state;
 }
 
-bool Sound::setupStream(SoundStream *stream)
+bool ResourceSound::setupStream(SoundStream *stream)
 {
     if (!bIsLoaded)
         return false;
@@ -100,7 +100,7 @@ bool Sound::setupStream(SoundStream *stream)
     return true;
 }
 
-int Sound::processStream(SoundStream *stream, unsigned char *buffer, int bufferSize)
+int ResourceSound::processStream(SoundStream *stream, unsigned char *buffer, int bufferSize)
 {
     if (!bIsLoaded || !isStreamable())
         return 0;
@@ -114,14 +114,14 @@ int Sound::processStream(SoundStream *stream, unsigned char *buffer, int bufferS
     return shortsRead * 2 * stream->numChannels;
 }
 
-void Sound::closeStream(SoundStream *stream)
+void ResourceSound::closeStream(SoundStream *stream)
 {
     if (!stream)
         return;
     stb_vorbis_close((stb_vorbis *)stream->fileReader);
 }
 
-void Sound::load()
+void ResourceSound::load()
 {
     if (bIsLoaded)
         return;
@@ -133,7 +133,7 @@ void Sound::load()
         bIsLoaded = loadOGG();
 }
 
-bool Sound::loadWAV()
+bool ResourceSound::loadWAV()
 {
     FILE *file = fopen(path.c_str(), "rb");
     if (file == nullptr)
@@ -267,7 +267,7 @@ bool Sound::loadWAV()
     return true;
 }
 
-bool Sound::loadOGG()
+bool ResourceSound::loadOGG()
 {
     FILE *file = fopen(path.c_str(), "rb");
     if (file == nullptr)

@@ -15,8 +15,8 @@ public:
     void onSpawned()
     {
         auto sphereMesh = repository->addMesh("./data/3d/concrete_ball.fbx");
-        auto sphereAlbedoTexture = repository->addTexture("./data/3d/concrete_ball_albedo.jpg");
-        auto sphereNormalTexture = repository->addTexture("./data/3d/concrete_ball_normal.jpg");
+        auto sphereAlbedoTexture = repository->addImage("./data/3d/concrete_ball_albedo.jpg")->getAsTexture();
+        auto sphereNormalTexture = repository->addImage("./data/3d/concrete_ball_normal.jpg")->getAsTexture();
 
         if (!sphereShader)
         {
@@ -60,7 +60,7 @@ public:
     void onSpawned()
     {
         crateMesh = meshMaker->createBox({1.0f, 1.0f, 1.0f});
-        auto crateAlbedoTexture = repository->addTexture("./data/crate.jpg");
+        auto crateAlbedoTexture = repository->addImage("./data/crate.jpg")->getAsTexture();
 
         if (!crateShader)
         {
@@ -106,7 +106,7 @@ public:
     void onSpawned()
     {
         platformMesh = meshMaker->createBox({10.0f, 1.0f, 10.0f});
-        auto platformAlbedoTexture = repository->addTexture("./data/3d/concrete_albedo.jpg");
+        auto platformAlbedoTexture = repository->addImage("./data/3d/concrete_albedo.jpg")->getAsTexture();
 
         if (!platformShader)
         {
@@ -141,8 +141,8 @@ public:
     void onSpawned()
     {
         auto sphereMesh = repository->addMesh("./data/3d/concrete_ball.fbx");
-        auto sphereAlbedoTexture = repository->addTexture("./data/3d/concrete_ball_albedo.jpg");
-        auto sphereNormalTexture = repository->addTexture("./data/3d/concrete_ball_normal.jpg");
+        auto sphereAlbedoTexture = repository->addImage("./data/3d/concrete_ball_albedo.jpg")->getAsTexture();
+        auto sphereNormalTexture = repository->addImage("./data/3d/concrete_ball_normal.jpg")->getAsTexture();
 
         if (!sphereShader)
         {

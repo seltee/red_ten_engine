@@ -27,10 +27,10 @@ public:
         sphereMesh = resourceController->addMesh("./data/3d/concrete_ball.fbx");
         platformMesh = resourceController->addMesh("./data/3d/platform.fbx");
 
-        auto sphereAlbedoTexture = resourceController->addTexture("./data/3d/concrete_ball_albedo.jpg");
-        auto sphereNormalTexture = resourceController->addTexture("./data/3d/concrete_ball_normal.jpg");
+        auto sphereAlbedoTexture = resourceController->addImage("./data/3d/concrete_ball_albedo.jpg")->getAsTexture();
+        auto sphereNormalTexture = resourceController->addImage("./data/3d/concrete_ball_normal.jpg")->getAsTexture();
 
-        auto platformAlbedoTexture = resourceController->addTexture("./data/3d/platform_albedo.jpg");
+        auto platformAlbedoTexture = resourceController->addImage("./data/3d/platform_albedo.jpg")->getAsTexture();
 
         sphereShader = new PhongShader();
         sphereShader->setTexture(TextureType::Albedo, sphereAlbedoTexture);

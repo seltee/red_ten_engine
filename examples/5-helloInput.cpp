@@ -164,10 +164,10 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    CratePlayer::crateTexture = resourceController->addTexture("./data/crate.jpg");
+    CratePlayer::crateTexture = resourceController->addImage("./data/crate.jpg")->getAsTexture();
     HiddenCrate::crateTexture = CratePlayer::crateTexture;
 
-    auto background = resourceController->addTexture("./data/background.jpg");
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
 
     // Just a background for better look
     auto backgroundActor = layerActors->createActor<Actor>();

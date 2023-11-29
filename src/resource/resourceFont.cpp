@@ -5,9 +5,8 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
-ResourceFont::ResourceFont(std::string path, int size)
+ResourceFont::ResourceFont(std::string path, int size) : Resource(path)
 {
-    this->path = path;
     this->size = size;
 
     if (path == "default")
@@ -29,9 +28,4 @@ int ResourceFont::getSize()
 InternalFont *ResourceFont::getFont()
 {
     return font;
-}
-
-bool ResourceFont::isPath(std::string path)
-{
-    return this->path == path;
 }

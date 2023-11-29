@@ -5,9 +5,10 @@
 #include "common/utils.h"
 #include "common/mesh.h"
 #include "connector/withLogger.h"
+#include "resource/resource.h"
 #include <string>
 
-class ResourceMesh : public Mesh, public WithLogger
+class ResourceMesh : public Mesh, public WithLogger, public Resource
 {
 public:
     EXPORT ResourceMesh(std::string meshPath);
@@ -15,7 +16,6 @@ public:
 
     EXPORT void reload();
     EXPORT bool isLoaded();
-    EXPORT bool isPath(std::string meshPath);
     EXPORT Geometry *getGeometry();
 
     // positions
@@ -27,6 +27,4 @@ public:
 protected:
     bool bLoaded = false;
     Geometry *geometry = nullptr;
-
-    std::string meshPath;
 };

@@ -76,8 +76,8 @@ APPMAIN
     plainBody->setFriction(0.7f);
 
     auto plainMesh = engine->getMeshMaker()->createPlane({25.0f, 25.0f}, 4.0f);
-    auto plainTextureAlbedo = engine->getResourceController()->addTexture("./data/3d/pavement_albedo.jpg");
-    auto plainTextureNormal = engine->getResourceController()->addTexture("./data/3d/pavement_normal.jpg");
+    auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
+    auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
     auto plainShader = new PhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
@@ -92,7 +92,7 @@ APPMAIN
     Actor *platform = layerActors->createActor<Actor>();
     auto platformShader = new PhongShader();
 
-    auto platformAlbedoTexture = resourceController->addTexture("./data/3d/platform_albedo.jpg");
+    auto platformAlbedoTexture = resourceController->addImage("./data/3d/platform_albedo.jpg")->getAsTexture();
     platformShader->setTexture(TextureType::Albedo, platformAlbedoTexture);
 
     auto platformComponent = platform->createComponent<ComponentMesh>();

@@ -5,7 +5,7 @@
 #include "common/utils.h"
 #include "common/soundPlayer.h"
 #include "component/component.h"
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 
 class ComponentSoundPlayer : public Component, public SoundPlayer
 {

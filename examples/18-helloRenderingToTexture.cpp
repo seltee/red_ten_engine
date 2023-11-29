@@ -82,12 +82,15 @@ APPMAIN
     ComponentMesh *componentMesh;
 
     // Render target for texture rendering
+    // View always have it's default render target and stage by default is using View's render target
+    // But you can create your own and manually pass the render target to the
+    // Render target contains several buffers used for deffered rendering and final result that you can use as usual texture
     auto screenRenderTarget = viewController->createRenderTarget(800, 600, RenderQuality::SuperFast);
 
-    // Create plain
+    // Create plain for ground
     auto plainMesh = engine->getMeshMaker()->createPlane({20.0f, 20.0f}, 4.0f);
-    auto plainTextureAlbedo = engine->getResourceController()->addTexture("./data/3d/pavement_albedo.jpg");
-    auto plainTextureNormal = engine->getResourceController()->addTexture("./data/3d/pavement_normal.jpg");
+    auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
+    auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
     auto plainShader = new PhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
@@ -98,9 +101,9 @@ APPMAIN
     componentMesh->setShader(plainShader);
     plain->transform.setPosition(Vector3(0.0f, 0.0f, 0.0f));
 
-    // Rotating boxes
+    // Rotating boxes for the look
     auto boxMesh = engine->getMeshMaker()->createBox({0.8f, 0.8f, 0.8f});
-    auto boxTexture = engine->getResourceController()->addTexture("./data/crate.jpg");
+    auto boxTexture = engine->getResourceController()->addImage("./data/crate.jpg")->getAsTexture();
     auto boxShader = new PhongShader();
     boxShader->setTexture(TextureType::Albedo, boxTexture);
 
@@ -114,11 +117,12 @@ APPMAIN
         boxes.push_back(box);
     }
 
-    // Screens
+    // Screens around the scene
     const float scale = 0.008f;
     auto screenMesh = engine->getMeshMaker()->createPlane({800.0f * scale, 600.0f * scale});
     auto screenShader = new PhongShader();
 
+    // Here you can see how we take our final rendering texture from manually created rendering target and using it as usual texture
     screenShader->setTexture(TextureType::Albedo, screenRenderTarget->getResultTextureAsClass());
 
     const int screensAmount = 5;
@@ -165,7 +169,7 @@ APPMAIN
 
         // First rendering our scene from the screen camera into the texture
         // Rendering pipeline is the same as with usual rendering
-        // Just rendering target is different from the one that used by View
+        // Just rendering target is different from the default View's one
         screenCamera->setActive();
         effectLayer->setVisible(true);
         stage->present(screenRenderTarget);

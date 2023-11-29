@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/config.h"
-#include "resource/texture.h"
+#include "common/texture.h"
 
 class RenderTarget
 {

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 
 // returns bool isFinished
 inline bool fillFloatStereoBufferFromMono8(unsigned char *data, int dataSize, float &position, int &sample, float step, float *buffer, int lengthInSamples, float volume)

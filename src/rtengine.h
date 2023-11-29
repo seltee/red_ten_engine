@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once
@@ -8,6 +8,7 @@
 #include "common/pawn.h"
 #include "common/keyboard.h"
 #include "common/meshMaker.h"
+#include "common/texture.h"
 #include "connector/withLogger.h"
 #include "connector/withDebug.h"
 #include "connector/withRepository.h"
@@ -16,8 +17,8 @@
 #include "connector/withProfiler.h"
 #include "resource/resourceMesh.h"
 #include "resource/resourceFont.h"
-#include "resource/sound.h"
-#include "resource/texture.h"
+#include "resource/resourceSound.h"
+#include "resource/resourceImage.h"
 #include "actor/actor.h"
 #include "actor/actorPawn.h"
 #include "actor/actorGUIElement.h"

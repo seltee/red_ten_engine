@@ -21,7 +21,7 @@ void SoundPlayer::setPosition(Vector3 position)
     audioSource->setPosition(position);
 }
 
-void SoundPlayer::setSound(Sound *sound)
+void SoundPlayer::setSound(ResourceSound *sound)
 {
     stop();
     this->sound = sound;

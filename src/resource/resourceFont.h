@@ -2,24 +2,23 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#include <string>
+#include "resource/resource.h"
 #include "common/utils.h"
 #include "static/dm_sans.h"
-#include <string>
 
 struct InternalFont
 {
 };
 
-class ResourceFont
+class ResourceFont : public Resource
 {
 public:
     ResourceFont(std::string path, int size);
     int getSize();
     InternalFont *getFont();
-    bool isPath(std::string path);
 
 protected:
     int size;
-    std::string path;
     InternalFont *font;
 };

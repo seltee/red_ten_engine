@@ -208,10 +208,10 @@ APPMAIN
 
     // Textures, fonts setup
     auto resourceController = engine->getResourceController();
-    JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
-    auto background = resourceController->addTexture("./data/background.jpg");
-    CratePlate::crateTexture = resourceController->addTexture("./data/crate.jpg");
-    CratePlate::plateTexture = resourceController->addTexture("./data/plate.png");
+    JoJo::jojoTexture = resourceController->addImage("./data/jojo.png")->getAsTexture();
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
+    CratePlate::crateTexture = resourceController->addImage("./data/crate.jpg")->getAsTexture();
+    CratePlate::plateTexture = resourceController->addImage("./data/plate.png")->getAsTexture();
 
     auto font = resourceController->addFont("./data/BebasNeue-Regular.ttf", 72);
     GUIButton::font = resourceController->addFont("./data/BebasNeue-Regular.ttf", 48);
@@ -226,7 +226,7 @@ APPMAIN
     dio->transform.setScale(1.1f);
     dio->transform.setPosition(-100.0f, 0.0f);
     auto dioSprite = dio->createComponent<ComponentSprite>();
-    dioSprite->setTexture(resourceController->addTexture("./data/dio.jpg"));
+    dioSprite->setTexture(resourceController->addImage("./data/dio.jpg")->getAsTexture());
     dioSprite->setOpacity(0);
 
     auto plate = topLayerActors->createActor<CratePlate>();

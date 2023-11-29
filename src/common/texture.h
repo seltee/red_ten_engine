@@ -52,49 +52,23 @@ enum class TextureFilter
 class Texture : public WithLogger
 {
 public:
-    EXPORT Texture(std::string path);
-    EXPORT Texture(unsigned int internalId);
+    EXPORT Texture(unsigned int textureID);
     EXPORT ~Texture();
 
     EXPORT void bind();
     EXPORT void bind(TextureSlot slot);
 
-    EXPORT void reload();
-    EXPORT void unload();
-    EXPORT void clear();
-    EXPORT bool isLoaded();
-    EXPORT bool isPath(std::string path);
-
     EXPORT unsigned int getGLTextureId();
-    EXPORT int getWidth();
-    EXPORT int getHeight();
 
-    EXPORT void processBytemaps(const unsigned char *data = nullptr, int width = 0, int height = 0, int nrChannels = 0);
-    EXPORT void setMakeBytemapAlpha(bool state);
-    EXPORT void setMakeBytemapFull(bool state);
-    EXPORT void setBytemapScale(int scale);
-    EXPORT unsigned char getProbeBytemapAlpha(int x, int y);
-    EXPORT unsigned int getProbeFull(int x, int y);
-    EXPORT const unsigned char *getBytemapAlphaData();
-    EXPORT const unsigned char *getBytemapFullData();
+    EXPORT void setFiltering(TextureFilter filter);
+    EXPORT TextureFilter getFiltering();
 
-    EXPORT void setTextureFilter(TextureFilter filter);
-    EXPORT TextureFilter getTextureFilter();
+    inline int getWidth() { return width; }
+    inline int getHeight() { return height; }
 
 protected:
     TextureFilter filter = TextureFilter::Linear;
 
-    std::string path;
-    std::vector<Texture *> list;
-
     int width = 0, height = 0, nrChannels = 0;
     unsigned int textureID = 0;
-    bool bIsLoaded = false;
-
-    bool bMakeBytemapAlpha = false;
-    bool bMakeFullBytemap = false;
-    int byteMapScale = 1;
-    int mapWidth = 0, mapHeight = 0;
-    unsigned char *bytemapFullData = nullptr;
-    unsigned char *bytemapAlphaData = nullptr;
 };

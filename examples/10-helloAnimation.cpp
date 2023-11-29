@@ -94,13 +94,13 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    Sonic::sonicTexture = resourceController->addTexture("./data/sonic.png");
+    Sonic::sonicTexture = resourceController->addImage("./data/sonic.png")->getAsTexture();
 
     // Just a background for better look
     auto backgroundActor = layerActors->createActor<Actor>();
     backgroundActor->transform.setScale(2.0f);
     auto backgroundActorSprite = backgroundActor->createComponent<ComponentSprite>();
-    backgroundActorSprite->setTexture(resourceController->addTexture("./data/background.jpg"));
+    backgroundActorSprite->setTexture(resourceController->addImage("./data/background.jpg")->getAsTexture());
 
     float spawnerCounter = 0.0f;
 

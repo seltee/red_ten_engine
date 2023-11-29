@@ -22,7 +22,7 @@ public:
         if (!crateShader)
         {
             crateShader = new PhongShader();
-            auto crateAlbedoTexture = repository->addTexture("./data/crate.jpg");
+            auto crateAlbedoTexture = repository->addImage("./data/crate.jpg")->getAsTexture();
             crateShader->setTexture(TextureType::Albedo, crateAlbedoTexture);
         }
 

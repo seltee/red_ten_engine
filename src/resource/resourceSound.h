@@ -6,6 +6,7 @@
 // streaming: .ogg
 
 #pragma once
+#include "resource/resource.h"
 #include "common/utils.h"
 #include "connector/withLogger.h"
 #include "audio/audioBase.h"
@@ -37,10 +38,10 @@ struct SoundStream
     int numChannels;
 };
 
-class Sound : public WithLogger
+class ResourceSound : public WithLogger, public Resource
 {
 public:
-    EXPORT Sound(std::string path);
+    EXPORT ResourceSound(std::string path);
 
     EXPORT bool isPath(std::string path);
     EXPORT bool isStreamable();

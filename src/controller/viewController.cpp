@@ -109,7 +109,7 @@ void ViewController::getAvailableRefreshRates(DisplayMode *mode, std::vector<int
     SDL_DisplayMode nativeMode;
     int displayModes = SDL_GetNumDisplayModes(0);
 
-    printf("Refresh Rates: %i\n", displayModes);
+    // printf("Refresh Rates: %i\n", displayModes);
     for (int i = 0; i < displayModes; i++)
     {
         SDL_GetDisplayMode(0, i, &nativeMode);

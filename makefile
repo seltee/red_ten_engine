@@ -67,8 +67,8 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o \
 			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
-			${OBJDIR}/sound.o ${OBJDIR}/texture.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
-			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
+			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
+			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
@@ -145,11 +145,14 @@ ${OBJDIR}/layerDebug.o: ${SRCDIR}/stage/layerDebug.cpp
 ${OBJDIR}/stage.o: ${SRCDIR}/stage/stage.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/stage.o ${SRCDIR}/stage/stage.cpp
 
-${OBJDIR}/texture.o: ${SRCDIR}/resource/texture.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/texture.o ${SRCDIR}/resource/texture.cpp
+${OBJDIR}/resource.o: ${SRCDIR}/resource/resource.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/resource.o ${SRCDIR}/resource/resource.cpp
 
-${OBJDIR}/sound.o: ${SRCDIR}/resource/sound.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/sound.o ${SRCDIR}/resource/sound.cpp
+${OBJDIR}/resourceImage.o: ${SRCDIR}/resource/resourceImage.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceImage.o ${SRCDIR}/resource/resourceImage.cpp
+
+${OBJDIR}/resourceSound.o: ${SRCDIR}/resource/resourceSound.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceSound.o ${SRCDIR}/resource/resourceSound.cpp
 
 ${OBJDIR}/resourceFont.o: ${SRCDIR}/resource/resourceFont.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceFont.o ${SRCDIR}/resource/resourceFont.cpp
@@ -318,6 +321,9 @@ ${OBJDIR}/config.o: ${SRCDIR}/common/config.cpp
 
 ${OBJDIR}/mesh.o: ${SRCDIR}/common/mesh.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/mesh.o ${SRCDIR}/common/mesh.cpp
+	
+${OBJDIR}/texture.o: ${SRCDIR}/common/texture.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/texture.o ${SRCDIR}/common/texture.cpp
 	
 ${OBJDIR}/effect.o: ${SRCDIR}/shaders/effect.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/effect.o ${SRCDIR}/shaders/effect.cpp

@@ -142,12 +142,12 @@ APPMAIN
 
     // Resources
     auto resourceController = engine->getResourceController();
-    auto concreteAlbedoTexture = resourceController->addTexture("./data/3d/concrete_albedo.jpg");
-    auto concreteNormalTexture = resourceController->addTexture("./data/3d/concrete_normal.jpg");
+    auto concreteAlbedoTexture = resourceController->addImage("./data/3d/concrete_albedo.jpg")->getAsTexture();
+    auto concreteNormalTexture = resourceController->addImage("./data/3d/concrete_normal.jpg")->getAsTexture();
 
-    auto towerAlbedoTexture = resourceController->addTexture("./data/3d/tower_albedo.png");
-    auto towerEmissionTexture = resourceController->addTexture("./data/3d/tower_emission.png");
-    auto towerNormalTexture = resourceController->addTexture("./data/3d/tower_normal.png");
+    auto towerAlbedoTexture = resourceController->addImage("./data/3d/tower_albedo.png")->getAsTexture();
+    auto towerEmissionTexture = resourceController->addImage("./data/3d/tower_emission.png")->getAsTexture();
+    auto towerNormalTexture = resourceController->addImage("./data/3d/tower_normal.png")->getAsTexture();
 
     // our floor
     auto plainMesh = new Mesh();

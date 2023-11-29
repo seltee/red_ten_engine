@@ -32,6 +32,4 @@ protected:
     unsigned int vbo = 0;
     unsigned int vao = 0;
     unsigned int programm = 0;
-
-    std::string meshPath;
 };

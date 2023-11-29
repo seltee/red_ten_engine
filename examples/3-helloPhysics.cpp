@@ -4,7 +4,7 @@
 #include "../src/rtengine.h"
 #include <math.h>
 
-// This actor represents circle in physics
+// This actor will use sphere to simulate physics
 class Ball : public Actor
 {
 public:
@@ -40,7 +40,7 @@ protected:
 };
 Texture *Ball::ballTexture = nullptr;
 
-// This actor represents box shape
+// This actor will use box to simulate physics
 class Crate : public Actor
 {
 public:
@@ -173,10 +173,10 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    Ball::ballTexture = resourceController->addTexture("./data/ball.png");
-    Crate::crateTexture = resourceController->addTexture("./data/crate.jpg");
+    Ball::ballTexture = resourceController->addImage("./data/ball.png")->getAsTexture();
+    Crate::crateTexture = resourceController->addImage("./data/crate.jpg")->getAsTexture();
     DoubleCrate::crateTexture = Crate::crateTexture;
-    auto background = resourceController->addTexture("./data/background.jpg");
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
 
     // Just a background for better look
     auto backgroundActor = layerActors->createActor<Actor>();

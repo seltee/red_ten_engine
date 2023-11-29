@@ -176,10 +176,10 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
-    auto background = resourceController->addTexture("./data/background.jpg");
-    CratePlate::crateTexture = resourceController->addTexture("./data/crate.jpg");
-    CratePlate::plateTexture = resourceController->addTexture("./data/plate.png");
+    JoJo::jojoTexture = resourceController->addImage("./data/jojo.png")->getAsTexture();
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
+    CratePlate::crateTexture = resourceController->addImage("./data/crate.jpg")->getAsTexture();
+    CratePlate::plateTexture = resourceController->addImage("./data/plate.png")->getAsTexture();
 
     // To create texts we first need to setup font
     // You can both load TTF font from file or use internal TTF font

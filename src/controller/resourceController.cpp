@@ -7,45 +7,44 @@ ResourceController::ResourceController()
 {
 }
 
-Texture *ResourceController::addTexture(std::string path, TextureFilter filter)
+ResourceImage *ResourceController::addImage(std::string path, ByteMap byteMap, int byteMapScale)
 {
-    Texture *texture = getTextureByPath(path);
-    if (!texture)
+    ResourceImage *image = getImageByPath(path);
+    if (!image)
     {
-        texture = new Texture(path);
-        texture->setTextureFilter(filter);
-        textures.push_back(texture);
+        image = new ResourceImage(path, byteMap, byteMapScale);
+        images.push_back(image);
     }
-    return texture;
+    return image;
 }
 
-Texture *ResourceController::getTextureByPath(std::string path)
+ResourceImage *ResourceController::getImageByPath(std::string path)
 {
-    for (auto it = textures.begin(); it != textures.end(); ++it)
+    for (auto &it : images)
     {
-        if ((*it)->isPath(path))
-            return (*it);
+        if (it->isPath(path))
+            return it;
     }
     return nullptr;
 }
 
-Sound *ResourceController::addSound(std::string path)
+ResourceSound *ResourceController::addSound(std::string path)
 {
-    Sound *sound = getSoundByPath(path);
+    ResourceSound *sound = getSoundByPath(path);
     if (!sound)
     {
-        sound = new Sound(path);
+        sound = new ResourceSound(path);
         sounds.push_back(sound);
     }
     return sound;
 }
 
-Sound *ResourceController::getSoundByPath(std::string path)
+ResourceSound *ResourceController::getSoundByPath(std::string path)
 {
-    for (auto it = sounds.begin(); it != sounds.end(); ++it)
+    for (auto &it : sounds)
     {
-        if ((*it)->isPath(path))
-            return (*it);
+        if (it->isPath(path))
+            return it;
     }
     return nullptr;
 }
@@ -74,10 +73,10 @@ ResourceFont *ResourceController::addFont(std::string path, int size)
 
 ResourceFont *ResourceController::getFontByPath(std::string path, int size)
 {
-    for (auto it = fonts.begin(); it != fonts.end(); ++it)
+    for (auto &it : fonts)
     {
-        if ((*it)->isPath(path) && (*it)->getSize() == size)
-            return (*it);
+        if (it->isPath(path) && it->getSize() == size)
+            return it;
     }
     return nullptr;
 }
@@ -95,19 +94,20 @@ ResourceMesh *ResourceController::addMesh(std::string path)
 
 ResourceMesh *ResourceController::getMeshByPath(std::string path)
 {
-    for (auto it = meshes.begin(); it != meshes.end(); ++it)
+    for (auto &it : meshes)
     {
-        if ((*it)->isPath(path))
-            return (*it);
+        if (it->isPath(path))
+            return it;
     }
     return nullptr;
 }
 
 void ResourceController::loadAll()
 {
-    for (auto it = textures.begin(); it != textures.end(); ++it)
-    {
-        if (!(*it)->isLoaded())
-            (*it)->reload();
-    }
+    for (auto &it : images)
+        it->preload();
+    for (auto &it : meshes)
+        it->reload();
+    for (auto &it : sounds)
+        it->load();
 }

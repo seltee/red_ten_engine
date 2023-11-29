@@ -60,11 +60,11 @@ APPMAIN
 
     // Textures setup
     auto resourceController = engine->getResourceController();
-    JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
-    auto background = resourceController->addTexture("./data/background.jpg");
+    JoJo::jojoTexture = resourceController->addImage("./data/jojo.png")->getAsTexture();
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
 
     // Music setup and playing
-    Sound *cyberpunkSong = resourceController->addSound("./data/streamable.ogg");
+    ResourceSound *cyberpunkSong = resourceController->addSound("./data/streamable.ogg");
     cyberpunkSong->load();
 
     SoundPlayer *player = new SoundPlayer();

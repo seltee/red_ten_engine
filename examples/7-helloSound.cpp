@@ -16,9 +16,6 @@ public:
         transform.setScale(0.8);
         // Note: here we use z position of an actor, because that's the way to control sound pan in 3d space
         transform.setPosition(0.0f, -50.0f, frontDistance);
-        jojoTexture->setMakeBytemapAlpha(true);
-        jojoTexture->setBytemapScale(4);
-        jojoTexture->reload();
 
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(jojoTexture);
@@ -52,7 +49,7 @@ public:
     }
 
     static Texture *jojoTexture;
-    static Sound *jojoSong;
+    static ResourceSound *jojoSong;
 
     float counter = 0.0f;
     float moveX = 0.0f;
@@ -62,7 +59,7 @@ protected:
     ComponentSprite *sprite;
 };
 Texture *JoJo::jojoTexture = nullptr;
-Sound *JoJo::jojoSong = nullptr;
+ResourceSound *JoJo::jojoSong = nullptr;
 
 APPMAIN
 {
@@ -91,8 +88,8 @@ APPMAIN
 
     // Textures and sound setup
     auto resourceController = engine->getResourceController();
-    JoJo::jojoTexture = resourceController->addTexture("./data/jojo.png");
-    auto background = resourceController->addTexture("./data/background.jpg");
+    JoJo::jojoTexture = resourceController->addImage("./data/jojo.png")->getAsTexture();
+    auto background = resourceController->addImage("./data/background.jpg")->getAsTexture();
 
     JoJo::jojoSong = resourceController->addSound("./data/sound.wav");
     // Note that only mono sounds can be panned. Stereo sounds always being played as is

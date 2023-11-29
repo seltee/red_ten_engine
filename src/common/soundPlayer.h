@@ -7,7 +7,7 @@
 #include "math/math.h"
 #include "controller/audioController.h"
 #include "connector/withAudio.h"
-#include "resource/sound.h"
+#include "resource/resourceSound.h"
 #include "audio/audioSource.h"
 
 class SoundPlayer : public ChildProcess, public WithAudio
@@ -18,7 +18,7 @@ public:
 
     EXPORT void setPosition(Vector3 position);
 
-    EXPORT void setSound(Sound *sound);
+    EXPORT void setSound(ResourceSound *sound);
     EXPORT void playOnce();
     EXPORT void playLoop();
     EXPORT void stop();
@@ -35,7 +35,7 @@ public:
     inline float getVolume() { return this->audioSource->getVolume(); }
 
 protected:
-    Sound *sound = nullptr;
+    ResourceSound *sound = nullptr;
     AudioSource *audioSource = nullptr;
 
     bool repeatStream = false;

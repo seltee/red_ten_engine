@@ -14,9 +14,8 @@
 // 3 - tangent
 // 3 - biTangent
 
-ResourceMesh::ResourceMesh(std::string meshPath)
+ResourceMesh::ResourceMesh(std::string meshPath) : Resource(meshPath)
 {
-    this->meshPath = meshPath;
 }
 
 ResourceMesh::~ResourceMesh()
@@ -27,12 +26,12 @@ ResourceMesh::~ResourceMesh()
 
 void ResourceMesh::reload()
 {
-    if (meshPath.length() > 0 && !bLoaded)
+    if (path.length() > 0 && !bLoaded)
     {
-        logger->logf("Add mesh %s", meshPath.c_str());
+        logger->logf("Add mesh %s", path.c_str());
 
         FBXLoader *loader = new FBXLoader();
-        bool result = loader->load(meshPath);
+        bool result = loader->load(path);
         if (result && loader->root)
         {
             int amountOfFloats;
@@ -46,7 +45,7 @@ void ResourceMesh::reload()
         }
         else
         {
-            logger->logff("Failed loading %s\n", meshPath.c_str());
+            logger->logff("Failed loading %s\n", path.c_str());
         }
         delete loader;
     }
@@ -55,11 +54,6 @@ void ResourceMesh::reload()
 bool ResourceMesh::isLoaded()
 {
     return bLoaded;
-}
-
-bool ResourceMesh::isPath(std::string meshPath)
-{
-    return this->meshPath == meshPath;
 }
 
 Geometry *ResourceMesh::getGeometry()

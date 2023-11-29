@@ -162,9 +162,9 @@ APPMAIN
 
     // Resources
     auto resourceController = engine->getResourceController();
-    auto landAlbedoTexture = resourceController->addTexture("./data/3d/land_albedo.jpg");
-    auto landNormalTexture = resourceController->addTexture("./data/3d/land_normal.jpg");
-    auto mushroomAlbedoTexture = resourceController->addTexture("./data/3d/mushroom_albedo.jpg");
+    auto landAlbedoTexture = resourceController->addImage("./data/3d/land_albedo.jpg")->getAsTexture();
+    auto landNormalTexture = resourceController->addImage("./data/3d/land_normal.jpg")->getAsTexture();
+    auto mushroomAlbedoTexture = resourceController->addImage("./data/3d/mushroom_albedo.jpg")->getAsTexture();
 
     // our tower
     auto landMesh = resourceController->addMesh("./data/3d/land.fbx");

@@ -64,34 +64,22 @@ void ComponentSprite::setAnchor(Vector2 &anchor)
 void ComponentSprite::setRelativeScale(float x, float y)
 {
     if (texture)
-    {
-        texture->reload();
         transform.setScale((float)texture->getWidth() * x, (float)texture->getHeight() * y, 1.0f);
-    }
     else
-    {
         transform.setScale(1.0f, 1.0f, 1.0f);
-    }
 }
 
 void ComponentSprite::setRelativeScale(Vector2 &size)
 {
     if (texture)
-    {
-        texture->reload();
         transform.setScale((float)texture->getWidth() * size.x, (float)texture->getHeight() * size.y, 1.0f);
-    }
     else
-    {
         transform.setScale(1.0f, 1.0f, 1.0f);
-    }
 }
 
 void ComponentSprite::setTexture(Texture *texture)
 {
     this->texture = texture;
-    if (texture && !texture->isLoaded())
-        texture->reload();
     setRelativeScale(1.0f, 1.0f);
 }
 

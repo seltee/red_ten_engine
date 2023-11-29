@@ -153,7 +153,7 @@ void AudioSource::process(float delta)
     }
 }
 
-void AudioSource::play(Sound *sound)
+void AudioSource::play(ResourceSound *sound)
 {
     this->sound = sound;
     sound->load();
@@ -189,7 +189,7 @@ void AudioSource::play(Sound *sound)
     }
 }
 
-void AudioSource::loop(Sound *sound)
+void AudioSource::loop(ResourceSound *sound)
 {
     this->sound = sound;
     sound->load();
