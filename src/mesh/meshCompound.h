@@ -20,10 +20,14 @@ public:
     EXPORT Mesh *createInstance();
 
     EXPORT MeshCompoundNode *addMesh(MeshStatic *mesh);
+    EXPORT bool setParent(Mesh *child, Mesh *parent);
 
     EXPORT MeshStatic *getAsStatic();
 
 protected:
+    MeshCompoundNode *getNodeByMesh(Mesh *mesh);
+    Matrix4 getTransformationMatrix(MeshCompoundNode *node);
+
     std::vector<MeshCompoundNode *> nodes;
     MeshStatic *meshStatic = nullptr;
 };
@@ -34,4 +38,5 @@ public:
     MeshCompoundNode(MeshStatic *mesh) { this->mesh = mesh; }
     MeshStatic *mesh;
     Transformation transform;
+    MeshCompoundNode *parent = nullptr;
 };

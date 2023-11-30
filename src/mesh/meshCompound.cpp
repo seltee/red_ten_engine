@@ -1,4 +1,5 @@
 #include "mesh/meshCompound.h"
+#include <algorithm>
 
 MeshCompound::MeshCompound()
 {
@@ -28,6 +29,19 @@ MeshCompoundNode *MeshCompound::addMesh(MeshStatic *mesh)
     auto newNode = new MeshCompoundNode(mesh);
     nodes.push_back(newNode);
     return newNode;
+}
+
+bool MeshCompound::setParent(Mesh *child, Mesh *parent)
+{
+    MeshCompoundNode *childNode = getNodeByMesh(child);
+    MeshCompoundNode *parentNode = getNodeByMesh(parent);
+
+    if (childNode && parentNode)
+    {
+        childNode->parent = parentNode;
+        return true;
+    }
+    return false;
 }
 
 MeshStatic *MeshCompound::getAsStatic()
@@ -61,7 +75,7 @@ MeshStatic *MeshCompound::getAsStatic()
         float *meshVertexData = node->mesh->getVertexData();
 
         // Ignore old tangents cause they will be outdated with apply of transformation
-        auto modelMatrix = *node->transform.getModelMatrix();
+        auto modelMatrix = getTransformationMatrix(node);
         auto rq = node->transform.getRotation();
 
         for (int i = 0; i < meshVertexAmount; i++)
@@ -93,4 +107,42 @@ MeshStatic *MeshCompound::getAsStatic()
 
     delete[] data;
     return meshStatic;
+}
+
+MeshCompoundNode *MeshCompound::getNodeByMesh(Mesh *mesh)
+{
+    for (auto &it : nodes)
+    {
+        if (it->mesh == mesh)
+        {
+            return it;
+        }
+    }
+    return nullptr;
+}
+
+Matrix4 MeshCompound::getTransformationMatrix(MeshCompoundNode *node)
+{
+    if (!node->parent)
+    {
+        return *node->transform.getModelMatrix();
+    }
+    else
+    {
+        Matrix4 out;
+        std::vector<Matrix4 *> list;
+        MeshCompoundNode *current = node;
+        while (current)
+        {
+            list.push_back(current->transform.getModelMatrix());
+            current = current->parent;
+        }
+
+        for (auto it = list.rbegin(); it != list.rend(); ++it)
+        {
+            out = out * **it;
+        }
+
+        return out;
+    }
 }

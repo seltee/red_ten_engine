@@ -17,8 +17,10 @@ struct FBXMeshWithIndex
 struct FBXModelWithIndex
 {
     unsigned long long index;
+    unsigned long long parentIndex;
     Vector3 position, rotation, scale;
     std::string name;
+    MeshStatic *mesh;
 };
 
 struct FBXNodeDataBinding

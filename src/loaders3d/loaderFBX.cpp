@@ -167,9 +167,11 @@ void LoaderFBX::reload()
             FBXModelWithIndex mWithIndex;
             mWithIndex.index = *static_cast<unsigned long *>(it->bindedData.at(0).data);
             mWithIndex.name = std::string(reinterpret_cast<const char *>(it->bindedData.at(1).data));
+            mWithIndex.parentIndex = 0;
             mWithIndex.position = Vector3(0.0f, 0.0f, 0.0f);
             mWithIndex.rotation = Vector3(0.0f, 0.0f, 0.0f);
             mWithIndex.scale = Vector3(0.0f, 0.0f, 0.0f);
+            mWithIndex.mesh = nullptr;
 
             FBXNode *properties = it->findNode("Properties70");
             if (properties)
@@ -198,7 +200,7 @@ void LoaderFBX::reload()
                         mWithIndex.position = out / 100.0f;
 
                     if (transformationType == 's')
-                        mWithIndex.scale = out / 100.0f;
+                        mWithIndex.scale = out;
 
                     if (transformationType == 'r')
                         mWithIndex.rotation = out * CONST_PI / 180.0f;
@@ -210,9 +212,7 @@ void LoaderFBX::reload()
         }
     }
 
-    // connecting models and geometry
-
-    float n = 0.0f;
+    // Connecting models and geometry
     for (auto &it : connections->children)
     {
         unsigned long long indexFrom = *static_cast<unsigned long *>(it->bindedData.at(1).data);
@@ -222,9 +222,7 @@ void LoaderFBX::reload()
         if (foundModel)
         {
             if (indexTo)
-            {
-                printf("TODO: IMPLEMENT PARENTING\n");
-            }
+                foundModel->parentIndex = indexTo;
             continue;
         }
 
@@ -238,9 +236,29 @@ void LoaderFBX::reload()
                 MeshCompoundNode *meshCompoundNode = meshCompound->addMesh(instance);
                 meshCompoundNode->transform.setPosition(foundModel->position);
                 meshCompoundNode->transform.setRotation(foundModel->rotation);
-                meshCompoundNode->transform.setScale(foundModel->scale);
 
-                n += 2.0f;
+                if (foundModel->parentIndex)
+                    meshCompoundNode->transform.setScale(foundModel->scale);
+                else
+                    meshCompoundNode->transform.setScale(foundModel->scale * 0.01f);
+
+                foundModel->mesh = instance;
+            }
+        }
+    }
+
+    // Setting up parent links
+    for (auto &model : models)
+    {
+        if (model.parentIndex)
+        {
+            auto parentModel = getModelByIndex(model.parentIndex);
+            if (parentModel)
+            {
+                if (!meshCompound->setParent(model.mesh, parentModel->mesh))
+                {
+                    logger->logff("Failed to set parent during FBX load");
+                }
             }
         }
     }
