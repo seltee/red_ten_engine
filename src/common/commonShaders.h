@@ -7,7 +7,7 @@
 #include "controller/resourceController.h"
 #include "shaders/lightningShader.h"
 #include "connector/withLogger.h"
-#include "common/mesh.h"
+#include "mesh/meshStatic.h"
 
 class CommonShaders : public WithLogger
 {
@@ -25,14 +25,14 @@ public:
     EXPORT static LightningShader *getOmniShader();
     EXPORT static RawShader *getDebugCubeShader();
 
-    EXPORT static Mesh *getScreenMesh();
-    EXPORT static Mesh *getSpriteMesh();
-    EXPORT static Mesh *getCubeMesh();
+    inline static MeshStatic *getScreenMesh() { return screenMesh; }
+    inline static MeshStatic *getSpriteMesh() { return spriteMesh; }
+    inline static MeshStatic *getCubeMesh() { return cubeMesh; }
 
 protected:
-    static Mesh *spriteMesh;
-    static Mesh *cubeMesh;
-    static Mesh *screenMesh;
+    static MeshStatic *spriteMesh;
+    static MeshStatic *cubeMesh;
+    static MeshStatic *screenMesh;
 
     static Shader *spriteShader;
     static Shader *spriteFrameShader;
@@ -40,7 +40,6 @@ protected:
     static RawShader *effectShader;
     static RawShader *initialLightningShader;
     static RawShader *debugCubeShader;
-
 
     static LightningShader *sunShader;
     static LightningShader *sunWithShadowShader;

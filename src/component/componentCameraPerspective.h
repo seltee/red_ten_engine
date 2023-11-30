@@ -12,7 +12,7 @@ public:
     EXPORT ~ComponentCameraPerspective();
 
     EXPORT void onCreated();
-    EXPORT bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
+    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
 
     EXPORT CameraPerspective *getCamera();
 

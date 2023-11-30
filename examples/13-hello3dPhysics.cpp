@@ -24,8 +24,8 @@ public:
     ActorFactory(ResourceController *resourceController, LayerActors *layer)
     {
         this->layer = layer;
-        sphereMesh = resourceController->addMesh("./data/3d/concrete_ball.fbx");
-        platformMesh = resourceController->addMesh("./data/3d/platform.fbx");
+        sphereMesh = resourceController->addMesh("./data/3d/concrete_ball.fbx")->getAsMeshStatic();
+        platformMesh = resourceController->addMesh("./data/3d/platform.fbx")->getAsMeshStatic();
 
         auto sphereAlbedoTexture = resourceController->addImage("./data/3d/concrete_ball_albedo.jpg")->getAsTexture();
         auto sphereNormalTexture = resourceController->addImage("./data/3d/concrete_ball_normal.jpg")->getAsTexture();
@@ -76,8 +76,8 @@ protected:
     LayerActors *layer = nullptr;
     PhongShader *sphereShader = nullptr;
     PhongShader *platformShader = nullptr;
-    ResourceMesh *sphereMesh = nullptr;
-    ResourceMesh *platformMesh = nullptr;
+    MeshStatic *sphereMesh = nullptr;
+    MeshStatic *platformMesh = nullptr;
 };
 
 APPMAIN

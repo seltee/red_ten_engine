@@ -24,7 +24,7 @@ void ComponentCameraOrto::onCreated()
     }
 }
 
-bool ComponentCameraOrto::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentCameraOrto::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
     Matrix4 viewMatrix = glm::inverse(*tf->getModelMatrix() * *transform.getModelMatrix());
     cameraOrto->setViewMatrix(viewMatrix);
@@ -33,7 +33,6 @@ bool ComponentCameraOrto::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf,
         audio->getAudioBase()->setPosition(transform.getPosition());
         audio->getAudioBase()->setOrientation(transform.getRotation());
     }
-    return true;
 }
 
 CameraOrto *ComponentCameraOrto::getCamera()

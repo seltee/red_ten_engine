@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "common/utils.h"
-#include "common/mesh.h"
+#include "mesh/mesh.h"
 #include "math/math.h"
 #include <stdlib.h>
 

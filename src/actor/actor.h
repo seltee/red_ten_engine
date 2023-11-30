@@ -67,10 +67,16 @@ public:
 
     EXPORT inline bool hasBlended() { return bHasBlended; };
 
-    EXPORT inline bool hasDebugView() { return bShowBoundingBox; }
+    EXPORT inline bool hasDebugView() { return bShowBoundingBox || bShowNormals; }
     EXPORT inline void showBoundingBox(bool state) { bShowBoundingBox = state; }
+    EXPORT inline void showNormals(bool state) { bShowNormals = state; }
+
+    inline bool isBoundingBoxShown() { return bShowBoundingBox; }
+    inline bool isNormalsShown() { return bShowNormals; }
 
     EXPORT void childUpdated();
+
+    inline const std::list<Component *> *getComponents() { return &components; }
 
 protected:
     void updatePhysics();
@@ -81,6 +87,7 @@ protected:
     bool bHasBlended = false;
     bool bPhysicsNeedsToBeRebuild = false;
     bool bShowBoundingBox = false;
+    bool bShowNormals = false;
 
     MotionType motionType = MotionType::Static;
     PhysicsWorld *physicsWorld = nullptr;

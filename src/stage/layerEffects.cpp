@@ -86,7 +86,7 @@ void LayerEffects::render(RenderTarget *renderTarget)
                 effect->use(m, m);
                 glActiveTexture(GL_TEXTURE0);
                 glBindTexture(GL_TEXTURE_2D, renderTarget->getResultTexture());
-                CommonShaders::getScreenMesh()->use();
+                CommonShaders::getScreenMesh()->useVertexArray();
                 glDrawArrays(GL_TRIANGLES, 0, 6);
 
                 renderTarget->useResultBuffer();
@@ -94,7 +94,7 @@ void LayerEffects::render(RenderTarget *renderTarget)
                 effectShader->setOpacity(effect->getOpacity());
 
                 glBindTexture(GL_TEXTURE_2D, renderedTexture);
-                CommonShaders::getScreenMesh()->use();
+                CommonShaders::getScreenMesh()->useVertexArray();
                 glDrawArrays(GL_TRIANGLES, 0, 6);
             }
         }

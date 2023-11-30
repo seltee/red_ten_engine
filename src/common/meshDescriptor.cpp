@@ -3,36 +3,48 @@
 
 #include "meshDescriptor.h"
 
-MeshDescriptor::MeshDescriptor(MeshDescriptor *parent)
+MeshDescriptor::MeshDescriptor()
 {
-    this->parent = parent;
+}
+MeshDescriptor::~MeshDescriptor()
+{
+    if (vertexes)
+        delete[] vertexes;
+    if (polygonIndexes)
+        delete[] polygonIndexes;
+    if (uvs)
+        delete[] uvs;
+    if (uvIndexes)
+        delete[] uvIndexes;
+    if (normals)
+        delete[] normals;
 }
 
 void MeshDescriptor::provideVertex(double *list, int countOfDoubles)
 {
     vertexAmount = countOfDoubles / 3;
-    vertexes = (Vertex *)malloc(sizeof(Vertex) * vertexAmount);
+    vertexes = new Vertex[vertexAmount];
 
     for (int i = 0; i < vertexAmount; i++)
     {
         int s = i * 3;
         vertexes[i].p[0] = list[s];
-        vertexes[i].p[2] = list[s + 1];
-        vertexes[i].p[1] = list[s + 2];
+        vertexes[i].p[1] = list[s + 1];
+        vertexes[i].p[2] = list[s + 2];
     }
 }
 
-void MeshDescriptor::providePolygonIndexes(int *list, int countOfInts)
+void MeshDescriptor::providePolygonIndexes(int *list, int countOfIndexes)
 {
-    polygonIndexes = (int *)malloc(sizeof(int) * countOfInts);
-    memcpy(polygonIndexes, list, sizeof(int) * countOfInts);
-    polygonIndexesAmount = countOfInts;
+    polygonIndexes = new int[countOfIndexes];
+    memcpy(polygonIndexes, list, sizeof(int) * countOfIndexes);
+    polygonIndexesAmount = countOfIndexes;
 }
 
 void MeshDescriptor::provideUVData(double *list, int countOfDoubles)
 {
     uvsAmount = countOfDoubles / 2;
-    uvs = (UV *)malloc(sizeof(UV) * uvsAmount);
+    uvs = new UV[uvsAmount];
     for (int i = 0; i < uvsAmount; i++)
     {
         int shift = i * 2;
@@ -41,23 +53,23 @@ void MeshDescriptor::provideUVData(double *list, int countOfDoubles)
     }
 }
 
-void MeshDescriptor::provideUVIndexes(int *list, int countOfInts)
+void MeshDescriptor::provideUVIndexes(int *list, int countOfIndexes)
 {
-    uvIndexes = (int *)malloc(sizeof(int) * countOfInts);
-    memcpy(uvIndexes, list, sizeof(int) * countOfInts);
-    uvIndexesAmount = countOfInts;
+    uvIndexes = new int[countOfIndexes];
+    memcpy(uvIndexes, list, sizeof(int) * countOfIndexes);
+    uvIndexesAmount = countOfIndexes;
 }
 
 void MeshDescriptor::provideNormals(double *list, int countOfDoubles)
 {
     int polyCount = countOfDoubles / 3;
-    normals = (Normal *)malloc(polyCount * sizeof(Normal));
+    normals = new Normal[polyCount];
     for (int i = 0; i < polyCount; i++)
     {
         int s = i * 3;
         normals[i].n[0] = (float)list[s];
-        normals[i].n[2] = (float)list[s + 1];
-        normals[i].n[1] = (float)list[s + 2];
+        normals[i].n[1] = (float)list[s + 1];
+        normals[i].n[2] = (float)list[s + 2];
     }
 }
 
@@ -136,27 +148,27 @@ float *MeshDescriptor::getAsFloatArray8f(int *amountOfFloats)
     const int floatsInPoly = 24;
     const int polyAmount = polygons.size();
     *amountOfFloats = polyAmount * floatsInPoly;
-    float *data = (float *)malloc(sizeof(float) * *amountOfFloats);
+    float *data = new float[*amountOfFloats];
 
     int shift = 0;
     for (auto it = polygons.begin(); it != polygons.end(); it++)
     {
-        data[shift + 8] = (*it).p1.p[0];
-        data[shift + 9] = (*it).p1.p[1];
-        data[shift + 10] = (*it).p1.p[2];
-        data[shift + 11] = (*it).n1.n[0];
-        data[shift + 12] = (*it).n1.n[1];
-        data[shift + 13] = (*it).n1.n[2];
-        data[shift + 14] = (*it).uv1.y;
-        data[shift + 15] = (*it).uv1.x;
-        data[shift + 0] = (*it).p2.p[0];
-        data[shift + 1] = (*it).p2.p[1];
-        data[shift + 2] = (*it).p2.p[2];
-        data[shift + 3] = (*it).n2.n[0];
-        data[shift + 4] = (*it).n2.n[1];
-        data[shift + 5] = (*it).n2.n[2];
-        data[shift + 6] = (*it).uv2.y;
-        data[shift + 7] = (*it).uv2.x;
+        data[shift + 0] = (*it).p1.p[0];
+        data[shift + 1] = (*it).p1.p[1];
+        data[shift + 2] = (*it).p1.p[2];
+        data[shift + 3] = (*it).n1.n[0];
+        data[shift + 4] = (*it).n1.n[1];
+        data[shift + 5] = (*it).n1.n[2];
+        data[shift + 6] = (*it).uv1.y;
+        data[shift + 7] = (*it).uv1.x;
+        data[shift + 8] = (*it).p2.p[0];
+        data[shift + 9] = (*it).p2.p[1];
+        data[shift + 10] = (*it).p2.p[2];
+        data[shift + 11] = (*it).n2.n[0];
+        data[shift + 12] = (*it).n2.n[1];
+        data[shift + 13] = (*it).n2.n[2];
+        data[shift + 14] = (*it).uv2.y;
+        data[shift + 15] = (*it).uv2.x;
         data[shift + 16] = (*it).p3.p[0];
         data[shift + 17] = (*it).p3.p[1];
         data[shift + 18] = (*it).p3.p[2];

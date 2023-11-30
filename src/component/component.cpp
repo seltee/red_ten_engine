@@ -25,26 +25,12 @@ void Component::process(float delta)
 {
 }
 
-void Component::render(Matrix4 &vpMatrix, Transformation *tf)
+void Component::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
-    bool state = onRenderPrepare(vpMatrix, tf, false);
-    if (state)
-    {
-        int drawAmount = getVertexAmount();
-        if (drawAmount)
-            glDrawArrays(GL_TRIANGLES, 0, drawAmount);
-    }
 }
 
-void Component::shadowRender(Matrix4 &vpMatrix, Transformation *tf)
+void Component::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
 {
-    bool state = onRenderPrepare(vpMatrix, tf, true);
-    if (state)
-    {
-        int drawAmount = getVertexAmount();
-        if (drawAmount)
-            glDrawArrays(GL_TRIANGLES, 0, drawAmount);
-    }
 }
 
 void Component::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture)
@@ -61,11 +47,6 @@ void Component::onCreated()
 {
 }
 
-bool Component::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
-{
-    return false;
-}
-
 void Component::prepareColorMode()
 {
     switch (colorMode)
@@ -77,11 +58,6 @@ void Component::prepareColorMode()
     case ComponentColorMode::Addition:
         return glBlendFunc(GL_ONE, GL_ONE);
     }
-}
-
-int Component::getVertexAmount()
-{
-    return 0;
 }
 
 ShapeSphere *Component::addShapeSphere(float radius)
@@ -217,4 +193,9 @@ ShapeCapsule *Component::addShapeCapsule(float height, float radius)
 Matrix4 Component::getLocalspaceMatrix()
 {
     return Matrix4(1.0f);
+}
+
+MeshStatic *Component::getStaticMesh()
+{
+    return nullptr;
 }

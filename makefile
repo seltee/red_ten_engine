@@ -73,7 +73,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
-			${OBJDIR}/stb_image.o ${OBJDIR}/fbx_loader.o ${OBJDIR}/stb_vorbis.o \
+			${OBJDIR}/stb_image.o ${OBJDIR}/stb_vorbis.o \
 			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
 			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o \
 			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o ${OBJDIR}/withProfiler.o \
@@ -83,13 +83,17 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/collisionSolver.o ${OBJDIR}/collisionMesh.o \
 			${OBJDIR}/meshMaker.o ${OBJDIR}/motion.o ${OBJDIR}/collisionDispatcher.o ${OBJDIR}/collisionCollector.o \
 			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o \
-			${OBJDIR}/audioBase.o ${OBJDIR}/audioSource.o
+			${OBJDIR}/audioBase.o ${OBJDIR}/audioSource.o \
+			${OBJDIR}/mesh.o ${OBJDIR}/meshCompound.o ${OBJDIR}/meshStatic.o \
+			${OBJDIR}/loader3d.o ${OBJDIR}/loaderFBX.o
+
 
 EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
 			5-helloInput${EXT} 6-helloBytemap${EXT} 7-helloSound${EXT} 8-helloGUI${EXT} \
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
-			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT}
+			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT} \
+			19-hello3dAnimation${EXT}
 
 all: engine examples
 
@@ -183,9 +187,6 @@ ${OBJDIR}/stb_image.o: ${SRCDIR}/loaders/stb_image.cpp
 
 ${OBJDIR}/stb_vorbis.o: ${SRCDIR}/loaders/stb_vorbis.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/stb_vorbis.o ${SRCDIR}/loaders/stb_vorbis.cpp
-	
-${OBJDIR}/fbx_loader.o: ${SRCDIR}/loaders/fbx_loader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/fbx_loader.o ${SRCDIR}/loaders/fbx_loader.cpp
 
 ${OBJDIR}/camera.o: ${SRCDIR}/camera/camera.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/camera.o ${SRCDIR}/camera/camera.cpp
@@ -319,9 +320,6 @@ ${OBJDIR}/geometry.o: ${SRCDIR}/common/geometry.cpp
 ${OBJDIR}/config.o: ${SRCDIR}/common/config.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/config.o ${SRCDIR}/common/config.cpp
 
-${OBJDIR}/mesh.o: ${SRCDIR}/common/mesh.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/mesh.o ${SRCDIR}/common/mesh.cpp
-	
 ${OBJDIR}/texture.o: ${SRCDIR}/common/texture.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/texture.o ${SRCDIR}/common/texture.cpp
 	
@@ -376,10 +374,24 @@ ${OBJDIR}/audioBase.o: ${SRCDIR}/audio/audioBase.cpp
 ${OBJDIR}/audioSource.o: ${SRCDIR}/audio/audioSource.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/audioSource.o ${SRCDIR}/audio/audioSource.cpp
 
+${OBJDIR}/mesh.o: ${SRCDIR}/mesh/mesh.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/mesh.o ${SRCDIR}/mesh/mesh.cpp
+
+${OBJDIR}/meshCompound.o: ${SRCDIR}/mesh/meshCompound.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/meshCompound.o ${SRCDIR}/mesh/meshCompound.cpp
+
+${OBJDIR}/meshStatic.o: ${SRCDIR}/mesh/meshStatic.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/meshStatic.o ${SRCDIR}/mesh/meshStatic.cpp
+
+${OBJDIR}/loader3d.o: ${SRCDIR}/loaders3d/loader3d.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/loader3d.o ${SRCDIR}/loaders3d/loader3d.cpp
+
+${OBJDIR}/loaderFBX.o: ${SRCDIR}/loaders3d/loaderFBX.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/loaderFBX.o ${SRCDIR}/loaders3d/loaderFBX.cpp
+
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)
 	${COPY} ${TARGET} "${BINDIR}/${TARGET}"
-
 
 examples: ${EXAMPLES} engine
 ${OBJDIR}/1-helloWorld.o: ${EXMDIR}/1-helloWorld.cpp ${EXMDIR}/helpers.h
@@ -507,6 +519,13 @@ ${OBJDIR}/18-helloRenderingToTexture.o: ${EXMDIR}/18-helloRenderingToTexture.cpp
 18-helloRenderingToTexture${EXT}: ${OBJDIR}/18-helloRenderingToTexture.o
 	$(LD) ${EFLAGS} ${OBJDIR}/18-helloRenderingToTexture.o -o 18-helloRenderingToTexture${EXT}
 	${MOVE} 18-helloRenderingToTexture${EXT} ${BINDIR}/18-helloRenderingToTexture${EXT}
+
+${OBJDIR}/19-hello3dAnimation.o: ${EXMDIR}/19-hello3dAnimation.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/19-hello3dAnimation.o ${EXMDIR}/19-hello3dAnimation.cpp
+
+19-hello3dAnimation${EXT}: ${OBJDIR}/19-hello3dAnimation.o
+	$(LD) ${EFLAGS} ${OBJDIR}/19-hello3dAnimation.o -o 19-hello3dAnimation${EXT}
+	${MOVE} 19-hello3dAnimation${EXT} ${BINDIR}/19-hello3dAnimation${EXT}
 
 
 # llvm-objcopy

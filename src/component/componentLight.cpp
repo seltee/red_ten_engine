@@ -41,11 +41,13 @@ void ComponentLight::setupOmniLight(float affectDistance, Vector3 color, bool bC
     bUseShadowPhase = bCastShadows;
 }
 
-bool ComponentLight::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentLight::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
-    if (!isShadowStage)
-        this->tf = tf;
-    return false;
+    this->tf = tf;
+}
+
+void ComponentLight::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
+{
 }
 
 Matrix4 ComponentLight::preparePreShadowPhase(Vector3 cameraPosition)
@@ -100,7 +102,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
         lightShader->setLightDirection(normal);
         lightShader->setLightColor(color);
 
-        CommonShaders::getScreenMesh()->use();
+        CommonShaders::getScreenMesh()->useVertexArray();
         glBlendFunc(GL_ONE, GL_ONE);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }
@@ -114,7 +116,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
         lightShader->setAffectDistance(affectDistance);
         lightShader->setLightColor(color);
 
-        CommonShaders::getScreenMesh()->use();
+        CommonShaders::getScreenMesh()->useVertexArray();
         glBlendFunc(GL_ONE, GL_ONE);
         glDrawArrays(GL_TRIANGLES, 0, 6);
     }

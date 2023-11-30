@@ -87,18 +87,18 @@ void LayerActors::render(RenderTarget *renderTarget)
     // G Buffer phase
     activeCamera->prepareToRender(renderTarget);
 
-    for (auto actor = actors.begin(); actor != actors.end(); ++actor)
+    for (auto &actor : actors)
     {
-        if ((*actor)->isVisible())
+        if (actor->isVisible())
         {
-            (*actor)->onRender(mProjectionView, &sceneLights);
-            if ((*actor)->hasBlended())
-                blends.push_back(*actor);
-            shadowCasters.push_back(*actor);
+            actor->onRender(mProjectionView, &sceneLights);
+            if (actor->hasBlended())
+                blends.push_back(actor);
+            shadowCasters.push_back(actor);
         }
-        if ((*actor)->hasDebugView())
+        if (actor->hasDebugView())
         {
-            debugView.push_back(*actor);
+            debugView.push_back(actor);
         }
     }
 
@@ -118,7 +118,7 @@ void LayerActors::render(RenderTarget *renderTarget)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, renderTarget->getAlbedoTexture());
     glUniform3fv(initialLightningShader->locV3AmbientColor, 1, ambientColor);
-    CommonShaders::getScreenMesh()->use();
+    CommonShaders::getScreenMesh()->useVertexArray();
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
@@ -184,25 +184,58 @@ void LayerActors::render(RenderTarget *renderTarget)
 
     if (blends.size() > 0)
     {
-        for (auto actor = blends.begin(); actor != blends.end(); ++actor)
+        for (auto &actor : blends)
         {
-            (*actor)->onRenderBlended(mProjectionView);
+            actor->onRenderBlended(mProjectionView);
         }
     }
 
     // Debug render
-    if (debugView.size() > 0 && physicsWorld && activeCamera)
+    if (debugView.size() > 0 && activeCamera)
     {
-        for (auto actor = debugView.begin(); actor != debugView.end(); ++actor)
+        for (auto &actor : debugView)
         {
-            auto body = (*actor)->getPhysicsBody();
-            if (body)
+            if (physicsWorld && actor->isBoundingBoxShown())
             {
-                debug->renderBoundingBox(body->getAABB(), &mProjectionView, physicsWorld->getSimScale(), activeCamera->getLineThickness(), Vector3(0.2f, 0.2f, 0.2f));
-                Shape *shape = body->getShape();
-                if (shape)
+                auto body = actor->getPhysicsBody();
+                if (body)
                 {
-                    shape->renderDebug(&mProjectionView, (*actor)->transform.getModelMatrix(), 1.0f / physicsWorld->getSimScale(), activeCamera->getLineThickness());
+                    debug->renderBoundingBox(body->getAABB(), &mProjectionView, physicsWorld->getSimScale(), activeCamera->getLineThickness(), Vector3(0.2f, 0.2f, 0.2f));
+                    Shape *shape = body->getShape();
+                    if (shape)
+                    {
+                        shape->renderDebug(&mProjectionView, actor->transform.getModelMatrix(), 1.0f / physicsWorld->getSimScale(), activeCamera->getLineThickness());
+                    }
+                }
+            }
+
+            // TOFO: move normal rendering to components
+            if (actor->isNormalsShown())
+            {
+                for (auto &component : *actor->getComponents())
+                {
+                    auto mesh = component->getStaticMesh();
+                    if (mesh)
+                    {
+                        auto vAmount = mesh->getVertexAmount();
+                        auto floatsPerVertex = mesh->getFloatsPerVertex();
+                        auto data = mesh->getVertexData();
+
+                        for (int i = 0; i < vAmount; i++)
+                        {
+                            int shift = i * floatsPerVertex;
+                            Vector4 v = Vector4(data[shift + 0], data[shift + 1], data[shift + 2], 1.0f);
+                            Vector3 n = Vector3(data[shift + 3], data[shift + 4], data[shift + 5]);
+
+                            Vector4 vts4 = *actor->transform.getModelMatrix() * *component->transform.getModelMatrix() * v;
+
+                            Vector3 vts3 = Vector3(vts4.x, vts4.y, vts4.z);
+
+                            Vector3 nr = glm::rotate(actor->transform.getRotation() * component->transform.getRotation(), n);
+
+                            debug->renderLine(vts3, vts3 + nr * 0.1f, &mProjectionView, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
+                        }
+                    }
                 }
             }
         }
@@ -217,7 +250,7 @@ void LayerActors::render(RenderTarget *renderTarget)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, renderTarget->getLightningTexture());
     CommonShaders::getScreenShader()->use(m1, m2);
-    CommonShaders::getScreenMesh()->use();
+    CommonShaders::getScreenMesh()->useVertexArray();
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
 

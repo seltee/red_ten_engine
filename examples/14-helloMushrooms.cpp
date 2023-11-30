@@ -20,11 +20,11 @@ public:
         landComponent->addShapeGeometry(landMesh->getGeometry());
     }
 
-    static ResourceMesh *landMesh;
+    static MeshStatic *landMesh;
     static PhongShader *landShader;
 };
 PhongShader *Land::landShader = nullptr;
-ResourceMesh *Land::landMesh = nullptr;
+MeshStatic *Land::landMesh = nullptr;
 
 class Mushroom : public Actor
 {
@@ -66,11 +66,11 @@ public:
     ComponentMesh *mushroomComponent;
     bool flyingAway = false;
 
-    static ResourceMesh *mushroomMesh;
+    static MeshStatic *mushroomMesh;
     static PhongShader *mushroomShader;
 };
 PhongShader *Mushroom::mushroomShader = nullptr;
-ResourceMesh *Mushroom::mushroomMesh = nullptr;
+MeshStatic *Mushroom::mushroomMesh = nullptr;
 
 class Pointer : public ActorPawn
 {
@@ -167,10 +167,8 @@ APPMAIN
     auto mushroomAlbedoTexture = resourceController->addImage("./data/3d/mushroom_albedo.jpg")->getAsTexture();
 
     // our tower
-    auto landMesh = resourceController->addMesh("./data/3d/land.fbx");
-    landMesh->reload();
-    auto mushroomMesh = resourceController->addMesh("./data/3d/mushroom.fbx");
-    mushroomMesh->reload();
+    auto landMesh = resourceController->addMesh("./data/3d/land.fbx")->getAsMeshStatic();
+    auto mushroomMesh = resourceController->addMesh("./data/3d/mushroom.fbx")->getAsMeshStatic();
 
     Land::landMesh = landMesh;
     Land::landShader = new PhongShader();

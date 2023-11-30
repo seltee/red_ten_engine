@@ -185,7 +185,7 @@ void DebugController::renderLine(Vector3 a, Vector3 b, Matrix4 *mProjectionView,
     float colorFloat[3] = {color.x, color.y, color.z};
     shader->provideFloat3Value(shaderColorLoc, 1, colorFloat);
 
-    CommonShaders::getCubeMesh()->use();
+    CommonShaders::getCubeMesh()->useVertexArray();
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }
@@ -205,7 +205,7 @@ void DebugController::renderLine(Matrix4 *model, Matrix4 *mProjectionView, Vecto
     float colorFloat[3] = {color.x, color.y, color.z};
     shader->provideFloat3Value(shaderColorLoc, 1, colorFloat);
 
-    CommonShaders::getCubeMesh()->use();
+    CommonShaders::getCubeMesh()->useVertexArray();
 
     glDrawArrays(GL_TRIANGLES, 0, 36);
 }

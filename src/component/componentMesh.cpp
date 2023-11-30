@@ -12,25 +12,23 @@ ComponentMesh::ComponentMesh() : Component()
     shader = nullptr;
 }
 
-bool ComponentMesh::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentMesh::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
-    if (mesh && shader)
+    if (mesh)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        shader->use(vpMatrix, mModelTransform);
-        mesh->use();
-        if (isShadowStage)
-            glBlendFunc(GL_ZERO, GL_ONE);
-        else
-            prepareColorMode();
-        return true;
+        prepareColorMode();
+        mesh->render(shader, vpMatrix, mModelTransform);
     }
-    return false;
 }
 
-int ComponentMesh::getVertexAmount()
+void ComponentMesh::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
 {
-    return mesh ? mesh->getVertexAmount() : 0;
+    if (mesh)
+    {
+        Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
+        mesh->render(shader, vpMatrix, mModelTransform);
+    }
 }
 
 void ComponentMesh::setMesh(Mesh *mesh)
@@ -53,4 +51,9 @@ void ComponentMesh::setShader(Shader *shader)
 Matrix4 ComponentMesh::getLocalspaceMatrix()
 {
     return *transform.getModelMatrix();
+}
+
+MeshStatic *ComponentMesh::getStaticMesh()
+{
+    return mesh->getAsStatic();
 }

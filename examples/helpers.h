@@ -26,7 +26,7 @@ public:
         }
 
         auto sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
+        sphereComponent->setMesh(sphereMesh->getAsMeshStatic());
         sphereComponent->setShader(sphereShader);
         sphereComponent->addShapeSphere(0.4f);
 
@@ -128,59 +128,3 @@ public:
 };
 PhongShader *Platform::platformShader = nullptr;
 Mesh *Platform::platformMesh = nullptr;
-
-
-class Capsule : public Actor, public WithRepository
-{
-public:
-    Capsule() : Actor()
-    {
-        registerClassName("Capsule");
-    }
-
-    void onSpawned()
-    {
-        auto sphereMesh = repository->addMesh("./data/3d/concrete_ball.fbx");
-        auto sphereAlbedoTexture = repository->addImage("./data/3d/concrete_ball_albedo.jpg")->getAsTexture();
-        auto sphereNormalTexture = repository->addImage("./data/3d/concrete_ball_normal.jpg")->getAsTexture();
-
-        if (!sphereShader)
-        {
-            sphereShader = new PhongShader();
-            sphereShader->setTexture(TextureType::Albedo, sphereAlbedoTexture);
-            sphereShader->setTexture(TextureType::Normal, sphereNormalTexture);
-        }
-
-        auto sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
-        sphereComponent->setShader(sphereShader);
-        sphereComponent->addShapeCapsule(1.0f, 0.4f);
-
-        sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
-        sphereComponent->setShader(sphereShader);
-        sphereComponent->transform.setPosition(Vector3(0.0f, -0.5f, 0.0f));
-
-        sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
-        sphereComponent->setShader(sphereShader);
-        sphereComponent->transform.setPosition(Vector3(0.0f, 0.5f, 0.0f));
-
-        sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
-        sphereComponent->setShader(sphereShader);
-        sphereComponent->transform.setPosition(Vector3(0.0f, -0.25f, 0.0f));
-
-        sphereComponent = createComponent<ComponentMesh>();
-        sphereComponent->setMesh(sphereMesh);
-        sphereComponent->setShader(sphereShader);
-        sphereComponent->transform.setPosition(Vector3(0.0f, 0.25f, 0.0f));
-
-        setFrictionAndRestitution(0.7f, 0.3f);
-        setPhysicsMotionType(MotionType::Dynamic);
-    }
-
-    static PhongShader *sphereShader;
-    bool autoremove = true;
-};
-PhongShader *Capsule::sphereShader = nullptr;

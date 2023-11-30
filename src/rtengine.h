@@ -4,7 +4,6 @@
 #pragma once
 #include "common/utils.h"
 #include "common/soundPlayer.h"
-#include "common/mesh.h"
 #include "common/pawn.h"
 #include "common/keyboard.h"
 #include "common/meshMaker.h"
@@ -19,6 +18,9 @@
 #include "resource/resourceFont.h"
 #include "resource/resourceSound.h"
 #include "resource/resourceImage.h"
+#include "mesh/mesh.h"
+#include "mesh/meshStatic.h"
+#include "mesh/meshCompound.h"
 #include "actor/actor.h"
 #include "actor/actorPawn.h"
 #include "actor/actorGUIElement.h"

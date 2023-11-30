@@ -21,20 +21,6 @@ public:
         towerComponent->setShader(towerShader);
         towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
 
-        towerComponent = createComponent<ComponentMesh>();
-        towerComponent->setMesh(towerMesh);
-        towerComponent->setShader(towerShader);
-        towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
-        towerComponent->transform.setPosition(0.0f, 0.0f, 0.8f);
-        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
-
-        towerComponent = createComponent<ComponentMesh>();
-        towerComponent->setMesh(towerMesh);
-        towerComponent->setShader(towerShader);
-        towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
-        towerComponent->transform.setPosition(0.0f, 0.0f, -0.8f);
-        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
-
         for (int i = 0; i < LIGHT_COUNT; i++)
         {
             light[i] = createComponent<ComponentLight>();
@@ -125,14 +111,14 @@ APPMAIN
     }
 
     // View setup
-    auto view = viewController->createView("Example \"12. Hello 3D\"");
+    auto view = viewController->createView("Example \"19. Hello Animation\"");
 
     // Stage setup
     auto stageController = engine->getStageController();
-    auto stage = stageController->createStage("Hello 3D");
+    auto stage = stageController->createStage("Hello Animation");
 
     // Layers and camera setup
-    auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
+    auto layerActors = stage->createLayerActors("Hello Animation Layer", 0);
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
 
@@ -145,15 +131,11 @@ APPMAIN
     auto concreteAlbedoTexture = resourceController->addImage("./data/3d/concrete_albedo.jpg")->getAsTexture();
     auto concreteNormalTexture = resourceController->addImage("./data/3d/concrete_normal.jpg")->getAsTexture();
 
-    auto towerAlbedoTexture = resourceController->addImage("./data/3d/tower_albedo.png")->getAsTexture();
-    auto towerEmissionTexture = resourceController->addImage("./data/3d/tower_emission.png")->getAsTexture();
-    auto towerNormalTexture = resourceController->addImage("./data/3d/tower_normal.png")->getAsTexture();
-
     // our floor
     auto plainMesh = engine->getMeshMaker()->createPlane({1.0f, 1.0f}, 3.0f);
 
     // our tower
-    auto towerMesh = resourceController->addMesh("./data/3d/tower.fbx")->getAsMeshStatic();
+    auto towerMesh = resourceController->addMesh("./data/3d/figures.fbx")->getAsMeshStatic();
 
     Town::floorMesh = plainMesh;
     Town::towerMesh = towerMesh;
@@ -163,9 +145,8 @@ APPMAIN
     Town::floorShader->setTexture(TextureType::Normal, concreteNormalTexture);
 
     Town::towerShader = new PhongShader();
-    Town::towerShader->setTexture(TextureType::Albedo, towerAlbedoTexture);
-    Town::towerShader->setTexture(TextureType::Emission, towerEmissionTexture);
-    Town::towerShader->setTexture(TextureType::Normal, towerNormalTexture);
+    Town::towerShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
+    Town::towerShader->setTexture(TextureType::Normal, concreteNormalTexture);
 
     // town
     auto town = layerActors->createActor<Town>();

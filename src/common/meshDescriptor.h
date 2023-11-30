@@ -35,12 +35,13 @@ struct Polygon
 class MeshDescriptor
 {
 public:
-    MeshDescriptor(MeshDescriptor *parent = nullptr);
+    MeshDescriptor();
+    ~MeshDescriptor();
 
     void provideVertex(double *list, int countOfDoubles);
-    void providePolygonIndexes(int *list, int countOfInts);
+    void providePolygonIndexes(int *list, int countOfIndexes);
     void provideUVData(double *list, int countOfDoubles);
-    void provideUVIndexes(int *list, int countOfInts);
+    void provideUVIndexes(int *list, int countOfIndexes);
     void provideNormals(double *list, int countOfDoubles);
 
     float *getAsFloatArray8f(int *amountOfFloats);
@@ -59,6 +60,4 @@ protected:
 
     int *uvIndexes = nullptr;
     int uvIndexesAmount = 0;
-
-    MeshDescriptor *parent;
 };

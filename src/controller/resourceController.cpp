@@ -107,7 +107,7 @@ void ResourceController::loadAll()
     for (auto &it : images)
         it->preload();
     for (auto &it : meshes)
-        it->reload();
+        it->preload();
     for (auto &it : sounds)
         it->load();
 }

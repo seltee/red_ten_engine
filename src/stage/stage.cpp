@@ -61,7 +61,7 @@ void Stage::present(View *view)
 
     glBindTexture(GL_TEXTURE_2D, viewRenderTarget->getResultTexture());
 
-    CommonShaders::getScreenMesh()->use();
+    CommonShaders::getScreenMesh()->useVertexArray();
     glDrawArrays(GL_TRIANGLES, 0, 6);
 
     profiler->stopTracking(presentTrackerId);

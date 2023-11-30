@@ -3,28 +3,27 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/mesh.h"
+#include "mesh/mesh.h"
+#include "mesh/meshCompound.h"
+#include "mesh/meshStatic.h"
 #include "connector/withLogger.h"
 #include "resource/resource.h"
+#include "loaders3d/loader3d.h"
 #include <string>
 
-class ResourceMesh : public Mesh, public WithLogger, public Resource
+class ResourceMesh : public WithLogger, public Resource
 {
 public:
     EXPORT ResourceMesh(std::string meshPath);
     EXPORT ~ResourceMesh();
 
-    EXPORT void reload();
-    EXPORT bool isLoaded();
+    EXPORT MeshCompound *getAsMeshCompound();
+    EXPORT MeshStatic *getAsMeshStatic();
+
     EXPORT Geometry *getGeometry();
 
-    // positions
-    // x, y, z - nx, ny, nz - u, v
-    EXPORT void setupByArray8f(const float *data, int amount);
-
-    EXPORT void use();
+    inline void preload() { getAsMeshCompound(); }
 
 protected:
-    bool bLoaded = false;
-    Geometry *geometry = nullptr;
+    MeshCompound *meshCompound = nullptr;
 };

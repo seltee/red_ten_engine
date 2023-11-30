@@ -96,7 +96,7 @@ APPMAIN
     platformShader->setTexture(TextureType::Albedo, platformAlbedoTexture);
 
     auto platformComponent = platform->createComponent<ComponentMesh>();
-    auto platformMesh = resourceController->addMesh("./data/3d/platform.fbx");
+    auto platformMesh = resourceController->addMesh("./data/3d/platform.fbx")->getAsMeshStatic();
     platformComponent->setMesh(platformMesh);
     platformComponent->setShader(platformShader);
     platformComponent->addShapeGeometry(platformMesh->getGeometry());

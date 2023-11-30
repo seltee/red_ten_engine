@@ -1,10 +1,11 @@
 #pragma once
-#include "common/mesh.h"
+#include "mesh/mesh.h"
+#include "mesh/meshStatic.h"
 #include "math/math.h"
 
 class MeshMaker
 {
 public:
-    EXPORT Mesh *createBox(Vector3 dimensions);
-    EXPORT Mesh *createPlane(Vector2 dimensions, float UVScale = 1.0f);
+    EXPORT MeshStatic *createBox(Vector3 dimensions);
+    EXPORT MeshStatic *createPlane(Vector2 dimensions, float UVScale = 1.0f);
 };

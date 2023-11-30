@@ -15,7 +15,7 @@ ComponentFramedSprite::ComponentFramedSprite() : Component()
     colorMode = ComponentColorMode::Alpha;
 }
 
-bool ComponentFramedSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentFramedSprite::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
     if (texture)
     {
@@ -28,16 +28,15 @@ bool ComponentFramedSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *t
         shader->setFrameSize(frameRenderSize);
 
         texture->bind();
-        CommonShaders::getSpriteMesh()->use();
+        CommonShaders::getSpriteMesh()->useVertexArray();
         prepareColorMode();
-        return true;
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
-    return false;
 }
 
-int ComponentFramedSprite::getVertexAmount()
+void ComponentFramedSprite::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
 {
-    return 6;
 }
 
 void ComponentFramedSprite::setOpacity(float opacity)
@@ -82,8 +81,8 @@ void ComponentFramedSprite::setTexture(Texture *texture)
     calcFrameRenderSize();
 }
 
-
-Texture *ComponentFramedSprite::getTexture(){
+Texture *ComponentFramedSprite::getTexture()
+{
     return texture;
 }
 

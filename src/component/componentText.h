@@ -15,8 +15,8 @@ public:
     EXPORT ComponentText();
     EXPORT ~ComponentText();
 
-    EXPORT bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
-    EXPORT virtual int getVertexAmount();
+    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
 
     EXPORT void setOpacity(float opacity);
     EXPORT float getOpacity();

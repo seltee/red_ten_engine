@@ -25,9 +25,9 @@ extern const char *omniFragmentCode;
 extern const char *debugCubeVertexCode;
 extern const char *debugCubeFragmentCode;
 
-Mesh *CommonShaders::spriteMesh = nullptr;
-Mesh *CommonShaders::cubeMesh = nullptr;
-Mesh *CommonShaders::screenMesh = nullptr;
+MeshStatic *CommonShaders::spriteMesh = nullptr;
+MeshStatic *CommonShaders::cubeMesh = nullptr;
+MeshStatic *CommonShaders::screenMesh = nullptr;
 
 Shader *CommonShaders::spriteShader = nullptr;
 Shader *CommonShaders::spriteFrameShader = nullptr;
@@ -47,15 +47,15 @@ void CommonShaders::build()
 
     // 3 - position, 2 - UV
     int fullAttributeSizes[2] = {3, 2};
-    spriteMesh = new Mesh();
+    spriteMesh = new MeshStatic();
     spriteMesh->setupFloatsArray(spriteData, 6, 2, fullAttributeSizes);
 
-    screenMesh = new Mesh();
+    screenMesh = new MeshStatic();
     screenMesh->setupFloatsArray(screenData, 6, 2, fullAttributeSizes);
 
     // 3 - position
     int triAttributeSizes[1] = {3};
-    cubeMesh = new Mesh();
+    cubeMesh = new MeshStatic();
     cubeMesh->setupFloatsArray(cubeData, 36, 1, triAttributeSizes);
 
     logger->logff("base meshes compiled\n");
@@ -144,21 +144,6 @@ LightningShader *CommonShaders::getOmniShader()
 RawShader *CommonShaders::getDebugCubeShader()
 {
     return debugCubeShader;
-}
-
-Mesh *CommonShaders::getScreenMesh()
-{
-    return screenMesh;
-}
-
-Mesh *CommonShaders::getSpriteMesh()
-{
-    return spriteMesh;
-}
-
-Mesh *CommonShaders::getCubeMesh()
-{
-    return cubeMesh;
 }
 
 float spriteData[] = {

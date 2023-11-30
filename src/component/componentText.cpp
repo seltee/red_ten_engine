@@ -22,7 +22,7 @@ EXPORT ComponentText::~ComponentText()
         glDeleteTextures(1, &textureID);
 }
 
-bool ComponentText::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentText::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
     if (isStringDirty)
         rebuildString();
@@ -41,16 +41,15 @@ bool ComponentText::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool 
         glActiveTexture((unsigned int)TextureSlot::TEXTURE_0);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
-        CommonShaders::getSpriteMesh()->use();
+        CommonShaders::getSpriteMesh()->useVertexArray();
         prepareColorMode();
-        return true;
+
+        glDrawArrays(GL_TRIANGLES, 0, 6);
     }
-    return false;
 }
 
-int ComponentText::getVertexAmount()
-{
-    return 6;
+void ComponentText::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf){
+
 }
 
 void ComponentText::setOpacity(float opacity)

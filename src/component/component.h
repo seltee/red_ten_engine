@@ -5,6 +5,7 @@
 #include "common/utils.h"
 #include "common/entity.h"
 #include "math/math.h"
+#include "mesh/meshStatic.h"
 #include "math/transformation.h"
 #include "physics/shapes/shape.h"
 #include "physics/shapes/shapeBox.h"
@@ -29,15 +30,13 @@ public:
     EXPORT void prepare(Entity *owner);
     EXPORT virtual void process(float delta);
 
-    EXPORT void render(Matrix4 &vpMatrix, Transformation *tf);
-    EXPORT void shadowRender(Matrix4 &vpMatrix, Transformation *tf);
     EXPORT virtual void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture);
     EXPORT virtual Matrix4 preparePreShadowPhase(Vector3 cameraPosition);
 
+    EXPORT virtual void onRender(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT virtual void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
     EXPORT virtual void onCreated();
-    EXPORT virtual bool onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage);
     EXPORT void prepareColorMode();
-    EXPORT virtual int getVertexAmount();
 
     EXPORT ShapeSphere *addShapeSphere(float radius);
     EXPORT ShapeSphere *addShapeSphere(Vector3 center, float radius);
@@ -55,6 +54,8 @@ public:
     EXPORT ShapeCapsule *addShapeCapsule(float height, float radius);
 
     EXPORT virtual Matrix4 getLocalspaceMatrix();
+
+    EXPORT virtual MeshStatic *getStaticMesh();
 
     EXPORT inline bool isUsingBlendingPhase() { return colorMode != ComponentColorMode::Lit; }
     EXPORT inline bool isUsingLightPhase() { return bUseLightPhase; }

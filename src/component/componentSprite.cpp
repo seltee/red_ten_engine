@@ -15,7 +15,7 @@ ComponentSprite::ComponentSprite() : Component()
     colorMode = ComponentColorMode::Alpha;
 }
 
-bool ComponentSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, bool isShadowStage)
+void ComponentSprite::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
     Matrix4 mOut = *tf->getModelMatrix() * *transform.getModelMatrix() * mAnchor;
 
@@ -30,15 +30,14 @@ bool ComponentSprite::onRenderPrepare(Matrix4 &vpMatrix, Transformation *tf, boo
         texture->bind();
     }
 
-    CommonShaders::getSpriteMesh()->use();
+    CommonShaders::getSpriteMesh()->useVertexArray();
     prepareColorMode();
 
-    return true;
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-int ComponentSprite::getVertexAmount()
+void ComponentSprite::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
 {
-    return 6;
 }
 
 void ComponentSprite::setOpacity(float opacity)
