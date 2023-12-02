@@ -70,7 +70,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
-			${OBJDIR}/componentMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
+			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/stb_vorbis.o \
@@ -85,7 +85,9 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o \
 			${OBJDIR}/audioBase.o ${OBJDIR}/audioSource.o \
 			${OBJDIR}/mesh.o ${OBJDIR}/meshCompound.o ${OBJDIR}/meshStatic.o \
-			${OBJDIR}/loader3d.o ${OBJDIR}/loaderFBX.o
+			${OBJDIR}/loader3d.o \
+			${OBJDIR}/loaderFBX.o ${OBJDIR}/FBXNode.o ${OBJDIR}/FBXAnimationStack.o ${OBJDIR}/FBXAnimationCurveNode.o ${OBJDIR}/FBXAnimationCurve.o ${OBJDIR}/FBXAnimationLayer.o \
+			${OBJDIR}/animation.o ${OBJDIR}/animator.o ${OBJDIR}/animationTarget.o
 
 
 EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
@@ -232,6 +234,9 @@ ${OBJDIR}/componentText.o: ${SRCDIR}/component/componentText.cpp
 
 ${OBJDIR}/componentMesh.o: ${SRCDIR}/component/componentMesh.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentMesh.o ${SRCDIR}/component/componentMesh.cpp
+
+${OBJDIR}/componentAnimatedMesh.o: ${SRCDIR}/component/componentAnimatedMesh.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/componentAnimatedMesh.o ${SRCDIR}/component/componentAnimatedMesh.cpp
 
 ${OBJDIR}/componentLight.o: ${SRCDIR}/component/componentLight.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentLight.o ${SRCDIR}/component/componentLight.cpp
@@ -388,6 +393,32 @@ ${OBJDIR}/loader3d.o: ${SRCDIR}/loaders3d/loader3d.cpp
 
 ${OBJDIR}/loaderFBX.o: ${SRCDIR}/loaders3d/loaderFBX.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/loaderFBX.o ${SRCDIR}/loaders3d/loaderFBX.cpp
+
+${OBJDIR}/FBXNode.o: ${SRCDIR}/loaders3d/FBXNode.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXNode.o ${SRCDIR}/loaders3d/FBXNode.cpp
+
+${OBJDIR}/FBXAnimationStack.o: ${SRCDIR}/loaders3d/FBXAnimationStack.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationStack.o ${SRCDIR}/loaders3d/FBXAnimationStack.cpp
+
+${OBJDIR}/FBXAnimationCurveNode.o: ${SRCDIR}/loaders3d/FBXAnimationCurveNode.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurveNode.o ${SRCDIR}/loaders3d/FBXAnimationCurveNode.cpp
+
+${OBJDIR}/FBXAnimationCurve.o: ${SRCDIR}/loaders3d/FBXAnimationCurve.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurve.o ${SRCDIR}/loaders3d/FBXAnimationCurve.cpp
+
+${OBJDIR}/FBXAnimationLayer.o: ${SRCDIR}/loaders3d/FBXAnimationLayer.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationLayer.o ${SRCDIR}/loaders3d/FBXAnimationLayer.cpp
+
+${OBJDIR}/animation.o: ${SRCDIR}/animation/animation.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/animation.o ${SRCDIR}/animation/animation.cpp
+	
+${OBJDIR}/animator.o: ${SRCDIR}/animation/animator.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/animator.o ${SRCDIR}/animation/animator.cpp
+
+${OBJDIR}/animationTarget.o: ${SRCDIR}/animation/animationTarget.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/animationTarget.o ${SRCDIR}/animation/animationTarget.cpp
+
+	
 
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)

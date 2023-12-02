@@ -119,6 +119,7 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Animation Layer", 0);
+    layerActors->setAmbientColor(0.75f, 0.75f, 0.75f);
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
 
@@ -134,31 +135,38 @@ APPMAIN
     // our floor
     auto plainMesh = engine->getMeshMaker()->createPlane({1.0f, 1.0f}, 3.0f);
 
+    auto floorShader = new PhongShader();
+    floorShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
+    floorShader->setTexture(TextureType::Normal, concreteNormalTexture);
+
+    auto floorActor = layerActors->createActor<Actor>();
+    auto floorComponent = floorActor->createComponent<ComponentMesh>();
+    floorComponent->setMesh(plainMesh);
+    floorComponent->setShader(floorShader);
+    floorComponent->transform.setScale(5.0f, 5.0f, 5.0f);
+
     // our tower
-    auto towerMesh = resourceController->addMesh("./data/3d/figures.fbx")->getAsMeshStatic();
+    auto animatedMeshResource = resourceController->addMesh("./data/3d/figures.fbx");
+    auto animatedMesh = animatedMeshResource->getAsMeshCompound();
 
-    Town::floorMesh = plainMesh;
-    Town::towerMesh = towerMesh;
+    auto animMeshShader = new PhongShader();
+    animMeshShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
+    animMeshShader->setTexture(TextureType::Normal, concreteNormalTexture);
 
-    Town::floorShader = new PhongShader();
-    Town::floorShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
-    Town::floorShader->setTexture(TextureType::Normal, concreteNormalTexture);
-
-    Town::towerShader = new PhongShader();
-    Town::towerShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
-    Town::towerShader->setTexture(TextureType::Normal, concreteNormalTexture);
-
-    // town
-    auto town = layerActors->createActor<Town>();
-    town->transform.setScale(2.0f, 2.0f, 2.0f);
+    auto animActor = layerActors->createActor<Actor>();
+    animActor->transform.setScale(0.5f, 0.5f, 0.5f);
+    auto animComponent = animActor->createComponent<ComponentAnimatedMesh>();
+    animComponent->setMesh(animatedMesh);
+    animComponent->setShader(animMeshShader);
+    auto animator = animComponent->createAnimator(animatedMeshResource->getFirstAnimation());
+    animator->play();
 
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 1.0f, -0.5f), Vector3(0.3f, 0.3f, 0.6f), true);
+    sunComponent->setupSunLight(Vector3(-1.0f, 1.0f, -0.5f), Vector3(0.55f, 0.55f, 0.5f), true);
 
     float cameraRotation = 0.0f;
-    float sunRotation = 0.0f;
 
     // Shadow quality switch GUI
     GUISimpleButton::font = resourceController->addFont("./data/BebasNeue-Regular.ttf", 32);
@@ -186,19 +194,11 @@ APPMAIN
         viewController->processEvents();
 
         cameraRotation += delta * 0.3f;
-        sunRotation += delta * 0.1f;
 
         const float cameraDistance = 4.8f;
         const float cameraHeight = 3.6f;
         camera->transform.setPosition(sinf(cameraRotation) * cameraDistance, cameraHeight, cosf(cameraRotation) * cameraDistance);
         camera->lookAt(0.0f, 0.0f, 0.0f);
-
-        float effectiveLight = fmaxf(sinf(sunRotation), 0.0f);
-        layerActors->setAmbientColor(0.05f + effectiveLight * 0.4f, 0.05f + effectiveLight * 0.4f, 0.09f + effectiveLight * 0.4f);
-        sunComponent->setupSunLight(
-            Vector3(cosf(sunRotation) + 0.5f, sinf(sunRotation), cosf(sunRotation)),
-            Vector3(0.7f + (1.0f - effectiveLight) * 0.4f, 0.7f, 0.7f) * effectiveLight,
-            true);
 
         // Camera flying effect
         cameraMovementDelta += delta * 0.25f;

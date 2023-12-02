@@ -22,8 +22,13 @@ public:
 
     EXPORT Geometry *getGeometry();
 
+    EXPORT Animation *getFirstAnimation();
+    EXPORT std::vector<Animation *> getAnimations();
+    EXPORT Animation *getAnimationByName(std::string name);
+
     inline void preload() { getAsMeshCompound(); }
 
 protected:
     MeshCompound *meshCompound = nullptr;
+    std::vector<Animation *> animations;
 };

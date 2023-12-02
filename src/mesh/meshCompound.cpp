@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "mesh/meshCompound.h"
 #include <algorithm>
 
@@ -11,7 +14,31 @@ MeshCompound::~MeshCompound()
 
 void MeshCompound::render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix)
 {
-    printf("COMPOUND RENDER\n");
+    for (auto &node : nodes)
+    {
+        Matrix4 local = modelMatrix * getTransformationMatrix(node);
+        node->mesh->render(shader, vpMatrix, local);
+    }
+}
+
+void MeshCompound::renderAnimation(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix, std::vector<Animator *> animators)
+{
+    for (auto &node : nodes)
+    {
+        Transformation transformation;
+        bool bUseAnimationTransform = false;
+        for (auto &animator : animators)
+        {
+            std::string name = node->mesh->getName();
+            if (animator->getAnimation() && animator->getAnimation()->getAnimationTransformation(name, animator->time, &transformation))
+            {
+                bUseAnimationTransform = true;
+            }
+        }
+
+        Matrix4 local = modelMatrix * (bUseAnimationTransform ? *transformation.getModelMatrix() : getTransformationMatrix(node));
+        node->mesh->render(shader, vpMatrix, local);
+    }
 }
 
 Mesh *MeshCompound::createInstance()

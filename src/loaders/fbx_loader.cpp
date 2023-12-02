@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "fbx_loader.h"
 #include "loaders/stb_image.h"
 
@@ -83,8 +86,8 @@ void Node::readValues()
     if (!propertyListLen)
         return;
 
-    int rawLength = 0, p = 0, b = 0, iValue;
-    unsigned int stringLength = 0, arrayLength, encoding, compressedLength, destLen, sourceLen, dataLength;
+    int rawLength = 0, p = 0;
+    unsigned int stringLength = 0, arrayLength, encoding, compressedLength, destLen;
     double dValue;
     long int longValue;
 
@@ -118,7 +121,6 @@ void Node::readValues()
             break;
 
         case 'I':
-            iValue = *((int *)&property[p + 1]);
             p += 5;
             iData = (int *)malloc(sizeof(int));
             *iData = dValue;
@@ -152,11 +154,9 @@ void Node::readValues()
             encoding = *((unsigned int *)&property[p + 5]);
             compressedLength = *((unsigned int *)&property[p + 9]);
             destLen = arrayLength * sizeof(double);
-            sourceLen = compressedLength;
 
             p += 13;
             dData = (double *)malloc(destLen);
-            dataLength = arrayLength;
 
             if (encoding)
                 b = stbi_zlib_decode_buffer((char *)dData, destLen, &property[p], compressedLength);
@@ -171,11 +171,9 @@ void Node::readValues()
             encoding = *((unsigned int *)&property[p + 5]);
             compressedLength = *((unsigned int *)&property[p + 9]);
             destLen = arrayLength * sizeof(int);
-            sourceLen = compressedLength;
 
             p += 13;
             iData = (int *)malloc(destLen);
-            dataLength = arrayLength;
 
             if (encoding)
                 b = stbi_zlib_decode_buffer((char *)iData, destLen, &property[p], compressedLength);

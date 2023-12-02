@@ -141,6 +141,7 @@ APPMAIN
         stage->present(view);
     }
 
+    delete actorFactory;
     engine->destroy();
     return 0;
 }

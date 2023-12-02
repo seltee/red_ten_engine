@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "loaders3d/loader3d.h"
 
 Loader3d::Loader3d(std::string path)
@@ -29,4 +32,10 @@ File3dFormat Loader3d::getFormat(std::string fileName)
 MeshCompound *Loader3d::getMeshCompound()
 {
     return nullptr;
+}
+
+std::vector<Animation *> Loader3d::getAnimations()
+{
+    std::vector<Animation *> v;
+    return v;
 }

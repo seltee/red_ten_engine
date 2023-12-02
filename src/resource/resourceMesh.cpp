@@ -43,6 +43,7 @@ MeshCompound *ResourceMesh::getAsMeshCompound()
     if (loader)
     {
         meshCompound = loader->getMeshCompound();
+        animations = loader->getAnimations();
         delete loader;
         return meshCompound;
     }
@@ -63,5 +64,25 @@ Geometry *ResourceMesh::getGeometry()
     MeshCompound *mesh = getAsMeshCompound();
     if (mesh)
         return mesh->getGeometry();
+    return nullptr;
+}
+
+Animation *ResourceMesh::getFirstAnimation()
+{
+    return animations.size() > 0 ? animations.at(0) : nullptr;
+}
+
+std::vector<Animation *> ResourceMesh::getAnimations()
+{
+    return animations;
+}
+
+Animation *ResourceMesh::getAnimationByName(std::string name)
+{
+    for (auto &anim : animations)
+    {
+        if (anim->getName() == name)
+            return anim;
+    }
     return nullptr;
 }

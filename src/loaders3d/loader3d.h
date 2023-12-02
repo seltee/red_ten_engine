@@ -3,7 +3,9 @@
 
 #pragma once
 #include "mesh/meshCompound.h"
+#include "animation/animation.h"
 #include <string>
+#include <vector>
 
 enum class File3dFormat
 {
@@ -22,4 +24,6 @@ public:
 
     static File3dFormat getFormat(std::string fileName);
     virtual MeshCompound *getMeshCompound();
+
+    virtual std::vector<Animation *> getAnimations();
 };

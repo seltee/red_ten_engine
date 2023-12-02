@@ -50,6 +50,7 @@
 #include "component/componentSoundPlayer.h"
 #include "component/componentText.h"
 #include "component/componentMesh.h"
+#include "component/componentAnimatedMesh.h"
 #include "component/componentLight.h"
 #include "component/componentCameraOrto.h"
 #include "component/componentCameraPerspective.h"
