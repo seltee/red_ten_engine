@@ -48,6 +48,7 @@ public:
         sphereComponent->setMesh(sphereMesh);
         sphereComponent->setShader(sphereShader);
         sphereComponent->addShapeSphere(0.4f);
+        sphereComponent->transform.setScale(0.01f, 0.01f, 0.01f);
 
         sphere->setFrictionAndRestitution(0.8f, 0.1f);
         sphere->setPhysicsMotionType(MotionType::Dynamic);
@@ -63,6 +64,7 @@ public:
         auto platformComponent = platform->createComponent<ComponentMesh>();
         platformComponent->setMesh(platformMesh);
         platformComponent->setShader(platformShader);
+        platformComponent->transform.setScale(Vector3(0.01f));
         platformComponent->addShapeGeometry(platformMesh->getGeometry());
 
         platform->setFrictionAndRestitution(0.6f, 0.1f);

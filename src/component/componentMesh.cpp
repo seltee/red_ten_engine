@@ -18,7 +18,23 @@ void ComponentMesh::onRender(Matrix4 &vpMatrix, Transformation *tf)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
         prepareColorMode();
-        mesh->render(shader, vpMatrix, mModelTransform);
+        if (lods.size() > 0)
+        {
+            float distance = fabsf((vpMatrix * mModelTransform * Vector4(0, 0, 0, 1.0f)).z);
+            Mesh *toRender = mesh;
+            for (auto &lod : lods)
+            {
+                if (lod.distance < distance)
+                    toRender = lod.mesh;
+                else
+                    break;
+            }
+            toRender->getAsStatic()->render(shader, vpMatrix, mModelTransform);
+        }
+        else
+        {
+            mesh->getAsStatic()->render(shader, vpMatrix, mModelTransform);
+        }
     }
 }
 
@@ -56,4 +72,9 @@ Matrix4 ComponentMesh::getLocalspaceMatrix()
 MeshStatic *ComponentMesh::getStaticMesh()
 {
     return mesh->getAsStatic();
+}
+
+void ComponentMesh::addLod(Mesh *mesh, float distance)
+{
+    lods.push_back({mesh, distance});
 }

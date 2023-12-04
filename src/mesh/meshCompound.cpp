@@ -21,23 +21,25 @@ void MeshCompound::render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatri
     }
 }
 
-void MeshCompound::renderAnimation(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix, std::vector<Animator *> animators)
+void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators)
 {
-    for (auto &node : nodes)
+    cache->clear();
+    for (auto node : nodes)
     {
-        Transformation transformation;
-        bool bUseAnimationTransform = false;
-        for (auto &animator : animators)
-        {
-            std::string name = node->mesh->getName();
-            if (animator->getAnimation() && animator->getAnimation()->getAnimationTransformation(name, animator->time, &transformation))
-            {
-                bUseAnimationTransform = true;
-            }
-        }
+        // printf("Node %s\n", node->mesh->getName().c_str());
+        // printf("%f %f %f\n", node->transform.getPosition().x, node->transform.getPosition().y, node->transform.getPosition().z);
+        // printf("%f %f %f\n", node->transform.getScale().x, node->transform.getScale().y, node->transform.getScale().z);
 
-        Matrix4 local = modelMatrix * (bUseAnimationTransform ? *transformation.getModelMatrix() : getTransformationMatrix(node));
-        node->mesh->render(shader, vpMatrix, local);
+        Matrix4 local = modelMatrix * getAnimatedTransformationMatrix(cache, node, animators);
+        cache->addEntry(node, local);
+    }
+}
+
+void MeshCompound::renderAnimation(Shader *shader, Matrix4 &vpMatrix, MeshCompoundCache *cache)
+{
+    for (auto &container : cache->entriesToRender)
+    {
+        container.node->mesh->render(shader, vpMatrix, container.model);
     }
 }
 
@@ -156,7 +158,7 @@ Matrix4 MeshCompound::getTransformationMatrix(MeshCompoundNode *node)
     }
     else
     {
-        Matrix4 out;
+        Matrix4 out(1.0f);
         std::vector<Matrix4 *> list;
         MeshCompoundNode *current = node;
         while (current)
@@ -171,5 +173,46 @@ Matrix4 MeshCompound::getTransformationMatrix(MeshCompoundNode *node)
         }
 
         return out;
+    }
+}
+
+Matrix4 MeshCompound::getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators)
+{
+    AnimationTarget *target = nullptr;
+    Animator *animator = nullptr;
+    for (auto anim : animators)
+    {
+        auto animation = anim->getAnimation();
+        if (animation)
+        {
+            target = animation->getTargetByName(node->mesh->getName());
+            if (target)
+            {
+                animator = anim;
+                break;
+            }
+        }
+    }
+
+    if (!target || !animator)
+    {
+        if (node->parent)
+        {
+            return getAnimatedTransformationMatrix(cache, node->parent, animators) * *node->transform.getModelMatrix();
+        }
+        else
+            return getTransformationMatrix(node);
+    }
+
+    Transformation transformation;
+    target->getTransformByTime(animator->time, &transformation);
+    if (!node->parent)
+    {
+        return *transformation.getModelMatrix();
+    }
+    else
+    {
+        Matrix4 parentTransformation = getAnimatedTransformationMatrix(cache, node->parent, animators);
+        return parentTransformation * *transformation.getModelMatrix();
     }
 }

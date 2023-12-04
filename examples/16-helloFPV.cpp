@@ -5,6 +5,8 @@
 #include "helpers.h"
 #include <math.h>
 
+// TODO: Finish
+
 class Viewer : public Actor, public WithRepository
 {
 public:
@@ -99,6 +101,7 @@ APPMAIN
     auto platformMesh = resourceController->addMesh("./data/3d/platform.fbx")->getAsMeshStatic();
     platformComponent->setMesh(platformMesh);
     platformComponent->setShader(platformShader);
+    platformComponent->transform.setScale(Vector3(0.01f));
     platformComponent->addShapeGeometry(platformMesh->getGeometry());
 
     platform->setFrictionAndRestitution(0.6f, 0.1f);

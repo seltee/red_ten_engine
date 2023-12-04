@@ -5,6 +5,7 @@
 
 #include "mesh/mesh.h"
 #include "mesh/meshStatic.h"
+#include "mesh/meshCompoundCache.h"
 #include "math/transformation.h"
 #include "animation/animator.h"
 #include <vector>
@@ -18,7 +19,10 @@ public:
     EXPORT ~MeshCompound();
 
     EXPORT void render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix);
-    EXPORT void renderAnimation(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix, std::vector<Animator*> animators);
+
+    EXPORT void prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators);
+    EXPORT void renderAnimation(Shader *shader, Matrix4 &vpMatrix, MeshCompoundCache *cache);
+
     EXPORT Mesh *createInstance();
 
     EXPORT MeshCompoundNode *addMesh(MeshStatic *mesh);
@@ -29,6 +33,7 @@ public:
 protected:
     MeshCompoundNode *getNodeByMesh(Mesh *mesh);
     Matrix4 getTransformationMatrix(MeshCompoundNode *node);
+    Matrix4 getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators);
 
     std::vector<MeshCompoundNode *> nodes;
     MeshStatic *meshStatic = nullptr;

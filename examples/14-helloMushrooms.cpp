@@ -18,6 +18,7 @@ public:
         landComponent->setMesh(landMesh);
         landComponent->setShader(landShader);
         landComponent->addShapeGeometry(landMesh->getGeometry());
+        landComponent->transform.setScale(Vector3(0.01f));
     }
 
     static MeshStatic *landMesh;
@@ -39,13 +40,14 @@ public:
         mushroomComponent = createComponent<ComponentMesh>();
         mushroomComponent->setMesh(mushroomMesh);
         mushroomComponent->setShader(mushroomShader);
+        mushroomComponent->transform.setScale(Vector3(0.005f));
         mushroomComponent->addShapeGeometry(mushroomMesh->getGeometry());
     }
 
     void onProcess(float delta)
     {
         size = fminf(size + delta * 0.5f, 1.0f);
-        mushroomComponent->transform.setScale(size, size, size);
+        mushroomComponent->transform.setScale(Vector3(size * 0.01f));
         if (flyingAway)
         {
             flyingSpeed += delta;

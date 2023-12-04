@@ -16,30 +16,27 @@ public:
         floorComponent->setShader(floorShader);
         floorComponent->transform.setScale(2.5f, 2.5f, 2.5f);
 
-        auto towerComponent = createComponent<ComponentMesh>();
-        towerComponent->setMesh(towerMesh);
-        towerComponent->setShader(towerShader);
-        towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
-
-        towerComponent = createComponent<ComponentMesh>();
-        towerComponent->setMesh(towerMesh);
-        towerComponent->setShader(towerShader);
-        towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
-        towerComponent->transform.setPosition(0.0f, 0.0f, 0.8f);
-        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
-
-        towerComponent = createComponent<ComponentMesh>();
-        towerComponent->setMesh(towerMesh);
-        towerComponent->setShader(towerShader);
-        towerComponent->transform.setScale(0.2f, 0.2f, 0.2f);
-        towerComponent->transform.setPosition(0.0f, 0.0f, -0.8f);
-        towerComponent->transform.setRotation(Vector3(0.0f, CONST_PI, 0.0f));
+        createTower(0.0f, 0.0f, 0.0f);
+        createTower(0.0f, 0.8f, CONST_PI);
+        createTower(0.0f, -0.8f, CONST_PI);
 
         for (int i = 0; i < LIGHT_COUNT; i++)
         {
             light[i] = createComponent<ComponentLight>();
             light[i]->setupOmniLight(0.2f + randf(0.0f, 0.1f), Vector3(0.3f + randf(0.0f, 0.7f), 0.3f + randf(0.0f, 0.7f), 0.3f + randf(0.0f, 0.7f)));
         }
+    }
+
+    void createTower(float positionX, float positionZ, float rotation)
+    {
+        // FBX export from Blender sets 100.0f scale on meshes
+        const float FBXSizeFix = 0.01f;
+        auto towerComponent = createComponent<ComponentMesh>();
+        towerComponent->setMesh(towerMesh);
+        towerComponent->setShader(towerShader);
+        towerComponent->transform.setScale(Vector3(0.2f * FBXSizeFix));
+        towerComponent->transform.setPosition(positionX, 0.0f, positionZ);
+        towerComponent->transform.setRotation(Vector3(0.0f, rotation, 0.0f));
     }
 
     void onProcess(float delta)
@@ -210,7 +207,7 @@ APPMAIN
         const float cameraDistance = 4.8f;
         const float cameraHeight = 3.6f;
         camera->transform.setPosition(sinf(cameraRotation) * cameraDistance, cameraHeight, cosf(cameraRotation) * cameraDistance);
-        camera->lookAt(0.0f, 0.0f, 0.0f);
+        camera->lookAt(0.0f, 0.1f, 0.0f);
 
         float effectiveLight = fmaxf(sinf(sunRotation), 0.0f);
         layerActors->setAmbientColor(0.05f + effectiveLight * 0.4f, 0.05f + effectiveLight * 0.4f, 0.09f + effectiveLight * 0.4f);

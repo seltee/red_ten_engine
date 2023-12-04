@@ -21,7 +21,8 @@ void ComponentAnimatedMesh::onRender(Matrix4 &vpMatrix, Transformation *tf)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
         prepareColorMode();
-        mesh->renderAnimation(shader, vpMatrix, mModelTransform, animators);
+        mesh->prepareCache(&cache, mModelTransform, animators);
+        mesh->renderAnimation(shader, vpMatrix, &cache);
     }
 }
 
@@ -30,7 +31,7 @@ void ComponentAnimatedMesh::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf
     if (mesh)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        mesh->renderAnimation(shader, vpMatrix, mModelTransform, animators);
+        mesh->renderAnimation(shader, vpMatrix, &cache);
     }
 }
 

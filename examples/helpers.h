@@ -29,6 +29,7 @@ public:
         sphereComponent->setMesh(sphereMesh->getAsMeshStatic());
         sphereComponent->setShader(sphereShader);
         sphereComponent->addShapeSphere(0.4f);
+        sphereComponent->transform.setScale(Vector3(0.01f));
 
         setFrictionAndRestitution(0.7f, 0.5f);
         setPhysicsMotionType(MotionType::Dynamic);

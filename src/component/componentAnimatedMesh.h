@@ -10,6 +10,7 @@
 #include "component/component.h"
 #include "shaders/shader.h"
 #include "animation/animator.h"
+#include "mesh/meshCompoundCache.h"
 
 class ComponentAnimatedMesh : public Component
 {
@@ -34,4 +35,5 @@ protected:
     MeshCompound *mesh = nullptr;
     Shader *shader = nullptr;
     std::vector<Animator *> animators;
+    MeshCompoundCache cache;
 };

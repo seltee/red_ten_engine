@@ -12,7 +12,7 @@
 // A curve node can be connected to only one property of one FBX object.
 // Properties such as KFbxNode::LclTranslation contain more than one value (X, Y, Z).
 
-class FBXModelWithIndex;
+struct FBXModelWithIndex;
 
 // type n - none, x - x, y - y, z - z
 struct FBXCurveBinding

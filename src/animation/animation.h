@@ -13,6 +13,7 @@ public:
 
     AnimationTarget *getAnimationTarget(std::string targetName);
     AnimationTarget *createAnimationTarget(std::string targetName);
+    AnimationTarget *getTargetByName(std::string targetName);
 
     bool getAnimationTransformation(std::string &name, float timeStamp, Transformation *transformation);
 

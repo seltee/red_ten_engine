@@ -26,7 +26,7 @@ void ComponentLight::setupSunLight(Vector3 position, Vector3 color, bool bCastSh
     this->color[2] = color.z;
 
     bUseShadowPhase = bCastShadows;
-    this->affectDistance = 32.0f;
+    this->affectDistance = 36.0f;
 }
 
 void ComponentLight::setupOmniLight(float affectDistance, Vector3 color, bool bCastShadows)
@@ -66,20 +66,11 @@ Matrix4 ComponentLight::preparePreShadowPhase(Vector3 cameraPosition)
             float l = -r;
             float b = -affectDistance / 2.0f;
             float t = -b;
-            float f = affectDistance;
+            float f = affectDistance * 2.0f;
             float n = 0.0f;
 
             Matrix4 lightProjectionMatrix = glm::ortho(l, r, b, t, n, f);
             lightViewProjection = lightProjectionMatrix * rotation;
-
-            /*
-                glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-                // Now we need to render scene to the depth buffer
-                glViewport(0, 0, shadowMapWidth, shadowMapHeight);
-                glBindFramebuffer(GL_FRAMEBUFFER, shadowFrameBuffer);
-                glClear(GL_DEPTH_BUFFER_BIT);
-            */
         }
     }
     return lightViewProjection;

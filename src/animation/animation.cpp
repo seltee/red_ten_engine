@@ -30,6 +30,18 @@ AnimationTarget *Animation::createAnimationTarget(std::string targetName)
     return existing;
 }
 
+AnimationTarget *Animation::getTargetByName(std::string targetName)
+{
+    for (auto &target : targets)
+    {
+        if (target->getTargetName() == targetName)
+        {
+            return target;
+        }
+    }
+    return nullptr;
+}
+
 bool Animation::getAnimationTransformation(std::string &name, float timeStamp, Transformation *transformation)
 {
     for (auto &target : targets)

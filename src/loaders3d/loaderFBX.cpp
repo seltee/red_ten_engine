@@ -198,10 +198,10 @@ void LoaderFBX::reload()
                         }
                     }
                     if (transformationType == 'p')
-                        mWithIndex.position = out / 100.0f;
+                        mWithIndex.position = out;
 
                     if (transformationType == 's')
-                        mWithIndex.scale = out / 100.0f;
+                        mWithIndex.scale = out;
 
                     if (transformationType == 'r')
                         mWithIndex.rotation = out * CONST_PI / 180.0f;
@@ -270,13 +270,17 @@ void LoaderFBX::reload()
             {
                 MeshStatic *instance = reinterpret_cast<MeshStatic *>(foundMesh->mesh->createInstance());
                 MeshCompoundNode *meshCompoundNode = meshCompound->addMesh(instance);
-                meshCompoundNode->transform.setPosition(foundModel->position);
-                meshCompoundNode->transform.setRotation(foundModel->rotation);
-
                 if (foundModel->parentIndex)
-                    meshCompoundNode->transform.setScale(foundModel->scale * 100.0f);
+                {
+                    meshCompoundNode->transform.setPosition(foundModel->position);
+                }
                 else
-                    meshCompoundNode->transform.setScale(foundModel->scale);
+                {
+                    meshCompoundNode->transform.setPosition(foundModel->position);
+                }
+
+                meshCompoundNode->transform.setRotation(foundModel->rotation);
+                meshCompoundNode->transform.setScale(foundModel->scale);
 
                 foundModel->mesh = instance;
                 instance->setName(foundModel->name);
@@ -409,9 +413,9 @@ void LoaderFBX::reload()
                                 if (curveNode->hasModelName(anim.modelName))
                                 {
                                     if (curveNode->type == FBXAnimationCurveNodeType::Position)
-                                        anim.keyTransform.position = out / 100.0f;
+                                        anim.keyTransform.position = out;
                                     if (curveNode->type == FBXAnimationCurveNodeType::Scale)
-                                        anim.keyTransform.scale = out / 100.0f;
+                                        anim.keyTransform.scale = out;
                                     if (curveNode->type == FBXAnimationCurveNodeType::Rotation)
                                         anim.keyTransform.rotation = (out / 180.0f) * CONST_PI;
                                 }
@@ -421,10 +425,10 @@ void LoaderFBX::reload()
                         // each timestamp we add transformation to anim bindings
                         for (auto &animBinding : animBindings)
                         {
-                            printf("ANIM %f - %s\n", animBinding.keyTransform.timeStamp, animBinding.modelName.c_str());
-                            printf("p %f %f %f\n", animBinding.keyTransform.position.x, animBinding.keyTransform.position.y, animBinding.keyTransform.position.z);
-                            printf("r %f %f %f\n", animBinding.keyTransform.rotation.x, animBinding.keyTransform.rotation.y, animBinding.keyTransform.rotation.z);
-                            printf("s %f %f %f\n", animBinding.keyTransform.scale.x, animBinding.keyTransform.scale.y, animBinding.keyTransform.scale.z);
+                            // printf("ANIM %f - %s\n", animBinding.keyTransform.timeStamp, animBinding.modelName.c_str());
+                            // printf("p %f %f %f\n", animBinding.keyTransform.position.x, animBinding.keyTransform.position.y, animBinding.keyTransform.position.z);
+                            // printf("r %f %f %f\n", animBinding.keyTransform.rotation.x, animBinding.keyTransform.rotation.y, animBinding.keyTransform.rotation.z);
+                            // printf("s %f %f %f\n", animBinding.keyTransform.scale.x, animBinding.keyTransform.scale.y, animBinding.keyTransform.scale.z);
                             auto animTarget = newAnimation->createAnimationTarget(animBinding.modelName);
                             animTarget->addKey(animBinding.keyTransform);
                         }

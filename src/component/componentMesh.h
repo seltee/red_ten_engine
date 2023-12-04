@@ -8,6 +8,13 @@
 #include "common/texture.h"
 #include "component/component.h"
 #include "shaders/shader.h"
+#include <vector>
+
+struct ComponentMeshLod
+{
+    Mesh *mesh;
+    float distance;
+};
 
 class ComponentMesh : public Component
 {
@@ -24,7 +31,11 @@ public:
 
     EXPORT MeshStatic *getStaticMesh();
 
+    EXPORT void addLod(Mesh *mesh, float distance);
+
 protected:
     Mesh *mesh = nullptr;
     Shader *shader = nullptr;
+
+    std::vector<ComponentMeshLod> lods;
 };
