@@ -4,6 +4,7 @@
 #include "os/view.h"
 #include "opengl/glew.h"
 #include "common/commonShaders.h"
+#include "common/commonTextures.h"
 #include <SDL.h>
 
 View::View(Config *config)
@@ -52,6 +53,9 @@ bool View::makeWindow()
 
         CommonShaders commonShaders;
         commonShaders.build();
+
+        CommonTextures commonTextures;
+        commonTextures.build();
 
         window = newWindow;
 

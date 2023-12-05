@@ -43,6 +43,7 @@ bool LightningShader::build()
             locTGNormal = glGetUniformLocation(programm, "tNormal");
             locTGPosition = glGetUniformLocation(programm, "tPosition");
             locTShadowMap = glGetUniformLocation(programm, "tShadowMap");
+            locTEnvMap = glGetUniformLocation(programm, "tEnvironment");
 
             bIsReady = true;
             return true;
@@ -73,6 +74,8 @@ bool LightningShader::use(Matrix4 mViewProjection, Matrix4 mModel)
         glUniform1i(locTGPosition, 2);
     if (locTShadowMap != -1)
         glUniform1i(locTShadowMap, 3);
+    if (locTEnvMap != -1)
+        glUniform1i(locTEnvMap, 4);
 
     if (locMViewProjection != -1)
         glUniformMatrix4fv(locMViewProjection, 1, GL_FALSE, value_ptr(mViewProjection));

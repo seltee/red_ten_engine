@@ -4,6 +4,8 @@
 #pragma once
 #include "shaders/shader.h"
 #include "shaders/rawShader.h"
+#include "shaders/cubeMapShader.h"
+#include "shaders/initialLightShader.h"
 #include "controller/resourceController.h"
 #include "shaders/lightningShader.h"
 #include "connector/withLogger.h"
@@ -18,12 +20,14 @@ public:
     EXPORT static Shader *getSpriteFrameShader();
     EXPORT static Shader *getScreenShader();
     EXPORT static RawShader *getEffectShader();
-    EXPORT static RawShader *getInitialLightningShader();
+    EXPORT static InitialLightShader *getInitialLightShader();
 
     EXPORT static LightningShader *getSunShader();
     EXPORT static LightningShader *getSunWithShadowShader();
     EXPORT static LightningShader *getOmniShader();
     EXPORT static RawShader *getDebugCubeShader();
+    
+    EXPORT static CubeMapShader *getCubeMapShader();
 
     inline static MeshStatic *getScreenMesh() { return screenMesh; }
     inline static MeshStatic *getSpriteMesh() { return spriteMesh; }
@@ -38,8 +42,9 @@ protected:
     static Shader *spriteFrameShader;
     static Shader *screenShader;
     static RawShader *effectShader;
-    static RawShader *initialLightningShader;
+    static InitialLightShader *initialLightShader;
     static RawShader *debugCubeShader;
+    static CubeMapShader *cubeMapShader;
 
     static LightningShader *sunShader;
     static LightningShader *sunWithShadowShader;

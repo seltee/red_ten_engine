@@ -4,6 +4,7 @@
 #pragma once
 #include "common/utils.h"
 #include "resource/resourceImage.h"
+#include "resource/resourceHDR.h"
 #include "resource/resourceSound.h"
 #include "resource/resourceFont.h"
 #include "resource/resourceMesh.h"
@@ -16,6 +17,9 @@ public:
 
     EXPORT ResourceImage *addImage(std::string path, ByteMap byteMap = ByteMap::None, int byteMapScale = 1);
     EXPORT ResourceImage *getImageByPath(std::string path);
+
+    EXPORT ResourceHDR *addHDRImage(std::string path, float ldrScale = 1.0f, float ldrGamma = 1.0f);
+    EXPORT ResourceHDR *getHDRImageByPath(std::string path);
 
     EXPORT ResourceSound *addSound(std::string path);
     EXPORT ResourceSound *getSoundByPath(std::string path);
@@ -31,6 +35,7 @@ public:
 
 protected:
     std::vector<ResourceImage *> images;
+    std::vector<ResourceHDR *> HDRs;
     std::vector<ResourceSound *> sounds;
     std::vector<ResourceFont *> fonts;
     std::vector<ResourceMesh *> meshes;

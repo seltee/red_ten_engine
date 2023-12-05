@@ -4,6 +4,7 @@
 #include "phongShader.h"
 #include "opengl/glew.h"
 #include "math/glm/gtc/type_ptr.hpp"
+#include "common/commonTextures.h"
 
 extern const char *gShaderVertexCode;
 extern const char *gShaderFragmentCode;
@@ -72,43 +73,9 @@ bool PhongShader::build()
     locShadowMViewProjection = glGetUniformLocation(shadowProgramm, "mViewProjection");
     locShadowMTransform = glGetUniformLocation(shadowProgramm, "mTransform");
 
-    // Grey and Black textures
-    if (tBlack == 0)
-    {
-        const unsigned char blackData[4] = {0x00, 0x00, 0x00, 0xff};
-
-        glGenTextures(1, &tBlack);
-        glBindTexture(GL_TEXTURE_2D, tBlack);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, blackData);
-    }
-
-    if (tGrey == 0)
-    {
-        const unsigned char greyData[4] = {0xAA, 0xAA, 0xAA, 0xff};
-        glGenTextures(1, &tGrey);
-        glBindTexture(GL_TEXTURE_2D, tGrey);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, greyData);
-    }
-
-    if (tZeroNormal == 0)
-    {
-        const unsigned char normalData[4] = {0x80, 0x80, 0xff, 0xff};
-        glGenTextures(1, &tZeroNormal);
-        glBindTexture(GL_TEXTURE_2D, tZeroNormal);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, normalData);
-    }
+    tBlack = CommonTextures::getBlackTexture()->getGLTextureId();
+    tGrey = CommonTextures::getGreyTexture()->getGLTextureId();
+    tZeroNormal = CommonTextures::getZeroNormalTexture()->getGLTextureId();
 
     bIsReady = true;
     return true;

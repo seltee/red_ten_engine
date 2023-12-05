@@ -28,6 +28,27 @@ ResourceImage *ResourceController::getImageByPath(std::string path)
     return nullptr;
 }
 
+ResourceHDR *ResourceController::addHDRImage(std::string path, float ldrScale, float ldrGamma)
+{
+    ResourceHDR *hdr = getHDRImageByPath(path);
+    if (!hdr)
+    {
+        hdr = new ResourceHDR(path, ldrScale, ldrGamma);
+        HDRs.push_back(hdr);
+    }
+    return hdr;
+}
+
+ResourceHDR *ResourceController::getHDRImageByPath(std::string path)
+{
+    for (auto &it : HDRs)
+    {
+        if (it->isPath(path))
+            return it;
+    }
+    return nullptr;
+}
+
 ResourceSound *ResourceController::addSound(std::string path)
 {
     ResourceSound *sound = getSoundByPath(path);

@@ -35,7 +35,7 @@ public:
     unsigned int locV2TexCoordShift;
     unsigned int locV2TexCoordMul;
     unsigned int locFOpacity;
-    unsigned int locV3AmbientColor;
+    unsigned int locV3Normal;
 
 protected:
     const char *vertexCode = nullptr;

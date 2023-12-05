@@ -51,7 +51,6 @@ bool RawShader::build()
             locV2TexCoordShift = glGetUniformLocation(programm, "aTexCoordShift");
             locV2TexCoordMul = glGetUniformLocation(programm, "aTexCoordMul");
             locFOpacity = glGetUniformLocation(programm, "fOpacity");
-            locV3AmbientColor = glGetUniformLocation(programm, "vf3ambientColor");
 
             bIsReady = true;
             return true;

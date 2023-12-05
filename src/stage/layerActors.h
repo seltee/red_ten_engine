@@ -56,6 +56,10 @@ public:
 
     EXPORT void setAmbientColor(float r, float g, float b);
 
+    EXPORT void setHDRTextures(Texture *HDRTexture, Texture *HDRRadianceTexture = nullptr);
+    EXPORT void setHDRRotation(float r);
+    EXPORT void setHDREnvVisibility(bool state);
+
     EXPORT PhysicsWorld *getPhysicsWorld();
 
     EXPORT void showDebugLine(const Segment &ray, const Vector3 &color, float showTime);
@@ -74,4 +78,12 @@ protected:
     int renderingTrackerId = 0;
     int processingTrackerId = 0;
     int physicsTrackerId = 0;
+
+    Texture *HDRTexture = nullptr;
+    Texture *HDRRadianceTexture = nullptr;
+
+    float HDRRotation = 0.0f;
+    bool HDREnvVisibility = true;
+
+    unsigned int tBlack;
 };

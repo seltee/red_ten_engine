@@ -16,8 +16,6 @@ extern const char *screenFragmentShader;
 
 extern const char *clearFragmentShader;
 
-extern const char *initialLightningFragmentCode;
-
 extern const char *sunFragmentCode;
 extern const char *sunWithShadowFragmentCode;
 extern const char *omniFragmentCode;
@@ -33,13 +31,15 @@ Shader *CommonShaders::spriteShader = nullptr;
 Shader *CommonShaders::spriteFrameShader = nullptr;
 Shader *CommonShaders::screenShader = nullptr;
 RawShader *CommonShaders::effectShader = nullptr;
-RawShader *CommonShaders::initialLightningShader = nullptr;
+InitialLightShader *CommonShaders::initialLightShader = nullptr;
 
 LightningShader *CommonShaders::sunShader = nullptr;
 LightningShader *CommonShaders::sunWithShadowShader = nullptr;
 LightningShader *CommonShaders::omniShader = nullptr;
 
 RawShader *CommonShaders::debugCubeShader = nullptr;
+
+CubeMapShader *CommonShaders::cubeMapShader = nullptr;
 
 void CommonShaders::build()
 {
@@ -91,12 +91,14 @@ void CommonShaders::build()
     effectShader->build();
 
     logger->logff("compiling initial lightning shader ...");
-    initialLightningShader = new RawShader(screenVertexShader, initialLightningFragmentCode);
-    initialLightningShader->build();
+    initialLightShader = new InitialLightShader();
 
     logger->logff("compiling debug cube shader ...");
     debugCubeShader = new RawShader(debugCubeVertexCode, debugCubeFragmentCode);
     debugCubeShader->build();
+
+    logger->logff("compiling cube map shader ...");
+    cubeMapShader = new CubeMapShader();
 
     logger->logff("shaders compiled\n");
 }
@@ -121,9 +123,9 @@ RawShader *CommonShaders::getEffectShader()
     return effectShader;
 }
 
-RawShader *CommonShaders::getInitialLightningShader()
+InitialLightShader *CommonShaders::getInitialLightShader()
 {
-    return initialLightningShader;
+    return initialLightShader;
 }
 
 LightningShader *CommonShaders::getSunShader()
@@ -144,6 +146,11 @@ LightningShader *CommonShaders::getOmniShader()
 RawShader *CommonShaders::getDebugCubeShader()
 {
     return debugCubeShader;
+}
+
+CubeMapShader *CommonShaders::getCubeMapShader()
+{
+    return cubeMapShader;
 }
 
 float spriteData[] = {
@@ -264,18 +271,6 @@ const char *clearFragmentShader =
     "   fragColor = vec4(clearColor, 1.0);\n"
     "}\n";
 
-const char *initialLightningFragmentCode =
-    "#version 410 core\n"
-    "out vec4 FragColor;\n"
-    "in vec2 texCoord;\n"
-    "uniform sampler2D tAlbedo;\n"
-    "uniform sampler2D tNormal;\n"
-    "uniform vec3 vf3ambientColor;\n"
-    "void main() {\n"
-    "   vec3 Albedo = texture(tAlbedo, texCoord).rgb;\n"
-    "   vec3 Normal = texture(tNormal, texCoord).rgb;\n"
-    "   FragColor = length(Normal) == 0 ? vec4(0.0, 0, 0, 0.0) : vec4(Albedo * vf3ambientColor, 1.0);\n"
-    "}\n";
 
 const char *sunFragmentCode =
     "#version 410 core\n"
@@ -380,16 +375,16 @@ const char *sunWithShadowFragmentCode =
     "   float NDF = DistributionGGX(Normal, H, Roughness);\n"
     "   float G = GeometrySmith(Normal, V, L, Roughness);\n"
     "   vec3 numerator = NDF * G * F;\n"
-    "   float denominator = 4.0 * max(dot(Normal, V), 0.0) * max(dot(Normal, L), 0.0)  + 0.0001;\n"
-    "   vec3 specular = numerator / denominator;\n"
+    "   float denominator = 4.0 * max(dot(Normal, V), 0.0) * max(dot(Normal, L), 0.0) + 0.0001;\n"
+    "   vec3 Specular = numerator / denominator;\n"
     "   vec3 kS = F;\n"
     "   vec3 kD = vec3(1.0) - kS;\n"
     "   kD *= 1.0 - Metallic;\n"
     "   vec4 FragPosLightSpace = mlightSpace * vec4(FragPos, 1.0);\n"
-    "   float shadow = ShadowCalculation(FragPosLightSpace, Normal);\n"
-    "   float NdotL = max(dot(Normal, L), 0.0);\n" 
-    "   vec3 light = (kD * Albedo / PI + specular) * lightColor * NdotL * (1.0 - shadow);\n"
-    "   FragColor = vec4(light, 0.0);\n"
+    "   float Shadow = ShadowCalculation(FragPosLightSpace, Normal);\n"
+    "   float NdotL = max(dot(Normal, L), 0.0);\n"
+    "   vec3 Light = (kD * Albedo / PI + Specular) * lightColor * NdotL * (1.0 - Shadow);\n"
+    "   FragColor = vec4(Light, 0.0);\n"
     "}\n";
 // ^ Todo
 // F0 = mix(F0, Albedo, Metallic)

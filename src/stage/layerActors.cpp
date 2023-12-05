@@ -1,12 +1,14 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "stage/layerActors.h"
 #include "math/math.h"
+#include "math/glm/gtc/type_ptr.hpp"
 #include "actor/actorGUIElement.h"
 #include "opengl/glew.h"
 #include "common/commonShaders.h"
 #include "component/componentLight.h"
+#include "common/commonTextures.h"
 #include <math.h>
 #include <algorithm>
 
@@ -16,6 +18,8 @@ LayerActors::LayerActors(std::string name, int index) : Layer(name, index)
     processingTrackerId = profiler->addTracker("layer actors \"" + name + "\" processing");
     physicsTrackerId = profiler->addTracker("layer actors \"" + name + "\" physics");
     profiler->setInactive(physicsTrackerId);
+
+    tBlack = CommonTextures::getBlackTexture()->getGLTextureId();
 }
 
 bool compareBodyPoints(PhysicsBodyPoint a, PhysicsBodyPoint b)
@@ -86,7 +90,37 @@ void LayerActors::render(RenderTarget *renderTarget)
 
     // G Buffer phase
     activeCamera->prepareToRender(renderTarget);
+    Vector3 cmPosition = activeCamera->getOwnerTransform() ? activeCamera->getOwnerTransform()->getPosition() : Vector3(0.0f);
 
+    // Render Cube Map
+    if (HDRTexture && HDREnvVisibility)
+    {
+        // TODO: make better setting up for camera
+        // TODO: Orthogrphic camera HDR
+
+        glBlendFunc(GL_ZERO, GL_ONE);
+        glDisable(GL_ALPHA_TEST);
+        glDisable(GL_CULL_FACE);
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
+
+        Transformation t;
+        t.setPosition(cmPosition);
+        t.setScale(Vector3(16.0f, 16.0f, 16.0f));
+        t.setRotation(Vector3(0.0f, HDRRotation, 0.0f));
+
+        auto cubeMapShader = CommonShaders::getCubeMapShader();
+        cubeMapShader->use(mView, *t.getModelMatrix());
+        cubeMapShader->setCubeMap(HDRTexture);
+
+        auto cubeMesh = CommonShaders::getCubeMesh();
+        cubeMesh->render(cubeMapShader, mProjectionView, *t.getModelMatrix());
+
+        // Reset camera parameters
+        activeCamera->prepareToRender(renderTarget);
+    }
+
+    // Render main phase actors
     for (auto &actor : actors)
     {
         if (actor->isVisible())
@@ -111,13 +145,18 @@ void LayerActors::render(RenderTarget *renderTarget)
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
 
-    auto initialLightningShader = CommonShaders::getInitialLightningShader();
+    auto initialLightShader = CommonShaders::getInitialLightShader();
     renderTarget->setupLightning(false);
-    initialLightningShader->use(m1, m2);
+    initialLightShader->use(m1, m2);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderTarget->getAlbedoTexture());
-    glUniform3fv(initialLightningShader->locV3AmbientColor, 1, ambientColor);
+    initialLightShader->setTextureAlbedo(renderTarget->getAlbedoTexture());
+    initialLightShader->setTextureNormal(renderTarget->getNormalTexture());
+    initialLightShader->setTexturePosition(renderTarget->getPositionTexture());
+    initialLightShader->setTextureRadiance(HDRRadianceTexture ? HDRRadianceTexture->getGLTextureId() : tBlack);
+    initialLightShader->setTextureEnvironment(HDRTexture ? HDRTexture->getGLTextureId() : tBlack);
+    initialLightShader->setCameraPosition(cmPosition);
+    initialLightShader->setAmbientColor(ambientColor);
+
     CommonShaders::getScreenMesh()->useVertexArray();
 
     glEnable(GL_BLEND);
@@ -444,6 +483,22 @@ void LayerActors::setAmbientColor(float r, float g, float b)
     ambientColor[0] = r;
     ambientColor[1] = g;
     ambientColor[2] = b;
+}
+
+void LayerActors::setHDRTextures(Texture *HDRTexture, Texture *HDRRadianceTexture)
+{
+    this->HDRTexture = HDRTexture;
+    this->HDRRadianceTexture = HDRRadianceTexture;
+}
+
+void LayerActors::setHDRRotation(float r)
+{
+    this->HDRRotation = r;
+}
+
+void LayerActors::setHDREnvVisibility(bool state)
+{
+    HDREnvVisibility = state;
 }
 
 PhysicsWorld *LayerActors::getPhysicsWorld()

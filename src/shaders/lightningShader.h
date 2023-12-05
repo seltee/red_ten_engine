@@ -32,6 +32,7 @@ public:
     unsigned int locTGNormal;
     unsigned int locTGPosition;
     unsigned int locTShadowMap;
+    unsigned int locTEnvMap;
 
 protected:
     const char *vertexCode = nullptr;

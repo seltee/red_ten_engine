@@ -67,15 +67,15 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/shape.o ${OBJDIR}/shapeBox.o ${OBJDIR}/shapeSphere.o ${OBJDIR}/shapeGeometry.o \
 			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
-			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
+			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceHDR.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/stb_vorbis.o \
-			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
-			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o \
+			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/commonTextures.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
+			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o ${OBJDIR}/cubeMapShader.o ${OBJDIR}/initialLightShader.o \
 			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o ${OBJDIR}/withProfiler.o \
 			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
 			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
@@ -165,6 +165,9 @@ ${OBJDIR}/resourceFont.o: ${SRCDIR}/resource/resourceFont.cpp
 
 ${OBJDIR}/resourceMesh.o: ${SRCDIR}/resource/resourceMesh.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceMesh.o ${SRCDIR}/resource/resourceMesh.cpp
+
+${OBJDIR}/resourceHDR.o: ${SRCDIR}/resource/resourceHDR.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/resourceHDR.o ${SRCDIR}/resource/resourceHDR.cpp
 
 ${OBJDIR}/vector3.o: ${SRCDIR}/math/vector3.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/vector3.o ${SRCDIR}/math/vector3.cpp
@@ -289,6 +292,9 @@ ${OBJDIR}/destroyable.o: ${SRCDIR}/common/destroyable.cpp
 ${OBJDIR}/commonShaders.o: ${SRCDIR}/common/commonShaders.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/commonShaders.o ${SRCDIR}/common/commonShaders.cpp
 
+${OBJDIR}/commonTextures.o: ${SRCDIR}/common/commonTextures.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/commonTextures.o ${SRCDIR}/common/commonTextures.cpp
+
 ${OBJDIR}/meshDescriptor.o: ${SRCDIR}/common/meshDescriptor.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/meshDescriptor.o ${SRCDIR}/common/meshDescriptor.cpp
 	
@@ -339,6 +345,12 @@ ${OBJDIR}/rawShader.o: ${SRCDIR}/shaders/rawShader.cpp
 
 ${OBJDIR}/lightningShader.o: ${SRCDIR}/shaders/lightningShader.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/lightningShader.o ${SRCDIR}/shaders/lightningShader.cpp
+
+${OBJDIR}/cubeMapShader.o: ${SRCDIR}/shaders/cubeMapShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/cubeMapShader.o ${SRCDIR}/shaders/cubeMapShader.cpp
+
+${OBJDIR}/initialLightShader.o: ${SRCDIR}/shaders/initialLightShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/initialLightShader.o ${SRCDIR}/shaders/initialLightShader.cpp
 
 ${OBJDIR}/shader.o: ${SRCDIR}/shaders/shader.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/shader.o ${SRCDIR}/shaders/shader.cpp
