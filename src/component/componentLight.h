@@ -25,7 +25,7 @@ public:
     EXPORT void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
 
     EXPORT Matrix4 preparePreShadowPhase(Vector3 cameraPosition);
-    EXPORT void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture);
+    EXPORT void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera);
 
     EXPORT void enableShadows();
     EXPORT void disableShadows();

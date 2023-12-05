@@ -37,6 +37,7 @@ bool LightningShader::build()
             locV3LightColor = glGetUniformLocation(programm, "lightColor");
             locV3LightDirection = glGetUniformLocation(programm, "lightDir");
             locFAffectDistance = glGetUniformLocation(programm, "affectDistance");
+            locV3CameraPos = glGetUniformLocation(programm, "cameraPos");
 
             locTGAlbedoSpec = glGetUniformLocation(programm, "tAlbedoSpec");
             locTGNormal = glGetUniformLocation(programm, "tNormal");
@@ -101,4 +102,10 @@ void LightningShader::setLightSpaceMatrix(Matrix4 mLightSpace)
 {
     if (locMLightSpace != -1)
         glUniformMatrix4fv(locMLightSpace, 1, GL_FALSE, value_ptr(mLightSpace));
+}
+
+void LightningShader::setCameraPosition(Vector3 v)
+{
+    if (locV3CameraPos != -1)
+        glUniform3fv(locV3CameraPos, 1, value_ptr(v));
 }

@@ -6,6 +6,7 @@
 #include "common/utils.h"
 #include "opengl/glew.h"
 #include "math/glm/gtc/type_ptr.hpp"
+#include "camera/camera.h"
 
 ComponentLight::ComponentLight()
 {
@@ -76,8 +77,11 @@ Matrix4 ComponentLight::preparePreShadowPhase(Vector3 cameraPosition)
     return lightViewProjection;
 }
 
-void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture)
+void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera)
 {
+    if (!activeCamera || !activeCamera->getOwnerTransform())
+        return;
+
     if (type == LightType::Sun)
     {
         auto lightShader = bUseShadowPhase ? CommonShaders::getSunWithShadowShader() : CommonShaders::getSunShader();
@@ -92,6 +96,7 @@ void ComponentLight::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapT
 
         lightShader->setLightDirection(normal);
         lightShader->setLightColor(color);
+        lightShader->setCameraPosition(activeCamera->getOwnerTransform()->getPosition());
 
         CommonShaders::getScreenMesh()->useVertexArray();
         glBlendFunc(GL_ONE, GL_ONE);

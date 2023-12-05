@@ -154,6 +154,7 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Mushroom", 0);
+    layerActors->setAmbientColor(0.8f, 0.8f, 0.8f);
     layerActors->enablePhisics(Vector3(0.0f, 0.0f, 0.0f), 0.1f, 200);
 
     auto cameraActor = layerActors->createActor<ActorCamera>();
@@ -187,7 +188,7 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(0.9f, 0.9f, 0.9f), true);
+    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(2.5f, 2.5f, 2.5f), true);
 
     // Pointer to receive input and apply actions
     auto pointer = layerActors->createActor<Pointer>();

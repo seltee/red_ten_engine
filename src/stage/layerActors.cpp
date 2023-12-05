@@ -171,7 +171,7 @@ void LayerActors::render(RenderTarget *renderTarget)
                 glBindTexture(GL_TEXTURE_2D, renderTarget->getPositionTexture());
             }
 
-            (*light)->renderLightPhase(mProjectionView, renderTarget->getShadowTexture());
+            (*light)->renderLightPhase(mProjectionView, renderTarget->getShadowTexture(), activeCamera);
         }
     }
 

@@ -10,7 +10,8 @@ enum TextureType
     Albedo = 0,
     Normal = 1,
     Specular = 2,
-    Emission = 3
+    Emission = 3,
+    Roughness = 4
 };
 
 class PhongShader : public Shader
@@ -35,9 +36,9 @@ protected:
     unsigned int locMTransform = 0;
     unsigned int locMNormal = 0;
     unsigned int locTDefuse = 0;
-    unsigned int locTSpecular = 0;
     unsigned int locTNormal = 0;
     unsigned int locTEmission = 0;
+    unsigned int locTRoughness = 0;
 
     unsigned int locShadowMViewProjection = 0;
     unsigned int locShadowMTransform = 0;
@@ -46,6 +47,7 @@ protected:
     unsigned int tNormal = 0;
     unsigned int tSpecular = 0;
     unsigned int tEmission = 0;
+    unsigned int tRoughness = 0;
 
     static unsigned int currentProgramm;
     static unsigned int tBlack;

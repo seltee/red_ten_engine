@@ -55,9 +55,9 @@ bool PhongShader::build()
     locMTransform = glGetUniformLocation(programm, "mTransform");
     locMNormal = glGetUniformLocation(programm, "mNormal");
     locTDefuse = glGetUniformLocation(programm, "TextureDefuse");
-    locTSpecular = glGetUniformLocation(programm, "TextureSpecular");
     locTNormal = glGetUniformLocation(programm, "TextureNormal");
     locTEmission = glGetUniformLocation(programm, "TextureEmission");
+    locTRoughness = glGetUniformLocation(programm, "TextureRoughness");
 
     // Building shadow pass programm
     shadowProgramm = glCreateProgram();
@@ -130,6 +130,9 @@ void PhongShader::setTexture(TextureType type, Texture *texture)
     case TextureType::Emission:
         tEmission = texture ? texture->getGLTextureId() : 0;
         break;
+    case TextureType::Roughness:
+        tRoughness = texture ? texture->getGLTextureId() : 0;
+        break;
     }
 }
 
@@ -166,6 +169,10 @@ bool PhongShader::use(Matrix4 mViewProjection, Matrix4 mModel)
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, tNormal ? tNormal : tZeroNormal);
     glUniform1i(locTNormal, 2);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, tRoughness ? tRoughness : tGrey);
+    glUniform1i(locTRoughness, 3);
 
     return true;
 }
@@ -234,6 +241,7 @@ const char *gShaderFragmentCode =
     "uniform sampler2D TextureEmission;\n"
     "uniform sampler2D TextureNormal;\n"
     "uniform sampler2D TextureSpecular;\n"
+    "uniform sampler2D TextureRoughness;\n"
     "in vec2 TexCoords;\n"
     "in vec3 FragPos;\n"
     "in mat3 mTBN;\n"
@@ -241,7 +249,7 @@ const char *gShaderFragmentCode =
     "   gPosition = FragPos;\n"
     "   gNormal = normalize(mTBN * (texture(TextureNormal, TexCoords).rgb * 2.0 - 1.0));\n"
     "   gAlbedoSpec.rgb = texture(TextureDefuse, TexCoords).rgb;\n"
-    "   gAlbedoSpec.a = texture(TextureSpecular, TexCoords).r;\n"
+    "   gAlbedoSpec.a = texture(TextureRoughness, TexCoords).r;\n"
     "   gEmission.rgb = texture(TextureEmission, TexCoords).rgb;\n"
     "}\n";
 

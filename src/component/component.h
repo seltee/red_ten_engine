@@ -15,6 +15,8 @@
 #include "common/destroyable.h"
 #include <list>
 
+class Camera;
+
 enum class ComponentColorMode
 {
     Lit = 0,
@@ -30,7 +32,7 @@ public:
     EXPORT void prepare(Entity *owner);
     EXPORT virtual void process(float delta);
 
-    EXPORT virtual void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture);
+    EXPORT virtual void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera);
     EXPORT virtual Matrix4 preparePreShadowPhase(Vector3 cameraPosition);
 
     EXPORT virtual void onRender(Matrix4 &vpMatrix, Transformation *tf);

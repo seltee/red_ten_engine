@@ -137,7 +137,7 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Animation Layer", 0);
-    layerActors->setAmbientColor(0.8f, 0.8f, 0.8f);
+    layerActors->setAmbientColor(0.6f, 0.6f, 0.6f);
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
 
@@ -162,10 +162,13 @@ APPMAIN
     auto animatedMesh = animatedMeshResource->getAsMeshCompound();
 
     auto animMeshShader = new PhongShader();
-    auto animMeshAlbedoTexture = resourceController->addImage("./data/3d/texture_base.jpg")->getAsTexture();
-    auto animMeshNormalTexture = resourceController->addImage("./data/3d/texture_nor.jpg")->getAsTexture();
+    auto animMeshAlbedoTexture = resourceController->addImage("./data/3d/robot_texture_base.jpg")->getAsTexture();
+    auto animMeshNormalTexture = resourceController->addImage("./data/3d/robot_texture_nor.jpg")->getAsTexture();
+    auto animMeshRoughTexture = resourceController->addImage("./data/3d/robot_texture_rough.jpg")->getAsTexture();
+
     animMeshShader->setTexture(TextureType::Albedo, animMeshAlbedoTexture);
     animMeshShader->setTexture(TextureType::Normal, animMeshNormalTexture);
+    animMeshShader->setTexture(TextureType::Roughness, animMeshRoughTexture);
 
     auto animActor = layerActors->createActor<Actor>();
     animActor->transform.setScale(0.25f, 0.25f, 0.25f);
@@ -189,7 +192,7 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-0.3f, 1.0f, 0.7f), Vector3(0.55f, 0.55f, 0.49f), true);
+    sunComponent->setupSunLight(Vector3(-0.3f, 1.0f, 0.7f), Vector3(1.85f, 1.85f, 1.79f), true);
 
     // Settings used to move our ground
     // Each time shift exceeding groundSize it will be moved back to groundSize

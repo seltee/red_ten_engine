@@ -33,7 +33,7 @@ void Component::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
 {
 }
 
-void Component::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture)
+void Component::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera)
 {
 }
 
