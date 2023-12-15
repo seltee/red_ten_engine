@@ -7,11 +7,6 @@
 
 void CameraOrto::prepareToRender(RenderTarget *renderTarget)
 {
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-
     float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;

@@ -21,6 +21,7 @@ public:
     EXPORT static Shader *getScreenShader();
     EXPORT static RawShader *getEffectShader();
     EXPORT static InitialLightShader *getInitialLightShader();
+    EXPORT static RawShader *getGammaShader();
 
     EXPORT static LightningShader *getSunShader();
     EXPORT static LightningShader *getSunWithShadowShader();
@@ -41,6 +42,7 @@ protected:
     static Shader *spriteShader;
     static Shader *spriteFrameShader;
     static Shader *screenShader;
+    static RawShader *gammaShader;
     static RawShader *effectShader;
     static InitialLightShader *initialLightShader;
     static RawShader *debugCubeShader;

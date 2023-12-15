@@ -92,6 +92,8 @@ void LayerActors::render(RenderTarget *renderTarget)
     activeCamera->prepareToRender(renderTarget);
     Vector3 cmPosition = activeCamera->getOwnerTransform() ? activeCamera->getOwnerTransform()->getPosition() : Vector3(0.0f);
 
+    glDisable(GL_CULL_FACE);
+
     // Render Cube Map
     if (HDRTexture && HDREnvVisibility)
     {
@@ -99,8 +101,6 @@ void LayerActors::render(RenderTarget *renderTarget)
         // TODO: Orthogrphic camera HDR
 
         glBlendFunc(GL_ZERO, GL_ONE);
-        glDisable(GL_ALPHA_TEST);
-        glDisable(GL_CULL_FACE);
         glDisable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
 
@@ -115,10 +115,16 @@ void LayerActors::render(RenderTarget *renderTarget)
 
         auto cubeMesh = CommonShaders::getCubeMesh();
         cubeMesh->render(cubeMapShader, mProjectionView, *t.getModelMatrix());
-
-        // Reset camera parameters
-        activeCamera->prepareToRender(renderTarget);
     }
+
+    if (bUseSorting)
+        glDisable(GL_DEPTH_TEST);
+    else
+        glEnable(GL_DEPTH_TEST);
+
+    glDisable(GL_CULL_FACE);
+    glDepthFunc(GL_LESS);
+    glDepthMask(GL_TRUE);
 
     // Render main phase actors
     for (auto &actor : actors)
@@ -284,11 +290,20 @@ void LayerActors::render(RenderTarget *renderTarget)
     // Final phase
     renderTarget->useResultBuffer();
     glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, renderTarget->getLightningTexture());
-    CommonShaders::getScreenShader()->use(m1, m2);
+
+    float gammaEffector = 1.0f / gamma;
+
+    RawShader *gammaShader = CommonShaders::getGammaShader();
+    gammaShader->use(m1, m2);
+
+    int gammaEffectorLoc = gammaShader->getUniformLocation("fGammaEffector");
+    gammaShader->provideFloatValue(gammaEffectorLoc, 1, &gammaEffector);
+
     CommonShaders::getScreenMesh()->useVertexArray();
 
     glDrawArrays(GL_TRIANGLES, 0, 6);

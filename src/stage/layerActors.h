@@ -65,6 +65,9 @@ public:
     EXPORT void showDebugLine(const Segment &ray, const Vector3 &color, float showTime);
     EXPORT void showDebugBox(const Vector3 &p, float size, const Vector3 &color, float showTime);
 
+    void inline setGamma(float gamma) { this->gamma = gamma; }
+    float inline getGamma() { return gamma; }
+
 protected:
     bool bIsVisible = true;
     bool bProcessingEnabled = true;
@@ -84,6 +87,8 @@ protected:
 
     float HDRRotation = 0.0f;
     bool HDREnvVisibility = true;
+
+    float gamma = 1.0f;
 
     unsigned int tBlack;
 };

@@ -14,6 +14,8 @@ extern const char *spriteFragmentShader;
 extern const char *screenVertexShader;
 extern const char *screenFragmentShader;
 
+extern const char *gammaFragmentShader;
+
 extern const char *clearFragmentShader;
 
 extern const char *sunFragmentCode;
@@ -30,6 +32,7 @@ MeshStatic *CommonShaders::screenMesh = nullptr;
 Shader *CommonShaders::spriteShader = nullptr;
 Shader *CommonShaders::spriteFrameShader = nullptr;
 Shader *CommonShaders::screenShader = nullptr;
+RawShader *CommonShaders::gammaShader = nullptr;
 RawShader *CommonShaders::effectShader = nullptr;
 InitialLightShader *CommonShaders::initialLightShader = nullptr;
 
@@ -100,6 +103,9 @@ void CommonShaders::build()
     logger->logff("compiling cube map shader ...");
     cubeMapShader = new CubeMapShader();
 
+    logger->logff("compiling gamma shader ...");
+    gammaShader = new RawShader(screenVertexShader, gammaFragmentShader);
+
     logger->logff("shaders compiled\n");
 }
 
@@ -126,6 +132,11 @@ RawShader *CommonShaders::getEffectShader()
 InitialLightShader *CommonShaders::getInitialLightShader()
 {
     return initialLightShader;
+}
+
+RawShader *CommonShaders::CommonShaders::getGammaShader()
+{
+    return gammaShader;
 }
 
 LightningShader *CommonShaders::getSunShader()
@@ -263,6 +274,17 @@ const char *screenFragmentShader =
     "   fragColor = texture(t, texCoord);\n"
     "}\n";
 
+const char *gammaFragmentShader =
+    "#version 410 core\n"
+    "out vec4 fragColor;\n"
+    "in vec2 texCoord;\n"
+    "uniform sampler2D t;\n"
+    "uniform float fGammaEffector;"
+    "void main() {\n"
+    "   fragColor = texture(t, texCoord);\n"
+    "   fragColor.rgb = 1.055 * pow(fragColor.rgb, vec3(fGammaEffector)) - vec3(0.055);\n"
+    "}\n";
+
 const char *clearFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
@@ -270,7 +292,6 @@ const char *clearFragmentShader =
     "void main() {\n"
     "   fragColor = vec4(clearColor, 1.0);\n"
     "}\n";
-
 
 const char *sunFragmentCode =
     "#version 410 core\n"

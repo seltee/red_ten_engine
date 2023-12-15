@@ -133,12 +133,12 @@ APPMAIN
     // Stage setup
     auto stageController = engine->getStageController();
     auto stage = stageController->createStage("Hello Animation");
-    // Sky color
-    stage->setClearColor(Color(0.772f, 0.912f, 0.930f));
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Animation Layer", 0);
-    layerActors->setAmbientColor(0.08f, 0.08f, 0.0f);
+    layerActors->setAmbientColor(0.25f, 0.25f, 0.1f);
+    layerActors->setGamma(1.2f);
+
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
 
@@ -150,7 +150,7 @@ APPMAIN
     auto resourceController = engine->getResourceController();
 
     // HDR
-    auto HDR = resourceController->addHDRImage("./data/3d/meadow.hdr", 1.0f, 1.8f);
+    auto HDR = resourceController->addHDRImage("./data/3d/meadow.hdr", 1.0f, 0.8f);
     layerActors->setHDRTextures(HDR->getAsTexture(), HDR->getAsRadianceTexture());
     layerActors->setHDRRotation(CONST_PI / 2.0f);
 
@@ -198,7 +198,7 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-0.8f, 1.0f, 0.7f), Vector3(1.65f, 1.65f, 1.49f), true);
+    sunComponent->setupSunLight(Vector3(-0.8f, 1.0f, 0.7f), Vector3(1.45f, 1.45f, 1.19f), true);
 
     // Settings used to move our ground
     // Each time shift exceeding groundSize it will be moved back to groundSize

@@ -23,7 +23,7 @@ public:
         for (int i = 0; i < LIGHT_COUNT; i++)
         {
             light[i] = createComponent<ComponentLight>();
-            light[i]->setupOmniLight(0.2f + randf(0.0f, 0.1f), Vector3(0.3f + randf(0.0f, 0.7f), 0.3f + randf(0.0f, 0.7f), 0.3f + randf(0.0f, 0.7f)));
+            light[i]->setupOmniLight(0.1f + randf(0.0f, 0.1f), Vector3(0.2f + randf(0.0f, 0.7f), 0.2f + randf(0.0f, 0.7f), 0.3f + randf(0.0f, 0.7f)));
         }
     }
 
@@ -130,6 +130,10 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello 3D Layer", 0);
+
+    // Gamma control helps lights to pop up and night to be more visually readable
+    layerActors->setGamma(1.6f);
+
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupPerspectiveCamera()->setWidthBasedResolution(1280);
 
@@ -210,10 +214,10 @@ APPMAIN
         camera->lookAt(0.0f, 0.1f, 0.0f);
 
         float effectiveLight = fmaxf(sinf(sunRotation), 0.0f);
-        layerActors->setAmbientColor(0.05f + effectiveLight * 0.5f, 0.05f + effectiveLight * 0.5f, 0.09f + effectiveLight * 0.5f);
+        layerActors->setAmbientColor(0.03f + effectiveLight * 0.42f, 0.03f + effectiveLight * 0.42f, 0.045f + effectiveLight * 0.4f);
         sunComponent->setupSunLight(
             Vector3(cosf(sunRotation) + 0.5f, sinf(sunRotation), cosf(sunRotation)),
-            Vector3(0.7f + (1.0f - effectiveLight) * 0.4f, 0.7f, 0.7f) * effectiveLight * 3.5f,
+            Vector3(0.7f + (1.0f - effectiveLight) * 0.4f, 0.7f, 0.7f) * effectiveLight * 3.0f,
             true);
 
         // Camera flying effect
