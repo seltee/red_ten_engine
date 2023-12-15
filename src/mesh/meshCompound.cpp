@@ -73,6 +73,19 @@ bool MeshCompound::setParent(Mesh *child, Mesh *parent)
     return false;
 }
 
+bool MeshCompound::setParent(std::string &child, std::string &parent)
+{
+    MeshCompoundNode *childNode = getNodeByName(child);
+    MeshCompoundNode *parentNode = getNodeByName(parent);
+
+    if (childNode && parentNode)
+    {
+        childNode->parent = parentNode;
+        return true;
+    }
+    return false;
+}
+
 MeshStatic *MeshCompound::getAsStatic()
 {
     if (meshStatic)
@@ -143,6 +156,18 @@ MeshCompoundNode *MeshCompound::getNodeByMesh(Mesh *mesh)
     for (auto &it : nodes)
     {
         if (it->mesh == mesh)
+        {
+            return it;
+        }
+    }
+    return nullptr;
+}
+
+MeshCompoundNode *MeshCompound::getNodeByName(std::string &name)
+{
+    for (auto &it : nodes)
+    {
+        if (it->mesh->getName() == name)
         {
             return it;
         }

@@ -28,6 +28,7 @@ struct FBXModelWithIndex
     std::string name;
     MeshStatic *mesh;
     std::vector<FBXAnimationCurveNode *> curveNodes;
+    MeshCompoundNode *meshCompoundNode;
 };
 
 struct FBXAnimationBinding

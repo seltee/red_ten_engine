@@ -27,11 +27,13 @@ public:
 
     EXPORT MeshCompoundNode *addMesh(MeshStatic *mesh);
     EXPORT bool setParent(Mesh *child, Mesh *parent);
+    EXPORT bool setParent(std::string &child, std::string &parent);
 
     EXPORT MeshStatic *getAsStatic();
 
 protected:
     MeshCompoundNode *getNodeByMesh(Mesh *mesh);
+    MeshCompoundNode *getNodeByName(std::string &name);
     Matrix4 getTransformationMatrix(MeshCompoundNode *node);
     Matrix4 getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators);
 
@@ -42,8 +44,9 @@ protected:
 class MeshCompoundNode
 {
 public:
+    MeshCompoundNode() {}
     MeshCompoundNode(MeshStatic *mesh) { this->mesh = mesh; }
-    MeshStatic *mesh;
     Transformation transform;
+    MeshStatic *mesh = nullptr;
     MeshCompoundNode *parent = nullptr;
 };

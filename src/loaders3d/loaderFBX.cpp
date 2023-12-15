@@ -216,7 +216,7 @@ void LoaderFBX::reload()
         {
             auto newAnimStack = new FBXAnimationStack(it);
             animStacks.push_back(newAnimStack);
-            printf("Animation Stack id %llu, l %llu, r %llu\n", newAnimStack->id, newAnimStack->localTime, newAnimStack->referenceTime);
+            // printf("Animation Stack id %llu, l %llu, r %llu\n", newAnimStack->id, newAnimStack->localTime, newAnimStack->referenceTime);
             continue;
         }
 
@@ -224,10 +224,7 @@ void LoaderFBX::reload()
         {
             auto newAnimLayer = new FBXAnimationLayer(it);
             animLayers.push_back(newAnimLayer);
-            printf(
-                "Animation Layer id %llu, %s\n",
-                newAnimLayer->id,
-                newAnimLayer->name.c_str());
+            // printf("Animation Layer id %llu, %s\n", newAnimLayer->id, newAnimLayer->name.c_str());
             continue;
         }
 
@@ -235,7 +232,7 @@ void LoaderFBX::reload()
         {
             auto newAnimCurveNode = new FBXAnimationCurveNode(it);
             animCurveNodes.push_back(newAnimCurveNode);
-            printf("Animation Curve Node id %llu, type %s\n", newAnimCurveNode->id, newAnimCurveNode->getTypeName());
+            // printf("Animation Curve Node id %llu, type %s\n", newAnimCurveNode->id, newAnimCurveNode->getTypeName());
             continue;
         }
 
@@ -243,9 +240,18 @@ void LoaderFBX::reload()
         {
             auto newAnimCurve = new FBXAnimationCurve(it);
             animCurves.push_back(newAnimCurve);
-            printf("Animation Curve id %llu, num %i\n", newAnimCurve->id, newAnimCurve->keysCount);
+            // printf("Animation Curve id %llu, num %i\n", newAnimCurve->id, newAnimCurve->keysCount);
             continue;
         }
+    }
+
+    // Precreate all models
+    for (auto &it : models)
+    {
+        MeshStatic *mesh = new MeshStatic();
+        mesh->setName(it.name);
+        MeshCompoundNode *meshCompoundNode = meshCompound->addMesh(mesh);
+        it.meshCompoundNode = meshCompoundNode;
     }
 
     // Connecting models, geometry and animations
@@ -266,24 +272,18 @@ void LoaderFBX::reload()
         if (foundMesh)
         {
             foundModel = getModelByIndex(indexTo);
-            if (foundModel)
+            if (foundModel && foundModel->meshCompoundNode)
             {
-                MeshStatic *instance = reinterpret_cast<MeshStatic *>(foundMesh->mesh->createInstance());
-                MeshCompoundNode *meshCompoundNode = meshCompound->addMesh(instance);
+                MeshCompoundNode *meshCompoundNode = foundModel->meshCompoundNode;
+                foundMesh->mesh->setOtherMeshAsInstanceOfThis(meshCompoundNode->mesh);
+
                 if (foundModel->parentIndex)
-                {
                     meshCompoundNode->transform.setPosition(foundModel->position);
-                }
                 else
-                {
                     meshCompoundNode->transform.setPosition(foundModel->position);
-                }
 
                 meshCompoundNode->transform.setRotation(foundModel->rotation);
                 meshCompoundNode->transform.setScale(foundModel->scale);
-
-                foundModel->mesh = instance;
-                instance->setName(foundModel->name);
             }
             continue;
         }
@@ -327,7 +327,7 @@ void LoaderFBX::reload()
             continue;
         }
 
-        printf("Unknown link %llu to %llu\n", indexFrom, indexTo);
+        // printf("Unknown link %llu to %llu\n", indexFrom, indexTo);
     }
 
     // printAnimationStructure();
@@ -340,7 +340,7 @@ void LoaderFBX::reload()
             auto parentModel = getModelByIndex(model.parentIndex);
             if (parentModel)
             {
-                if (!meshCompound->setParent(model.mesh, parentModel->mesh))
+                if (!meshCompound->setParent(model.name, parentModel->name))
                     logger->logff("Failed to set parent during FBX load");
             }
         }

@@ -145,6 +145,13 @@ void MeshStatic::setupInstance(unsigned int vao, unsigned int vbo, int vertexAmo
     this->vertexData = vertexData;
 }
 
+EXPORT void MeshStatic::setOtherMeshAsInstanceOfThis(MeshStatic *mesh)
+{
+    if (mesh){
+        mesh->setupInstance(vao, vbo, vertexAmount, floatsPerVertex, attributesAmount, vertexData);
+    }
+}
+
 void MeshStatic::clear()
 {
     if (vbo)

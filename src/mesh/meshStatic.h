@@ -28,8 +28,17 @@ public:
     EXPORT int getFloatsPerVertex();
     EXPORT int getAttributesAmount();
 
+    // Make original mesh by transfering geometry data to it
     EXPORT void setupFloatsArray(const float *data, int vertexAmount, int attributesAmount, int *attributeSize, bool buildTangents = false);
+
+    // Trasfer data to this mesh, this mesh becoming an instance
+    // Doesn't change the name
     EXPORT void setupInstance(unsigned int vao, unsigned int vbo, int vertexAmount, int floatsPerVertex, int attributesAmount, float *vertexData);
+
+    // Set VAO, VBO vertex data to the mesh.
+    // Target mesh becoming an instance of this mesh
+    // Name stays unique
+    EXPORT void setOtherMeshAsInstanceOfThis(MeshStatic *mesh);
 
     // Be carefull with this one. If you have instances and clear one of the instances it may crush the engine
     // Instances doesn't clear VAO and VBO, only main mesh upon deletion
