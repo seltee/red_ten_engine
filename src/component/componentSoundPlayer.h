@@ -10,5 +10,5 @@
 class ComponentSoundPlayer : public Component, public SoundPlayer
 {
 public:
-    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT void onRenderQueue(RenderQueue *renderQueue) override;
 };

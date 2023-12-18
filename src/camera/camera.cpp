@@ -5,6 +5,7 @@
 #include "math/math.h"
 #include "common/utils.h"
 #include "math/glm/gtc/type_ptr.hpp"
+#include "component/component.h"
 
 Camera::Camera()
 {
@@ -55,16 +56,6 @@ float Camera::getHeightTargetProportion()
     return 0;
 }
 
-Transformation *Camera::getOwnerTransform()
-{
-    return ownerTransform;
-}
-
-void Camera::setOwnerTransform(Transformation *transform)
-{
-    ownerTransform = transform;
-}
-
 PointWithDirection Camera::screenToWorld(float x, float y)
 {
     PointWithDirection s;
@@ -91,4 +82,13 @@ CameraType Camera::getCameraType()
 float Camera::getLineThickness()
 {
     return 0.01f;
+}
+
+Matrix4 Camera::getWorldModelMatrix()
+{
+    if (owner)
+    {
+        return owner->getWorldModelMatrix();
+    }
+    return Matrix4(1.0f);
 }

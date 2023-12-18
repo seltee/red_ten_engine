@@ -3,7 +3,6 @@
 
 #pragma once
 #include "common/utils.h"
-#include "shaders/effect.h"
 #include "stage/layerActors.h"
 #include "stage/layer.h"
 #include "resource/resourceFont.h"

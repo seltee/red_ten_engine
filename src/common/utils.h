@@ -7,7 +7,7 @@
 #define CONST_PI2 6.2831853f
 
 #ifdef __APPLE__
-#define EXPORT __attribute__ ((visibility("default")))
+#define EXPORT __attribute__((visibility("default")))
 #else
 #define EXPORT __declspec(dllexport)
 #endif
@@ -15,6 +15,13 @@
 #ifndef _strdup
 #define _strdup strdup
 #endif
+
+enum LightType
+{
+    None = 0,
+    Sun,
+    Omni
+};
 
 EXPORT float randf();
 EXPORT float randf(float from, float to);

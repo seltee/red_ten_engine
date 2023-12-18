@@ -4,10 +4,11 @@
 #pragma once
 
 #include "resource/resource.h"
-#include "common/texture.h"
+#include "renderer/texture.h"
 #include "connector/withLogger.h"
+#include "connector/withRenderer.h"
 
-class ResourceHDR : public Resource, public WithLogger
+class ResourceHDR : public Resource, public WithLogger, public WithRenderer
 {
 public:
     EXPORT ResourceHDR(std::string path, float ldrScale = 1.0f, float ldrGamma = 1.0f);

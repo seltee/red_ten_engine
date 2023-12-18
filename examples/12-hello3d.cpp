@@ -123,6 +123,7 @@ APPMAIN
 
     // View setup
     auto view = viewController->createView("Example \"12. Hello 3D\"");
+    auto renderer = view->getRenderer();
 
     // Stage setup
     auto stageController = engine->getStageController();
@@ -159,11 +160,11 @@ APPMAIN
     Town::floorMesh = plainMesh;
     Town::towerMesh = towerMesh;
 
-    Town::floorShader = new PhongShader();
+    Town::floorShader = renderer->createPhongShader();
     Town::floorShader->setTexture(TextureType::Albedo, concreteAlbedoTexture);
     Town::floorShader->setTexture(TextureType::Normal, concreteNormalTexture);
 
-    Town::towerShader = new PhongShader();
+    Town::towerShader = renderer->createPhongShader();
     Town::towerShader->setTexture(TextureType::Albedo, towerAlbedoTexture);
     Town::towerShader->setTexture(TextureType::Emission, towerEmissionTexture);
     Town::towerShader->setTexture(TextureType::Normal, towerNormalTexture);
@@ -175,7 +176,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 1.0f, -0.5f), Vector3(0.3f, 0.3f, 0.6f), true);
+    sunComponent->setupSunLight(Vector3(0.3f, 0.3f, 0.6f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 1.0f, -0.5f));
 
     float cameraRotation = 0.0f;
     float sunRotation = 0.0f;
@@ -216,9 +218,9 @@ APPMAIN
         float effectiveLight = fmaxf(sinf(sunRotation), 0.0f);
         layerActors->setAmbientColor(0.03f + effectiveLight * 0.42f, 0.03f + effectiveLight * 0.42f, 0.045f + effectiveLight * 0.4f);
         sunComponent->setupSunLight(
-            Vector3(cosf(sunRotation) + 0.5f, sinf(sunRotation), cosf(sunRotation)),
             Vector3(0.7f + (1.0f - effectiveLight) * 0.4f, 0.7f, 0.7f) * effectiveLight * 3.0f,
             true);
+        sunComponent->transform.setPosition(Vector3(cosf(sunRotation) + 0.5f, sinf(sunRotation), cosf(sunRotation)));
 
         // Camera flying effect
         cameraMovementDelta += delta * 0.25f;

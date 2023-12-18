@@ -5,8 +5,6 @@
 #include "math/math.h"
 #include "math/glm/gtc/type_ptr.hpp"
 #include "actor/actorGUIElement.h"
-#include "opengl/glew.h"
-#include "common/commonShaders.h"
 #include "component/componentLight.h"
 #include "common/commonTextures.h"
 #include <math.h>
@@ -18,8 +16,6 @@ LayerActors::LayerActors(std::string name, int index) : Layer(name, index)
     processingTrackerId = profiler->addTracker("layer actors \"" + name + "\" processing");
     physicsTrackerId = profiler->addTracker("layer actors \"" + name + "\" physics");
     profiler->setInactive(physicsTrackerId);
-
-    tBlack = CommonTextures::getBlackTexture()->getGLTextureId();
 }
 
 bool compareBodyPoints(PhysicsBodyPoint a, PhysicsBodyPoint b)
@@ -66,247 +62,56 @@ void LayerActors::process(float delta)
     profiler->stopTracking(processingTrackerId);
 }
 
-void LayerActors::render(RenderTarget *renderTarget)
+void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
 {
     profiler->startTracking(renderingTrackerId);
-
-    Matrix4 m1, m2;
-    // Clear light renderer
-    renderTarget->setupLightning();
-
-    // Clear deffered buffer and set this as primary
-    renderTarget->setupNewFrame();
-
-    std::vector<Component *> sceneLights;
-    std::vector<Actor *> blends;
-    std::vector<Actor *> shadowCasters;
-    std::vector<Actor *> debugView;
 
     if (!activeCamera || !bIsVisible)
         return;
 
-    Matrix4 mView = *activeCamera->getViewMatrix();
-    Matrix4 mProjectionView = *activeCamera->getProjectionMatrix() * mView;
-
     // G Buffer phase
     activeCamera->prepareToRender(renderTarget);
-    Vector3 cmPosition = activeCamera->getOwnerTransform() ? activeCamera->getOwnerTransform()->getPosition() : Vector3(0.0f);
 
-    glDisable(GL_CULL_FACE);
+    Matrix4 mView = *activeCamera->getViewMatrix();
+    Matrix4 mProjectionView = *activeCamera->getProjectionMatrix() * mView;
+    Vector4 cm4position = activeCamera->getWorldModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+    Vector3 cmPosition = Vector3(cm4position.x, cm4position.y, cm4position.z);
 
-    // Render Cube Map
-    if (HDRTexture && HDREnvVisibility)
-    {
-        // TODO: make better setting up for camera
-        // TODO: Orthogrphic camera HDR
+    RenderQueue *renderQueue = renderer->getRenderQueue();
 
-        glBlendFunc(GL_ZERO, GL_ONE);
-        glDisable(GL_DEPTH_TEST);
-        glDepthMask(GL_FALSE);
-
-        Transformation t;
-        t.setPosition(cmPosition);
-        t.setScale(Vector3(16.0f, 16.0f, 16.0f));
-        t.setRotation(Vector3(0.0f, HDRRotation, 0.0f));
-
-        auto cubeMapShader = CommonShaders::getCubeMapShader();
-        cubeMapShader->use(mView, *t.getModelMatrix());
-        cubeMapShader->setCubeMap(HDRTexture);
-
-        auto cubeMesh = CommonShaders::getCubeMesh();
-        cubeMesh->render(cubeMapShader, mProjectionView, *t.getModelMatrix());
-    }
+    renderQueue->reset();
+    renderQueue->setViewProjectionMatrix(mProjectionView);
+    renderQueue->setDefaultSpriteShader(renderer->getDefaultSpriteShader());
+    renderQueue->setDefaultSpriteMesh(renderer->getDefaultSpriteMesh());
+    renderQueue->setAmbientLight(ambientColor);
+    renderQueue->setCameraPosition(cmPosition);
+    renderQueue->setHDRTexture(HDRTexture);
+    renderQueue->setHDRRadianceTexture(HDRRadianceTexture);
+    renderQueue->setGamma(gamma);
 
     if (bUseSorting)
-        glDisable(GL_DEPTH_TEST);
+        renderQueue->enableSorting();
     else
-        glEnable(GL_DEPTH_TEST);
+        renderQueue->disableSorting();
 
-    glDisable(GL_CULL_FACE);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
+    renderQueue->setShowEnvHDR(HDRTexture && HDREnvVisibility);
+    renderQueue->setEnvHDRRotation(HDRRotation);
 
-    // Render main phase actors
+    // Put elements to queues
     for (auto &actor : actors)
     {
         if (actor->isVisible())
         {
-            actor->onRender(mProjectionView, &sceneLights);
-            if (actor->hasBlended())
-                blends.push_back(actor);
-            shadowCasters.push_back(actor);
-        }
-        if (actor->hasDebugView())
-        {
-            debugView.push_back(actor);
+            actor->onRenderQueue(renderQueue);
         }
     }
 
-    activeCamera->finishRender();
+    // Render queue
+    renderer->render(renderTarget);
 
-    // light phase
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_ALPHA_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-
-    auto initialLightShader = CommonShaders::getInitialLightShader();
-    renderTarget->setupLightning(false);
-    initialLightShader->use(m1, m2);
-
-    initialLightShader->setTextureAlbedo(renderTarget->getAlbedoTexture());
-    initialLightShader->setTextureNormal(renderTarget->getNormalTexture());
-    initialLightShader->setTexturePosition(renderTarget->getPositionTexture());
-    initialLightShader->setTextureRadiance(HDRRadianceTexture ? HDRRadianceTexture->getGLTextureId() : tBlack);
-    initialLightShader->setTextureEnvironment(HDRTexture ? HDRTexture->getGLTextureId() : tBlack);
-    initialLightShader->setCameraPosition(cmPosition);
-    initialLightShader->setAmbientColor(ambientColor);
-
-    CommonShaders::getScreenMesh()->useVertexArray();
-
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // Lightning phase
-    if (sceneLights.size() > 0)
-    {
-        bool setupLightningFrame = true;
-        for (auto light = sceneLights.begin(); light != sceneLights.end(); ++light)
-        {
-            // shadow preparation phase
-            if ((*light)->isUsingShadowPhase())
-            {
-                glEnable(GL_DEPTH_TEST);
-                glEnable(GL_CULL_FACE);
-                if (renderTarget->getShadowMapSize() < 2048)
-                    glFrontFace(GL_CW);
-                glDisable(GL_BLEND);
-
-                // prepare shadowed render
-                Matrix4 mLightViewProjection = (*light)->preparePreShadowPhase(activeCamera->getOwnerTransform()->getPosition());
-                renderTarget->setupShadowHQ();
-
-                for (auto actor = shadowCasters.begin(); actor != shadowCasters.end(); ++actor)
-                {
-                    (*actor)->onRenderShadowed(mLightViewProjection);
-                }
-                setupLightningFrame = true;
-
-                if (renderTarget->getShadowMapSize() < 2048)
-                    glFrontFace(GL_CCW);
-            }
-            if (setupLightningFrame)
-            {
-                setupLightningFrame = false;
-                renderTarget->setupLightning(false);
-
-                glDisable(GL_DEPTH_TEST);
-                glDisable(GL_CULL_FACE);
-                glEnable(GL_BLEND);
-
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, renderTarget->getAlbedoTexture());
-
-                glActiveTexture(GL_TEXTURE1);
-                glBindTexture(GL_TEXTURE_2D, renderTarget->getNormalTexture());
-
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, renderTarget->getPositionTexture());
-            }
-
-            (*light)->renderLightPhase(mProjectionView, renderTarget->getShadowTexture(), activeCamera);
-        }
-    }
-
-    // Blending phase
-    renderTarget->setupLightning(false);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-    glEnable(GL_BLEND);
-
-    if (blends.size() > 0)
-    {
-        for (auto &actor : blends)
-        {
-            actor->onRenderBlended(mProjectionView);
-        }
-    }
-
-    // Debug render
-    if (debugView.size() > 0 && activeCamera)
-    {
-        for (auto &actor : debugView)
-        {
-            if (physicsWorld && actor->isBoundingBoxShown())
-            {
-                auto body = actor->getPhysicsBody();
-                if (body)
-                {
-                    debug->renderBoundingBox(body->getAABB(), &mProjectionView, physicsWorld->getSimScale(), activeCamera->getLineThickness(), Vector3(0.2f, 0.2f, 0.2f));
-                    Shape *shape = body->getShape();
-                    if (shape)
-                    {
-                        shape->renderDebug(&mProjectionView, actor->transform.getModelMatrix(), 1.0f / physicsWorld->getSimScale(), activeCamera->getLineThickness());
-                    }
-                }
-            }
-
-            // TOFO: move normal rendering to components
-            if (actor->isNormalsShown())
-            {
-                for (auto &component : *actor->getComponents())
-                {
-                    auto mesh = component->getStaticMesh();
-                    if (mesh)
-                    {
-                        auto vAmount = mesh->getVertexAmount();
-                        auto floatsPerVertex = mesh->getFloatsPerVertex();
-                        auto data = mesh->getVertexData();
-
-                        for (int i = 0; i < vAmount; i++)
-                        {
-                            int shift = i * floatsPerVertex;
-                            Vector4 v = Vector4(data[shift + 0], data[shift + 1], data[shift + 2], 1.0f);
-                            Vector3 n = Vector3(data[shift + 3], data[shift + 4], data[shift + 5]);
-
-                            Vector4 vts4 = *actor->transform.getModelMatrix() * *component->transform.getModelMatrix() * v;
-
-                            Vector3 vts3 = Vector3(vts4.x, vts4.y, vts4.z);
-
-                            Vector3 nr = glm::rotate(actor->transform.getRotation() * component->transform.getRotation(), n);
-
-                            debug->renderLine(vts3, vts3 + nr * 0.1f, &mProjectionView, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
-                        }
-                    }
-                }
-            }
-        }
-    }
-    debug->renderAll(&mProjectionView);
-
-    // Final phase
-    renderTarget->useResultBuffer();
-    glEnable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, renderTarget->getLightningTexture());
-
-    float gammaEffector = 1.0f / gamma;
-
-    RawShader *gammaShader = CommonShaders::getGammaShader();
-    gammaShader->use(m1, m2);
-
-    int gammaEffectorLoc = gammaShader->getUniformLocation("fGammaEffector");
-    gammaShader->provideFloatValue(gammaEffectorLoc, 1, &gammaEffector);
-
-    CommonShaders::getScreenMesh()->useVertexArray();
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    /*
+        debug->renderAll(&mProjectionView);
+    */
 
     profiler->stopTracking(renderingTrackerId);
 }

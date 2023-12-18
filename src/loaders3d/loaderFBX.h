@@ -10,6 +10,7 @@
 #include "loaders3d/FBXAnimationCurve.h"
 #include "loaders3d/FBXAnimationLayer.h"
 #include "connector/withLogger.h"
+#include "connector/withRenderer.h"
 #include "animation/animation.h"
 
 const unsigned long long FBXTimeToMs = 46186158;
@@ -38,7 +39,8 @@ struct FBXAnimationBinding
 };
 
 class LoaderFBX : public Loader3d,
-                  public WithLogger
+                  public WithLogger,
+                  public WithRenderer
 {
 public:
     EXPORT LoaderFBX(std::string path);

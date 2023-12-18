@@ -114,8 +114,11 @@ APPMAIN
     auto stageController = engine->getStageController();
     auto stage = stageController->createStage("Hello Bytemap");
 
-    // Layers and camera setup
+    // Layers setup
     auto layerActors = stage->createLayerActors("Hello Bytemap", 0);
+    layerActors->enableSorting();
+
+    // Camera
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 

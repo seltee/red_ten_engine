@@ -8,20 +8,22 @@
 #include "mesh/meshCompoundCache.h"
 #include "math/transformation.h"
 #include "animation/animator.h"
+#include "connector/withRenderer.h"
+#include "renderer/renderQueue.h"
 #include <vector>
 
 class MeshCompoundNode;
 
-class MeshCompound : public Mesh
+class MeshCompound : public Mesh, WithRenderer
 {
 public:
     EXPORT MeshCompound();
     EXPORT ~MeshCompound();
 
-    EXPORT void render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix);
-
+    EXPORT void render();
     EXPORT void prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators);
-    EXPORT void renderAnimation(Shader *shader, Matrix4 &vpMatrix, MeshCompoundCache *cache);
+    EXPORT void queueAnimation(RenderQueue *renderQueue, Shader *shader, MeshCompoundCache *cache, bool bCastShadows);
+    
 
     EXPORT Mesh *createInstance();
 

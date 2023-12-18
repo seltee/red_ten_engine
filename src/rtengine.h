@@ -7,7 +7,6 @@
 #include "common/pawn.h"
 #include "common/keyboard.h"
 #include "common/meshMaker.h"
-#include "common/texture.h"
 #include "connector/withLogger.h"
 #include "connector/withDebug.h"
 #include "connector/withRepository.h"
@@ -54,11 +53,11 @@
 #include "component/componentLight.h"
 #include "component/componentCameraOrto.h"
 #include "component/componentCameraPerspective.h"
+#include "renderer/texture.h"
+#include "renderer/renderer.h"
 #include "stage/stage.h"
 #include "math/math.h"
-#include "shaders/phongShader.h"
-#include "shaders/rawShader.h"
-#include "shaders/effect.h"
+#include "renderer/shader.h"
 
 #ifdef _WIN32
 #include <shellscalingapi.h>

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "resource/resourceMesh.h"
-#include "opengl/glew.h"
 #include "math/math.h"
 #include "loaders3d/loaderFBX.h"
 #include <string.h>

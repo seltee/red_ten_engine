@@ -4,19 +4,19 @@
 #pragma once
 
 #include "common/utils.h"
-#include "common/texture.h"
+#include "renderer/texture.h"
 #include "connector/withLogger.h"
+#include "connector/withRenderer.h"
 #include "component/component.h"
 #include "resource/resourceFont.h"
 
-class ComponentText : public Component, WithLogger
+class ComponentText : public Component, WithLogger, public WithRenderer
 {
 public:
     EXPORT ComponentText();
     EXPORT ~ComponentText();
 
-    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
-    EXPORT void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT void onRenderQueue(RenderQueue *renderQueue) override final;
 
     EXPORT void setOpacity(float opacity);
     EXPORT float getOpacity();
@@ -28,20 +28,22 @@ public:
     EXPORT void setText(std::string string);
     EXPORT std::string getText();
     EXPORT void rebuildString();
+    EXPORT void setShader(Shader *shader);
 
     EXPORT int getWidth();
     EXPORT int getHeight();
 
-    EXPORT Matrix4 getLocalspaceMatrix();
+    EXPORT Matrix4 getLocalspaceMatrix() override;
 
 protected:
     unsigned char r = 255, g = 255, b = 255;
     std::string string = "";
     bool isStringDirty = true;
     float opacity = 1.0f;
-    unsigned int textureID = 0;
     Matrix4 mAnchor;
     ResourceFont *font = nullptr;
+    Texture *texture = nullptr;
 
     int textTextureWidth = 0, textTextureHeight = 0;
+    Shader *shader = nullptr;
 };

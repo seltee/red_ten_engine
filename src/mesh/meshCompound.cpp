@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "mesh/meshCompound.h"
+#include "renderer/renderer.h"
 #include <algorithm>
 
 MeshCompound::MeshCompound()
@@ -12,12 +13,24 @@ MeshCompound::~MeshCompound()
 {
 }
 
-void MeshCompound::render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix)
+void MeshCompound::render()
 {
+    /*
     for (auto &node : nodes)
     {
         Matrix4 local = modelMatrix * getTransformationMatrix(node);
         node->mesh->render(shader, vpMatrix, local);
+    }
+    */
+}
+
+void MeshCompound::queueAnimation(RenderQueue *renderQueue, Shader *shader, MeshCompoundCache *cache, bool bCastShadows)
+{
+    for (auto &container : cache->entriesToRender)
+    {
+        renderQueue->addMainPhase(container.model, shader, nullptr, container.node->mesh->getAsStatic(), nullptr, 0);
+        if (bCastShadows)
+            renderQueue->addShadowCaster(container.model, container.node->mesh->getAsStatic());
     }
 }
 
@@ -34,14 +47,15 @@ void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, 
         cache->addEntry(node, local);
     }
 }
-
+/*
 void MeshCompound::renderAnimation(Shader *shader, Matrix4 &vpMatrix, MeshCompoundCache *cache)
 {
     for (auto &container : cache->entriesToRender)
     {
-        container.node->mesh->render(shader, vpMatrix, container.model);
+        // container.node->mesh->render(shader, vpMatrix, container.model);
     }
 }
+*/
 
 Mesh *MeshCompound::createInstance()
 {
@@ -94,7 +108,7 @@ MeshStatic *MeshCompound::getAsStatic()
     if (nodes.size() == 0)
         return nullptr;
 
-    meshStatic = new MeshStatic();
+    meshStatic = getRenderer()->createStaticMesh();
 
     // Collect amount of verticies
     int amountOfVerticies = 0;

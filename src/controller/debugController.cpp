@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "debugController.h"
-#include "common/commonShaders.h"
-#include "opengl/glew.h"
 #include "math/transformation.h"
 
 void DebugController::print(std::string str)
@@ -157,55 +155,12 @@ void DebugController::renderBoundingBox(AABB aabb, Matrix4 *mProjectionView, flo
 
 void DebugController::renderLine(Vector3 a, Vector3 b, Matrix4 *mProjectionView, float thickness, Vector3 color)
 {
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    auto shader = CommonShaders::getDebugCubeShader();
-    if (!shader)
-        return;
-
-    int shaderColorLoc = shader->getUniformLocation("color");
-
-    Vector3 p = (a + b) / 2.0f;
-    Vector3 dif = glm::normalize(b - a);
-
-    float y = atan2f(dif.z, dif.x);
-    float len = sqrtf(dif.x * dif.x + dif.z * dif.z);
-    float x = atan2(len, dif.y);
-
-    float lineLength = glm::length(a - b);
-
-    Transformation tf;
-    tf.setPosition(p);
-    tf.setRotation(Vector3(CONST_PI / 2 - x, -y - CONST_PI / 2.0f, 0.0f));
-    tf.setScale(Vector3(thickness, thickness, lineLength));
-    Matrix4 *mOut = tf.getModelMatrix();
-
-    shader->use(*mProjectionView, *mOut);
-    float colorFloat[3] = {color.x, color.y, color.z};
-    shader->provideFloat3Value(shaderColorLoc, 1, colorFloat);
-
-    CommonShaders::getCubeMesh()->useVertexArray();
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    if (getRenderer())
+        getRenderer()->renderDebugLine(a, b, mProjectionView, thickness, color);
 }
 
 void DebugController::renderLine(Matrix4 *model, Matrix4 *mProjectionView, Vector3 color)
 {
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    auto shader = CommonShaders::getDebugCubeShader();
-    if (!shader)
-        return;
-
-    int shaderColorLoc = shader->getUniformLocation("color");
-
-    shader->use(*mProjectionView, *model);
-    float colorFloat[3] = {color.x, color.y, color.z};
-    shader->provideFloat3Value(shaderColorLoc, 1, colorFloat);
-
-    CommonShaders::getCubeMesh()->useVertexArray();
-
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    if (getRenderer())
+        getRenderer()->renderDebugLine(model, mProjectionView, color);
 }

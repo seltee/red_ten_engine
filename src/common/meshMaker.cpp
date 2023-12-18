@@ -1,4 +1,8 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "meshMaker.h"
+#include "renderer/renderer.h"
 #include <string>
 
 extern const float meshMakerCubeData[];
@@ -16,7 +20,7 @@ MeshStatic *MeshMaker::createBox(Vector3 dimensions)
         data[index + 1] *= dimensions.y;
         data[index + 2] *= dimensions.z;
     }
-    auto newMesh = new MeshStatic();
+    auto newMesh = getRenderer()->createStaticMesh();
     int attributeSizes[3] = {3, 3, 2};
     newMesh->setupFloatsArray(data, 36, 3, attributeSizes, true);
     return newMesh;
@@ -34,14 +38,14 @@ MeshStatic *MeshMaker::createPlane(Vector2 dimensions, float UVScale)
         data[index + 6] *= UVScale;
         data[index + 7] *= UVScale;
     }
-    auto newMesh = new MeshStatic();
+    auto newMesh = getRenderer()->createStaticMesh();
     int attributeSizes[3] = {3, 3, 2};
     newMesh->setupFloatsArray(data, 6, 3, attributeSizes, true);
     return newMesh;
 }
 
 const float meshMakerCubeData[] = {
-    -0.5f, 0.5f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f, 1.0f,
+    -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
     -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
     0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
     0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,

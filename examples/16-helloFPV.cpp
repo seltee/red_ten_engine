@@ -65,7 +65,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(0.9f, 0.9f, 0.9f), true);
+    sunComponent->setupSunLight(Vector3(0.9f, 0.9f, 0.9f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 2.0f, 1.0f));
 
     ComponentMesh *componentMesh;
 
@@ -80,7 +81,7 @@ APPMAIN
     auto plainMesh = engine->getMeshMaker()->createPlane({25.0f, 25.0f}, 4.0f);
     auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
     auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
-    auto plainShader = new PhongShader();
+    auto plainShader = view->getRenderer()->createPhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
 
@@ -92,7 +93,7 @@ APPMAIN
 
     // Platform - temporary
     Actor *platform = layerActors->createActor<Actor>();
-    auto platformShader = new PhongShader();
+    auto platformShader = view->getRenderer()->createPhongShader();
 
     auto platformAlbedoTexture = resourceController->addImage("./data/3d/platform_albedo.jpg")->getAsTexture();
     platformShader->setTexture(TextureType::Albedo, platformAlbedoTexture);

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "../src/rtengine.h"
@@ -12,18 +12,22 @@ public:
     // pass parameters here to your class. The usual way is to create setup function that will be called after the creation by your code
     Bowl() : Actor()
     {
-        moveDirection = (float)rand() / (float)RAND_MAX * 3.14f * 2.0f;
-        moveSpeed = (float)(rand() % 100);
-        life = 10.0f;
+        moveDirection = randf(0.0f, CONST_PI2);
+        moveSpeed = randf(0.0f, 100.0f);
+        life = 4.0f + randf(0.0f, 4.0f);
 
         sprite = createComponent<ComponentSprite>();
         sprite->setTexture(ballTexture);
 
         // All actors has transform property inside them that provides ability to set position, scale and rotation in 3d or 2d space
+        // Z axis (Vector3(x, y, z)) controls the order in which sprites are rendered and represents depth if look from the camera
+        // Sprites are rendered on the blending phase (everything that is not of Lit mixing type are on the blending phase)
+        // If sorting is disabled - for blending phase engine sorts all entities by their depth
+        // That's more an example, it's better to enable sorting for 2d layers - sorting works with disabled depth buffer
+        // Without sorting if you have 2 sprites on the same depth they will glith through each other cause of depth buffer
+        // Sorting shown in the future examples
         transform.setScale(0.5f);
-        transform.setPosition(
-            ((float)rand() / (float)RAND_MAX - 0.5f) * 400.0f,
-            ((float)rand() / (float)RAND_MAX - 0.5f) * 400.0f);
+        transform.setPosition(randf(-200.0f, 200.0f), randf(-200.0f, 200.0f), randf(0.0f, 50.0f));
     }
 
     // This is the standart actor lifecycle function called on all stage updates once per frame
@@ -35,7 +39,7 @@ public:
         // Actors don't have transparancy because they are abstraction, they don't determine how components should be drawn,
         // They only provide transformation to their components. But components can have a lot of parameters to control their presentation
         // Such as opacity
-        sprite->setOpacity(life);
+        sprite->setOpacity(life * 0.8f);
 
         // Life is for how long our actor will exist
         life -= delta;
@@ -95,8 +99,8 @@ APPMAIN
     {
         float delta = engine->syncFrame();
 
-        // This way we will create 200 sprites per second
-        creationCounter += delta * 200;
+        // This way we will create 300 sprites per second
+        creationCounter += delta * 300.0f;
         while (creationCounter > 0.0f)
         {
             creationCounter -= 1.0f;

@@ -2,41 +2,48 @@
 // SPDX-License-Identifier: MIT
 
 #include "component/componentFramedSprite.h"
-#include "common/commonShaders.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include "opengl/glew.h"
 #include <math.h>
 
 ComponentFramedSprite::ComponentFramedSprite() : Component()
 {
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
-    shader = CommonShaders::getSpriteFrameShader();
+    shader = getRenderer()->getDefaultFramedSpriteShader();
+    mesh = getRenderer()->getDefaultSpriteMesh();
+
     colorMode = ComponentColorMode::Alpha;
+
+    shadersParameters[0] = shader->createShaderParameter("aTexCoordShift", ShaderParameterType::Float2);
+    shadersParameters[1] = shader->createShaderParameter("aTexCoordMul", ShaderParameterType::Float2);
+
+    setShaderParameters(shadersParameters, 2);
 }
 
-void ComponentFramedSprite::onRender(Matrix4 &vpMatrix, Transformation *tf)
+ComponentFramedSprite::~ComponentFramedSprite()
 {
-    if (texture)
+    shader = getRenderer()->getDefaultFramedSpriteShader();
+    shader->destroyShaderParameter(shadersParameters[0]);
+    shader->destroyShaderParameter(shadersParameters[1]);
+}
+
+void ComponentFramedSprite::onRenderQueue(RenderQueue *renderQueue)
+{
+    if (texture && owner)
     {
-        Matrix4 mOut = *tf->getModelMatrix() * *transform.getModelMatrix() * mAnchor;
+        Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix() * mAnchor;
+        shadersParameters[0]->set(1, frameShift);
+        shadersParameters[1]->set(1, frameRenderSize);
 
-        shader->use(vpMatrix, mOut);
-        shader->setOpacity(opacity);
-
-        shader->setFrameShift(frameShift);
-        shader->setFrameSize(frameRenderSize);
-
-        texture->bind();
-        CommonShaders::getSpriteMesh()->useVertexArray();
-        prepareColorMode();
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        if (colorMode == ComponentColorMode::Lit)
+        {
+            renderQueue->addMainPhase(mModel, shader, texture, mesh, parametersList, parametersAmount);
+        }
+        else
+        {
+            renderQueue->addBlendingPhase(mModel, colorMode, shader, texture, mesh, opacity, parametersList, parametersAmount);
+        }
     }
-}
-
-void ComponentFramedSprite::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
-{
 }
 
 void ComponentFramedSprite::setOpacity(float opacity)

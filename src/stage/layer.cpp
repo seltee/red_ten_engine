@@ -13,6 +13,6 @@ void Layer::process(float delta)
 {
 }
 
-void Layer::render(RenderTarget *renderTarget)
+void Layer::render(Renderer* renderer, RenderTarget *renderTarget)
 {
 }

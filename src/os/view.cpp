@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 #include "os/view.h"
-#include "opengl/glew.h"
-#include "common/commonShaders.h"
-#include "common/commonTextures.h"
+#include "renderer/opengl/rendererOpenGL.h"
+#include "renderer/vulkan/rendererVulkan.h"
+#include "connector/withRenderer.h"
 #include <SDL.h>
 
 View::View(Config *config)
@@ -22,16 +22,19 @@ bool View::makeWindow()
     if (window)
         return false;
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    if (!RendererOpenGL::isAvailable())
+        return false;
+
+    renderer = new RendererOpenGL();
+    // renderer = new RendererVulkan();
+
+    renderer->preInit();
 
     auto newWindow = SDL_CreateWindow(windowName.c_str(),
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,
                                       width, height,
-                                      (bIsFullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI);
+                                      (bIsFullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_ALLOW_HIGHDPI | renderer->getWindowFlags());
 
     if (newWindow)
     {
@@ -42,25 +45,15 @@ bool View::makeWindow()
             SDL_SetWindowDisplayMode(newWindow, &mode);
         }
 
-        SDL_GLContext context = SDL_GL_CreateContext(newWindow);
-        if (!context)
+        if (!renderer->init(newWindow))
         {
-            printf("Failed to create OpenGL context\n");
+            delete renderer;
+            SDL_DestroyWindow(newWindow);
+            return false;
         }
 
-        glewExperimental = GL_TRUE;
-        glewInit();
-
-        CommonShaders commonShaders;
-        commonShaders.build();
-
-        CommonTextures commonTextures;
-        commonTextures.build();
-
+        WithRenderer::setCurrentRenderer(renderer);
         window = newWindow;
-
-        oglVersion = (char *)glGetString(GL_RENDERER); // get renderer string
-        version = (char *)glGetString(GL_VERSION);     // version as a string
 
         SDL_GL_GetDrawableSize((SDL_Window *)window, &drawableWidth, &drawableHeight);
         if (SDL_GL_SetSwapInterval(-1) == 0)
@@ -177,6 +170,7 @@ void View::updateSuitableDisplayMode()
 
 void View::updateFrameBuffer()
 {
+    printf("Create render target %i %i\n", drawableWidth, drawableHeight);
     if (renderTarget)
         delete renderTarget;
     renderTarget = new RenderTarget(drawableWidth, drawableHeight, config->getShadowQuality());

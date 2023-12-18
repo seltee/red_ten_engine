@@ -16,22 +16,11 @@ ComponentCameraPerspective::~ComponentCameraPerspective()
 void ComponentCameraPerspective::onCreated()
 {
     cameraPerspective = new CameraPerspective();
-    cameraPerspective->setOwnerTransform(&owner->transform);
+    cameraPerspective->setOwner(this);
     auto layer = (LayerActors *)owner->getCurrentLayer();
     if (!layer->getActiveCamera())
     {
         layer->setActiveCamera(cameraPerspective);
-    }
-}
-
-void ComponentCameraPerspective::onRender(Matrix4 &vpMatrix, Transformation *tf)
-{
-    Matrix4 viewMatrix = glm::inverse(*tf->getModelMatrix() * *transform.getModelMatrix());
-    cameraPerspective->setViewMatrix(viewMatrix);
-    if (cameraPerspective->isListenerCamera())
-    {
-        audio->getAudioBase()->setPosition(transform.getPosition());
-        audio->getAudioBase()->setOrientation(transform.getRotation());
     }
 }
 

@@ -4,8 +4,9 @@
 #pragma once
 
 #include "resource/resource.h"
-#include "common/texture.h"
+#include "renderer/texture.h"
 #include "connector/withLogger.h"
+#include "connector/withRenderer.h"
 
 enum class ByteMap
 {
@@ -14,7 +15,7 @@ enum class ByteMap
     Alpha
 };
 
-class ResourceImage : public Resource, public WithLogger
+class ResourceImage : public Resource, public WithLogger, public WithRenderer
 {
 public:
     EXPORT ResourceImage(std::string path, ByteMap byteMap, int byteMapScale);

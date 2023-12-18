@@ -10,6 +10,7 @@
 #include "math/math.h"
 #include "physics/physicsWorld.h"
 #include "connector/withProfiler.h"
+#include "renderer/renderer.h"
 #include <list>
 
 class LayerActors : public Layer,
@@ -27,8 +28,8 @@ public:
         return newActor;
     }
 
-    EXPORT void process(float delta);
-    EXPORT void render(RenderTarget *renderTarget);
+    EXPORT void process(float delta) override;
+    EXPORT void render(Renderer* renderer, RenderTarget *renderTarget) override;
     EXPORT void prepareNewActor(Actor *actor);
     EXPORT void enablePhisics(const Vector3 &gravity, float simScale = 1.0f, int stepsPerSecond = 100);
     EXPORT void enableSorting();
@@ -71,7 +72,7 @@ public:
 protected:
     bool bIsVisible = true;
     bool bProcessingEnabled = true;
-    float ambientColor[3] = {1.0f, 1.0f, 1.0f};
+    Vector3 ambientColor = Vector3(1.0f);
 
     std::list<Actor *> actors;
     PhysicsWorld *physicsWorld = nullptr;
@@ -89,6 +90,4 @@ protected:
     bool HDREnvVisibility = true;
 
     float gamma = 1.0f;
-
-    unsigned int tBlack;
 };

@@ -4,7 +4,7 @@
 #include "../src/rtengine.h"
 #include <math.h>
 
-class Sphere : public Actor, public WithRepository
+class Sphere : public Actor, public WithRepository, public WithRenderer
 {
 public:
     Sphere() : Actor()
@@ -20,7 +20,7 @@ public:
 
         if (!sphereShader)
         {
-            sphereShader = new PhongShader();
+            sphereShader = getRenderer()->createPhongShader();
             sphereShader->setTexture(TextureType::Albedo, sphereAlbedoTexture);
             sphereShader->setTexture(TextureType::Normal, sphereNormalTexture);
         }
@@ -50,7 +50,7 @@ public:
 };
 PhongShader *Sphere::sphereShader = nullptr;
 
-class Crate : public Actor, public WithMeshMaker, public WithRepository
+class Crate : public Actor, public WithMeshMaker, public WithRepository, public WithRenderer
 {
 public:
     Crate() : Actor()
@@ -65,7 +65,7 @@ public:
 
         if (!crateShader)
         {
-            crateShader = new PhongShader();
+            crateShader = getRenderer()->createPhongShader();
             crateShader->setTexture(TextureType::Albedo, crateAlbedoTexture);
         }
 
@@ -96,7 +96,7 @@ PhongShader *Crate::crateShader = nullptr;
 Mesh *Crate::crateMesh = nullptr;
 
 
-class Platform : public Actor, public WithMeshMaker, public WithRepository
+class Platform : public Actor, public WithMeshMaker, public WithRepository, public WithRenderer
 {
 public:
     Platform() : Actor()
@@ -111,7 +111,7 @@ public:
 
         if (!platformShader)
         {
-            platformShader = new PhongShader();
+            platformShader = getRenderer()->createPhongShader();
             platformShader->setTexture(TextureType::Albedo, platformAlbedoTexture);
         }
 

@@ -4,7 +4,7 @@
 #include "../src/rtengine.h"
 #include <math.h>
 
-class CrateCollection : public Actor, public WithMeshMaker, public WithRepository
+class CrateCollection : public Actor, public WithMeshMaker, public WithRepository, public WithRenderer
 {
 public:
     CrateCollection() : Actor()
@@ -21,7 +21,7 @@ public:
 
         if (!crateShader)
         {
-            crateShader = new PhongShader();
+            crateShader = getRenderer()->createPhongShader();
             auto crateAlbedoTexture = repository->addImage("./data/crate.jpg")->getAsTexture();
             crateShader->setTexture(TextureType::Albedo, crateAlbedoTexture);
         }

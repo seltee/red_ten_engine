@@ -1,11 +1,10 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "../src/rtengine.h"
-#include "../src/common/commonShaders.h"
 #include <math.h>
 
-class Ground : public Actor
+class Ground : public Actor, WithRenderer
 {
 public:
     Ground()
@@ -23,14 +22,14 @@ public:
 
         if (!floorShader)
         {
-            floorShader = new PhongShader();
+            floorShader = getRenderer()->createPhongShader();
             auto floorAlbedoTexture = resourceController->addImage("./data/3d/ground_albedo.jpg")->getAsTexture();
             floorShader->setTexture(TextureType::Albedo, floorAlbedoTexture);
         }
 
         if (!treeShader)
         {
-            treeShader = new PhongShader();
+            treeShader = getRenderer()->createPhongShader();
             auto treeAlbedoTexture = resourceController->addImage("./data/3d/tree_albedo.jpg")->getAsTexture();
             treeShader->setTexture(TextureType::Albedo, treeAlbedoTexture);
         }
@@ -167,7 +166,7 @@ APPMAIN
     auto animatedMeshResource = resourceController->addMesh("./data/3d/robot.fbx");
     auto animatedMesh = animatedMeshResource->getAsMeshCompound();
 
-    auto animMeshShader = new PhongShader();
+    auto animMeshShader = view->getRenderer()->createPhongShader();
     auto animMeshAlbedoTexture = resourceController->addImage("./data/3d/robot_texture_base.jpg")->getAsTexture();
     auto animMeshNormalTexture = resourceController->addImage("./data/3d/robot_texture_nor.jpg")->getAsTexture();
     auto animMeshRoughTexture = resourceController->addImage("./data/3d/robot_texture_rough.jpg")->getAsTexture();
@@ -198,7 +197,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-0.8f, 1.0f, 0.7f), Vector3(1.45f, 1.45f, 1.19f), true);
+    sunComponent->setupSunLight(Vector3(1.45f, 1.45f, 1.19f), true);
+    sunComponent->transform.setPosition(Vector3(-0.8f, 1.0f, 0.7f));
 
     // Settings used to move our ground
     // Each time shift exceeding groundSize it will be moved back to groundSize

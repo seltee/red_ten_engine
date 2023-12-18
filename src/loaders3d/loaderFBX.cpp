@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
+#include "renderer/renderer.h"
 #include "loaders3d/loaderFBX.h"
 #include "loaders/stb_image.h"
 #include "common/meshDescriptor.h"
@@ -151,7 +152,7 @@ void LoaderFBX::reload()
             float *data = descriptor.getAsFloatArray8f(&amountOfFloats);
 
             // create static mesh with gathered data
-            MeshStatic *mesh = new MeshStatic();
+            MeshStatic *mesh = getRenderer()->createStaticMesh();
 
             int amountOfVertexes = amountOfFloats / 8;
             int attributeSizes[3] = {3, 3, 2};
@@ -248,7 +249,7 @@ void LoaderFBX::reload()
     // Precreate all models
     for (auto &it : models)
     {
-        MeshStatic *mesh = new MeshStatic();
+        MeshStatic *mesh = getRenderer()->createStaticMesh();
         mesh->setName(it.name);
         MeshCompoundNode *meshCompoundNode = meshCompound->addMesh(mesh);
         it.meshCompoundNode = meshCompoundNode;

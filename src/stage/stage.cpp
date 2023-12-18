@@ -1,9 +1,7 @@
 // SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "common/commonShaders.h"
 #include "stage/stage.h"
-#include "opengl/glew.h"
 #include <SDL.h>
 #include <math.h>
 
@@ -11,9 +9,8 @@ Stage::Stage(std::string name)
 {
     this->name = name;
 
-    debugLayer = new LayerDebug(debugLayerIndex);
-    layers.push_back(debugLayer);
-    sortLayers();
+    // debugLayer = new LayerDebug(debugLayerIndex);
+    // layers.push_back(debugLayer);
 
     presentTrackerId = profiler->addTracker("stage \"" + name + "\" final render");
     buffersSwapTrackerId = profiler->addTracker("stage \"" + name + "\" buffer swap");
@@ -46,23 +43,12 @@ void Stage::process(float delta)
 void Stage::present(View *view)
 {
     auto viewRenderTarget = view->getRenderTarget();
-    present(viewRenderTarget);
+    present(view->getRenderer(), viewRenderTarget);
+
+    profiler->startTracking(presentTrackerId);
 
     // present the framebuffer on the screen
-    Matrix4 m;
-    profiler->startTracking(presentTrackerId);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
-
-    auto screenShader = CommonShaders::getScreenShader();
-    screenShader->use(m, m);
-
-    glBindTexture(GL_TEXTURE_2D, viewRenderTarget->getResultTexture());
-
-    CommonShaders::getScreenMesh()->useVertexArray();
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    view->getRenderer()->presentToScreen(viewRenderTarget);
 
     profiler->stopTracking(presentTrackerId);
 
@@ -71,19 +57,19 @@ void Stage::present(View *view)
     profiler->stopTracking(buffersSwapTrackerId);
 }
 
-void Stage::present(RenderTarget *renderTarget)
+void Stage::present(Renderer *renderer, RenderTarget *renderTarget)
 {
     profiler->startTracking(presentTrackerId);
-    renderTarget->useResultBuffer();
-    glClearColor(clearColor.r, clearColor.g, clearColor.b, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    // set result buffer and clear it
+    renderTarget->setupResultBuffer(true, Vector4(clearColor.r, clearColor.g, clearColor.b, 1.0f));
     profiler->stopTracking(presentTrackerId);
 
     for (auto it = layers.begin(); it != layers.end(); ++it)
     {
         if ((*it)->isVisible())
         {
-            (*it)->render(renderTarget);
+            (*it)->render(renderer, renderTarget);
         }
     }
 }

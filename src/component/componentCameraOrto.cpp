@@ -16,22 +16,11 @@ ComponentCameraOrto::~ComponentCameraOrto()
 void ComponentCameraOrto::onCreated()
 {
     cameraOrto = new CameraOrto();
-    cameraOrto->setOwnerTransform(&owner->transform);
+    cameraOrto->setOwner(this);
     auto layer = (LayerActors *)owner->getCurrentLayer();
     if (!layer->getActiveCamera())
     {
         layer->setActiveCamera(cameraOrto);
-    }
-}
-
-void ComponentCameraOrto::onRender(Matrix4 &vpMatrix, Transformation *tf)
-{
-    Matrix4 viewMatrix = glm::inverse(*tf->getModelMatrix() * *transform.getModelMatrix());
-    cameraOrto->setViewMatrix(viewMatrix);
-    if (cameraOrto->isListenerCamera())
-    {
-        audio->getAudioBase()->setPosition(transform.getPosition());
-        audio->getAudioBase()->setOrientation(transform.getRotation());
     }
 }
 

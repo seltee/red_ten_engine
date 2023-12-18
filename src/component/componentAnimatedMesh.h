@@ -6,9 +6,9 @@
 #include "mesh/meshCompound.h"
 #include "mesh/meshStatic.h"
 #include "common/utils.h"
-#include "common/texture.h"
+#include "renderer/texture.h"
+#include "renderer/shader.h"
 #include "component/component.h"
-#include "shaders/shader.h"
 #include "animation/animator.h"
 #include "mesh/meshCompoundCache.h"
 
@@ -17,23 +17,27 @@ class ComponentAnimatedMesh : public Component
 public:
     EXPORT ComponentAnimatedMesh();
 
-    EXPORT void process(float delta);
+    EXPORT void process(float delta) override;
 
-    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
-    EXPORT void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT void onRenderQueue(RenderQueue *renderQueue) override;
 
     EXPORT void setMesh(MeshCompound *mesh);
     EXPORT void setShader(Shader *shader);
 
-    EXPORT Matrix4 getLocalspaceMatrix();
+    EXPORT Matrix4 getLocalspaceMatrix() override;
 
-    EXPORT MeshStatic *getStaticMesh();
+    EXPORT MeshStatic *getStaticMesh() override;
 
     EXPORT Animator *createAnimator(Animation *animation);
+
+    EXPORT inline void enableShadowCasting() { bCastShadows = true; };
+    EXPORT inline void disableShadowCasting() { bCastShadows = false; };
+    EXPORT inline bool isShadowCasting() { return bCastShadows; }
 
 protected:
     MeshCompound *mesh = nullptr;
     Shader *shader = nullptr;
     std::vector<Animator *> animators;
     MeshCompoundCache cache;
+    bool bCastShadows = true;
 };

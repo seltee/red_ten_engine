@@ -18,7 +18,7 @@ public:
     }
 };
 
-class ActorFactory
+class ActorFactory : public WithRenderer
 {
 public:
     ActorFactory(ResourceController *resourceController, LayerActors *layer)
@@ -32,11 +32,11 @@ public:
 
         auto platformAlbedoTexture = resourceController->addImage("./data/3d/platform_albedo.jpg")->getAsTexture();
 
-        sphereShader = new PhongShader();
+        sphereShader = getRenderer()->createPhongShader();
         sphereShader->setTexture(TextureType::Albedo, sphereAlbedoTexture);
         sphereShader->setTexture(TextureType::Normal, sphereNormalTexture);
 
-        platformShader = new PhongShader();
+        platformShader = getRenderer()->createPhongShader();
         platformShader->setTexture(TextureType::Albedo, platformAlbedoTexture);
     }
 
@@ -123,7 +123,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(2.5f, 2.5f, 2.5f), true);
+    sunComponent->setupSunLight(Vector3(2.5f, 2.5f, 2.5f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 2.0f, 1.0f));
 
     float spawnCounter = (float)spawnPerSecond;
 

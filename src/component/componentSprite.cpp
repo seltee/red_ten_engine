@@ -1,43 +1,34 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "component/componentSprite.h"
-#include "common/commonShaders.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include "opengl/glew.h"
+#include "actor/actor.h"
 #include <math.h>
 
 ComponentSprite::ComponentSprite() : Component()
 {
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
-    shader = CommonShaders::getSpriteShader();
     colorMode = ComponentColorMode::Alpha;
+    shader = getRenderer()->getDefaultSpriteShader();
+    mesh = getRenderer()->getDefaultSpriteMesh();
 }
 
-void ComponentSprite::onRender(Matrix4 &vpMatrix, Transformation *tf)
+void ComponentSprite::onRenderQueue(RenderQueue *renderQueue)
 {
-    Matrix4 mOut = *tf->getModelMatrix() * *transform.getModelMatrix() * mAnchor;
-
-    if (shader)
+    if (texture && owner)
     {
-        shader->use(vpMatrix, mOut);
-        shader->setOpacity(opacity);
+        Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix() * mAnchor;
+        if (colorMode == ComponentColorMode::Lit)
+        {
+            renderQueue->addMainPhase(mModel, shader, texture, mesh, parametersList, parametersAmount);
+        }
+        else
+        {
+            renderQueue->addBlendingPhase(mModel, colorMode, shader, texture, mesh, opacity, parametersList, parametersAmount);
+        }
     }
-
-    if (texture)
-    {
-        texture->bind();
-    }
-
-    CommonShaders::getSpriteMesh()->useVertexArray();
-    prepareColorMode();
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-void ComponentSprite::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
-{
 }
 
 void ComponentSprite::setOpacity(float opacity)

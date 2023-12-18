@@ -2,8 +2,9 @@
 #include "mesh/mesh.h"
 #include "mesh/meshStatic.h"
 #include "math/math.h"
+#include "connector/withRenderer.h"
 
-class MeshMaker
+class MeshMaker : public WithRenderer
 {
 public:
     EXPORT MeshStatic *createBox(Vector3 dimensions);

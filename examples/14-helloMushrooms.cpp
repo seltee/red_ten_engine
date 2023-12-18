@@ -174,12 +174,12 @@ APPMAIN
     auto mushroomMesh = resourceController->addMesh("./data/3d/mushroom.fbx")->getAsMeshStatic();
 
     Land::landMesh = landMesh;
-    Land::landShader = new PhongShader();
+    Land::landShader = view->getRenderer()->createPhongShader();
     Land::landShader->setTexture(TextureType::Albedo, landAlbedoTexture);
     Land::landShader->setTexture(TextureType::Normal, landNormalTexture);
 
     Mushroom::mushroomMesh = mushroomMesh;
-    Mushroom::mushroomShader = new PhongShader();
+    Mushroom::mushroomShader = view->getRenderer()->createPhongShader();
     Mushroom::mushroomShader->setTexture(TextureType::Albedo, mushroomAlbedoTexture);
 
     // land
@@ -188,7 +188,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(2.5f, 2.5f, 2.5f), true);
+    sunComponent->setupSunLight(Vector3(2.5f, 2.5f, 2.5f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 2.0f, 1.0f));
 
     // Pointer to receive input and apply actions
     auto pointer = layerActors->createActor<Pointer>();

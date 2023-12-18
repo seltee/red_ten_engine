@@ -13,16 +13,11 @@
 #include "physics/shapes/shapeGeometry.h"
 #include "physics/shapes/shapeCapsule.h"
 #include "common/destroyable.h"
+#include "renderer/renderQueue.h"
+#include "renderer/shaderParameter.h"
 #include <list>
 
 class Camera;
-
-enum class ComponentColorMode
-{
-    Lit = 0,
-    Alpha = 1,
-    Addition = 2,
-};
 
 class Component : public Destroyable
 {
@@ -32,13 +27,8 @@ public:
     EXPORT void prepare(Entity *owner);
     EXPORT virtual void process(float delta);
 
-    EXPORT virtual void renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera);
-    EXPORT virtual Matrix4 preparePreShadowPhase(Vector3 cameraPosition);
-
-    EXPORT virtual void onRender(Matrix4 &vpMatrix, Transformation *tf);
-    EXPORT virtual void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT virtual void onRenderQueue(RenderQueue *renderQueue);
     EXPORT virtual void onCreated();
-    EXPORT void prepareColorMode();
 
     EXPORT ShapeSphere *addShapeSphere(float radius);
     EXPORT ShapeSphere *addShapeSphere(Vector3 center, float radius);
@@ -56,23 +46,23 @@ public:
     EXPORT ShapeCapsule *addShapeCapsule(float height, float radius);
 
     EXPORT virtual Matrix4 getLocalspaceMatrix();
+    EXPORT Matrix4 getWorldModelMatrix();
 
     EXPORT virtual MeshStatic *getStaticMesh();
 
-    EXPORT inline bool isUsingBlendingPhase() { return colorMode != ComponentColorMode::Lit; }
-    EXPORT inline bool isUsingLightPhase() { return bUseLightPhase; }
-    EXPORT inline bool isUsingShadowPhase() { return bUseShadowPhase; }
-
     EXPORT inline void setVisibility(bool state) { bIsVisible = state; }
     EXPORT inline bool isVisible() { return bIsVisible; }
+
+    EXPORT virtual void setShaderParameters(ShaderParameter **parametersList, int parametersAmount);
 
     std::list<Shape *> shapes;
     Transformation transform;
 
     ComponentColorMode colorMode = ComponentColorMode::Lit;
+
 protected:
-    bool bUseLightPhase = false;
-    bool bUseShadowPhase = false;
     bool bIsVisible = true;
     Entity *owner = nullptr;
+    ShaderParameter **parametersList = nullptr;
+    int parametersAmount = 0;
 };

@@ -3,7 +3,7 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/renderTarget.h"
+#include "renderer/renderTarget.h"
 
 class Layer
 {
@@ -15,7 +15,7 @@ protected:
 
 public:
     virtual void process(float delta);
-    virtual void render(RenderTarget *renderTarget);
+    virtual void render(Renderer* renderer, RenderTarget *renderTarget);
 
     inline void setVisible(bool state) { bIsVisible = state; }
     inline bool isVisible() { return bIsVisible; }

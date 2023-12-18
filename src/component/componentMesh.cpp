@@ -3,8 +3,6 @@
 
 #include "component/componentMesh.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include "common/commonShaders.h"
-#include "opengl/glew.h"
 #include <math.h>
 
 ComponentMesh::ComponentMesh() : Component()
@@ -12,12 +10,43 @@ ComponentMesh::ComponentMesh() : Component()
     shader = nullptr;
 }
 
+void ComponentMesh::onRenderQueue(RenderQueue *renderQueue)
+{
+    if (mesh)
+    {
+        Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix();
+
+        if (lods.size() > 0)
+        {
+            float distance = fabsf((*renderQueue->getViewProjectionMatrix() * mModel * Vector4(0, 0, 0, 1.0f)).z);
+            Mesh *toRender = mesh;
+            for (auto &lod : lods)
+            {
+                if (lod.distance < distance)
+                    toRender = lod.mesh;
+                else
+                    break;
+            }
+            renderQueue->addMainPhase(mModel, shader, nullptr, toRender->getAsStatic(), parametersList, parametersAmount);
+            if (bCastShadows)
+                renderQueue->addShadowCaster(mModel, toRender->getAsStatic());
+        }
+        else
+        {
+            renderQueue->addMainPhase(mModel, shader, nullptr, mesh->getAsStatic(), parametersList, parametersAmount);
+            if (bCastShadows)
+                renderQueue->addShadowCaster(mModel, mesh->getAsStatic());
+        }
+    }
+}
+
+/*
 void ComponentMesh::onRender(Matrix4 &vpMatrix, Transformation *tf)
 {
     if (mesh)
     {
         Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        prepareColorMode();
+        //prepareColorMode();
         if (lods.size() > 0)
         {
             float distance = fabsf((vpMatrix * mModelTransform * Vector4(0, 0, 0, 1.0f)).z);
@@ -46,6 +75,7 @@ void ComponentMesh::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
         mesh->render(shader, vpMatrix, mModelTransform);
     }
 }
+*/
 
 void ComponentMesh::setMesh(Mesh *mesh)
 {

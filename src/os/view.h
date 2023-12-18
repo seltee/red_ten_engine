@@ -3,9 +3,10 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/renderTarget.h"
+#include "renderer/renderTarget.h"
 #include "connector/withLogger.h"
 #include "controller/logController.h"
+#include "renderer/renderer.h"
 #include <string>
 
 class View : public WithLogger
@@ -25,8 +26,8 @@ public:
     inline int getRefreshRate() { return refreshRate; }
     inline float getHWProportion() { return (float)height / (float)width; }
     inline bool isFullscreen() { return bIsFullscreen; }
-    inline const char *getOGLVersion() { return oglVersion; }
-    inline const char *getVersion() { return version; }
+
+    inline Renderer *getRenderer() { return renderer; }
 
     EXPORT void minimize();
 
@@ -47,9 +48,8 @@ protected:
     int displayMode = -1;
     bool bIsFullscreen = false;
 
-    const char *oglVersion = nullptr;
-    const char *version = nullptr;
-
     RenderTarget *renderTarget = nullptr;
     Config *config = nullptr;
+
+    Renderer *renderer = nullptr;
 };

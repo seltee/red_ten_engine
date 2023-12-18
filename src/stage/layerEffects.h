@@ -1,28 +1,29 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#include "renderer/shader.h"
+#include "renderer/effectBuffer.h"
 #include "common/utils.h"
-#include "shaders/effect.h"
 #include "stage/layer.h"
 #include "connector/withProfiler.h"
+#include "connector/withRenderer.h"
 #include <vector>
 
-class LayerEffects : public Layer, public WithProfiler
+class LayerEffects : public Layer, public WithProfiler, public WithRenderer
 {
 public:
     LayerEffects(std::string name, int index);
-    EXPORT void addEffect(Effect *effect);
-    EXPORT void removeEffect(Effect *effect);
+    ~LayerEffects();
+    EXPORT void addEffect(Shader *effect, ShaderParameter **parameters = nullptr, int parametersAmount = 0);
+    EXPORT void removeEffect(Shader *effect);
     EXPORT void clearEffects();
-    EXPORT void process(float delta);
-    EXPORT void render(RenderTarget *renderTarget);
+    EXPORT void render(Renderer *renderer, RenderTarget *renderTarget) override;
 
 protected:
-    std::vector<Effect *> effects;
-    unsigned int framebuffer = 0;
-    unsigned int renderedTexture = 0;
+    std::vector<ParametredShader> effects;
 
-    int processTrackerId = 0;
     int renderTrackerId = 0;
+
+    EffectBuffer *effectBuffer = nullptr;
 };

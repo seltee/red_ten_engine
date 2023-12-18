@@ -4,6 +4,7 @@ LD = clang++
 ifeq ($(OS),Windows_NT)
 SDL_LIB_PATH = "../SDL2-2.28.5"
 SDL_TTF_LIB_PATH = "../SDL2_ttf-2.0.15"
+VULKAN_PATH = "C:/VulkanSDK/1.3.268.0"
 else
 SDL_LIB_PATH = "/opt/homebrew/Cellar/sdl2/SDL2-2.28.5/"
 SDL_TTF_LIB_PATH = "/opt/homebrew/Cellar/sdl2_ttf/2.20.2/"
@@ -20,9 +21,9 @@ CFLAGS = -Isrc -I${SDL_LIB_PATH}/include -I${SDL_LIB_PATH}/include/SDL2 \
 endif
 
 ifeq ($(OS),Windows_NT)
-LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64/ \
+LIBRARIES = -L${SDL_LIB_PATH}/lib/x64/ -L${SDL_TTF_LIB_PATH}/lib/x64/ -L${VULKAN_PATH}/Lib \
 			-lSDL2 -lSDL2main -lkernel32 -luser32 -lgdi32 -lwinspool -lSDL2_ttf.lib \
-			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32
+			-lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 -lopengl32 -lvulkan-1
 else
 LIBRARIES = -L${SDL_LIB_PATH}/lib -L${SDL_TTF_LIB_PATH}/lib \
 			-lSDL2 -lSDL2main -lSDL2_ttf -framework OpenGL -framework
@@ -58,8 +59,9 @@ EXMDIR = examples
 OBJDIR = objects
 BINDIR = bin
  
-OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/glew.o ${OBJDIR}/effect.o ${OBJDIR}/transformation.o \
+OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/glew.o ${OBJDIR}/transformation.o \
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
+			${OBJDIR}/effectBuffer.o ${OBJDIR}/effectBufferOpenGL.o \
 			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o \
 			${OBJDIR}/viewController.o ${OBJDIR}/stageController.o ${OBJDIR}/debugController.o \
 			${OBJDIR}/audioController.o ${OBJDIR}/resourceController.o ${OBJDIR}/profilerController.o \
@@ -68,15 +70,19 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
 			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceHDR.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
-			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o \
+			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/stb_vorbis.o \
-			${OBJDIR}/destroyable.o ${OBJDIR}/commonShaders.o ${OBJDIR}/commonTextures.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
-			${OBJDIR}/phongShader.o ${OBJDIR}/rawShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningShader.o ${OBJDIR}/cubeMapShader.o ${OBJDIR}/initialLightShader.o \
+			${OBJDIR}/destroyable.o \
+			${OBJDIR}/shaderOpenGL.o ${OBJDIR}/commonOpenGLShaders.o ${OBJDIR}/commonTextures.o ${OBJDIR}/utils.o ${OBJDIR}/hullCliping.o \
+			${OBJDIR}/phongOpenGLShader.o ${OBJDIR}/shader.o ${OBJDIR}/lightningOpenGLShader.o \
+			${OBJDIR}/cubeMapOpenGLShader.o ${OBJDIR}/initialLightOpenGLShader.o ${OBJDIR}/phongShader.o  \
+			${OBJDIR}/shaderParameter.o ${OBJDIR}/shaderParameterOpenGL.o \
 			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o ${OBJDIR}/withProfiler.o \
+			${OBJDIR}/withRenderer.o \
 			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
 			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
 			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
@@ -84,10 +90,12 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/meshMaker.o ${OBJDIR}/motion.o ${OBJDIR}/collisionDispatcher.o ${OBJDIR}/collisionCollector.o \
 			${OBJDIR}/constraint.o ${OBJDIR}/constraint6DOF.o \
 			${OBJDIR}/audioBase.o ${OBJDIR}/audioSource.o \
-			${OBJDIR}/mesh.o ${OBJDIR}/meshCompound.o ${OBJDIR}/meshStatic.o \
+			${OBJDIR}/mesh.o ${OBJDIR}/meshCompound.o ${OBJDIR}/meshStatic.o ${OBJDIR}/meshStaticOpenGL.o \
 			${OBJDIR}/loader3d.o \
 			${OBJDIR}/loaderFBX.o ${OBJDIR}/FBXNode.o ${OBJDIR}/FBXAnimationStack.o ${OBJDIR}/FBXAnimationCurveNode.o ${OBJDIR}/FBXAnimationCurve.o ${OBJDIR}/FBXAnimationLayer.o \
-			${OBJDIR}/animation.o ${OBJDIR}/animator.o ${OBJDIR}/animationTarget.o
+			${OBJDIR}/animation.o ${OBJDIR}/animator.o ${OBJDIR}/animationTarget.o \
+			${OBJDIR}/renderer.o ${OBJDIR}/rendererOpenGL.o ${OBJDIR}/rendererVulkan.o ${OBJDIR}/vulkanPhysicalDevice.o ${OBJDIR}/vulkanLogicalDevice.o \
+			${OBJDIR}/renderQueue.o
 
 
 EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloSorting${EXT} \
@@ -289,8 +297,11 @@ ${OBJDIR}/utils.o: ${SRCDIR}/common/utils.cpp
 ${OBJDIR}/destroyable.o: ${SRCDIR}/common/destroyable.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/destroyable.o ${SRCDIR}/common/destroyable.cpp
 
-${OBJDIR}/commonShaders.o: ${SRCDIR}/common/commonShaders.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/commonShaders.o ${SRCDIR}/common/commonShaders.cpp
+${OBJDIR}/shaderOpenGL.o: ${SRCDIR}/renderer/opengl/shaders/shaderOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shaderOpenGL.o ${SRCDIR}/renderer/opengl/shaders/shaderOpenGL.cpp
+
+${OBJDIR}/commonOpenGLShaders.o: ${SRCDIR}/renderer/opengl/shaders/commonOpenGLShaders.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/commonOpenGLShaders.o ${SRCDIR}/renderer/opengl/shaders/commonOpenGLShaders.cpp
 
 ${OBJDIR}/commonTextures.o: ${SRCDIR}/common/commonTextures.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/commonTextures.o ${SRCDIR}/common/commonTextures.cpp
@@ -298,8 +309,8 @@ ${OBJDIR}/commonTextures.o: ${SRCDIR}/common/commonTextures.cpp
 ${OBJDIR}/meshDescriptor.o: ${SRCDIR}/common/meshDescriptor.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/meshDescriptor.o ${SRCDIR}/common/meshDescriptor.cpp
 	
-${OBJDIR}/renderTarget.o: ${SRCDIR}/common/renderTarget.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/renderTarget.o ${SRCDIR}/common/renderTarget.cpp
+${OBJDIR}/renderTarget.o: ${SRCDIR}/renderer/renderTarget.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/renderTarget.o ${SRCDIR}/renderer/renderTarget.cpp
 
 ${OBJDIR}/withLogger.o: ${SRCDIR}/connector/withLogger.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withLogger.o ${SRCDIR}/connector/withLogger.cpp
@@ -318,6 +329,9 @@ ${OBJDIR}/withAudio.o: ${SRCDIR}/connector/withAudio.cpp
 
 ${OBJDIR}/withProfiler.o: ${SRCDIR}/connector/withProfiler.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withProfiler.o ${SRCDIR}/connector/withProfiler.cpp
+	
+${OBJDIR}/withRenderer.o: ${SRCDIR}/connector/withRenderer.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withRenderer.o ${SRCDIR}/connector/withRenderer.cpp
 
 ${OBJDIR}/soundPlayer.o: ${SRCDIR}/common/soundPlayer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundPlayer.o ${SRCDIR}/common/soundPlayer.cpp
@@ -331,32 +345,47 @@ ${OBJDIR}/geometry.o: ${SRCDIR}/common/geometry.cpp
 ${OBJDIR}/config.o: ${SRCDIR}/common/config.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/config.o ${SRCDIR}/common/config.cpp
 
-${OBJDIR}/texture.o: ${SRCDIR}/common/texture.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/texture.o ${SRCDIR}/common/texture.cpp
-	
-${OBJDIR}/effect.o: ${SRCDIR}/shaders/effect.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/effect.o ${SRCDIR}/shaders/effect.cpp
+${OBJDIR}/texture.o: ${SRCDIR}/renderer/texture.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/texture.o ${SRCDIR}/renderer/texture.cpp
 
-${OBJDIR}/phongShader.o: ${SRCDIR}/shaders/phongShader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/phongShader.o ${SRCDIR}/shaders/phongShader.cpp
+${OBJDIR}/textureOpenGL.o: ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/textureOpenGL.o ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
 
-${OBJDIR}/rawShader.o: ${SRCDIR}/shaders/rawShader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/rawShader.o ${SRCDIR}/shaders/rawShader.cpp
+${OBJDIR}/phongOpenGLShader.o: ${SRCDIR}/renderer/opengl/shaders/phongOpenGLShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/phongOpenGLShader.o ${SRCDIR}/renderer/opengl/shaders/phongOpenGLShader.cpp
 
-${OBJDIR}/lightningShader.o: ${SRCDIR}/shaders/lightningShader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/lightningShader.o ${SRCDIR}/shaders/lightningShader.cpp
+${OBJDIR}/lightningOpenGLShader.o: ${SRCDIR}/renderer/opengl/shaders/lightningOpenGLShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/lightningOpenGLShader.o ${SRCDIR}/renderer/opengl/shaders/lightningOpenGLShader.cpp
 
-${OBJDIR}/cubeMapShader.o: ${SRCDIR}/shaders/cubeMapShader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/cubeMapShader.o ${SRCDIR}/shaders/cubeMapShader.cpp
+${OBJDIR}/effectShader.o: ${SRCDIR}/renderer/effectShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/effectShader.o ${SRCDIR}/renderer/effectShader.cpp
 
-${OBJDIR}/initialLightShader.o: ${SRCDIR}/shaders/initialLightShader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/initialLightShader.o ${SRCDIR}/shaders/initialLightShader.cpp
+${OBJDIR}/effectBuffer.o: ${SRCDIR}/renderer/effectBuffer.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/effectBuffer.o ${SRCDIR}/renderer/effectBuffer.cpp
 
-${OBJDIR}/shader.o: ${SRCDIR}/shaders/shader.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/shader.o ${SRCDIR}/shaders/shader.cpp
+${OBJDIR}/effectBufferOpenGL.o: ${SRCDIR}/renderer/opengl/effectBufferOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/effectBufferOpenGL.o ${SRCDIR}/renderer/opengl/effectBufferOpenGL.cpp
 
-${OBJDIR}/glew.o: ${SRCDIR}/opengl/glew.c
-	$(CC) $(CFLAGS) -o ${OBJDIR}/glew.o ${SRCDIR}/opengl/glew.c
+${OBJDIR}/cubeMapOpenGLShader.o: ${SRCDIR}/renderer/opengl/shaders/cubeMapOpenGLShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/cubeMapOpenGLShader.o ${SRCDIR}/renderer/opengl/shaders/cubeMapOpenGLShader.cpp
+
+${OBJDIR}/initialLightOpenGLShader.o: ${SRCDIR}/renderer/opengl/shaders/initialLightOpenGLShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/initialLightOpenGLShader.o ${SRCDIR}/renderer/opengl/shaders/initialLightOpenGLShader.cpp
+
+${OBJDIR}/phongShader.o: ${SRCDIR}/renderer/phongShader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/phongShader.o ${SRCDIR}/renderer/phongShader.cpp
+
+${OBJDIR}/shaderParameter.o: ${SRCDIR}/renderer/shaderParameter.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shaderParameter.o ${SRCDIR}/renderer/shaderParameter.cpp
+
+${OBJDIR}/shaderParameterOpenGL.o: ${SRCDIR}/renderer/opengl/shaderParameterOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shaderParameterOpenGL.o ${SRCDIR}/renderer/opengl/shaderParameterOpenGL.cpp
+
+${OBJDIR}/shader.o: ${SRCDIR}/renderer/shader.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/shader.o ${SRCDIR}/renderer/shader.cpp
+
+${OBJDIR}/glew.o: ${SRCDIR}/renderer/opengl/glew.c
+	$(CC) $(CFLAGS) -o ${OBJDIR}/glew.o ${SRCDIR}/renderer/opengl/glew.c
 
 ${OBJDIR}/dm_sans.o: ${SRCDIR}/static/dm_sans.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/dm_sans.o ${SRCDIR}/static/dm_sans.cpp
@@ -400,6 +429,9 @@ ${OBJDIR}/meshCompound.o: ${SRCDIR}/mesh/meshCompound.cpp
 ${OBJDIR}/meshStatic.o: ${SRCDIR}/mesh/meshStatic.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/meshStatic.o ${SRCDIR}/mesh/meshStatic.cpp
 
+${OBJDIR}/meshStaticOpenGL.o: ${SRCDIR}/renderer/opengl/meshStaticOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/meshStaticOpenGL.o ${SRCDIR}/renderer/opengl/meshStaticOpenGL.cpp
+
 ${OBJDIR}/loader3d.o: ${SRCDIR}/loaders3d/loader3d.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/loader3d.o ${SRCDIR}/loaders3d/loader3d.cpp
 
@@ -430,7 +462,23 @@ ${OBJDIR}/animator.o: ${SRCDIR}/animation/animator.cpp
 ${OBJDIR}/animationTarget.o: ${SRCDIR}/animation/animationTarget.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/animationTarget.o ${SRCDIR}/animation/animationTarget.cpp
 
-	
+${OBJDIR}/renderer.o: ${SRCDIR}/renderer/renderer.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/renderer.o ${SRCDIR}/renderer/renderer.cpp
+
+${OBJDIR}/rendererOpenGL.o: ${SRCDIR}/renderer/opengl/rendererOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/rendererOpenGL.o ${SRCDIR}/renderer/opengl/rendererOpenGL.cpp
+
+${OBJDIR}/rendererVulkan.o: ${SRCDIR}/renderer/vulkan/rendererVulkan.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/rendererVulkan.o ${SRCDIR}/renderer/vulkan/rendererVulkan.cpp
+
+${OBJDIR}/vulkanPhysicalDevice.o: ${SRCDIR}/renderer/vulkan/vulkanPhysicalDevice.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/vulkanPhysicalDevice.o ${SRCDIR}/renderer/vulkan/vulkanPhysicalDevice.cpp
+
+${OBJDIR}/vulkanLogicalDevice.o: ${SRCDIR}/renderer/vulkan/vulkanLogicalDevice.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/vulkanLogicalDevice.o ${SRCDIR}/renderer/vulkan/vulkanLogicalDevice.cpp
+
+${OBJDIR}/renderQueue.o: ${SRCDIR}/renderer/renderQueue.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/renderQueue.o ${SRCDIR}/renderer/renderQueue.cpp
 
 $(TARGET): ${OBJ_FILES}
 	$(LD) ${LFLAGS} ${LIBRARIES} ${OBJ_FILES} -o $(TARGET)

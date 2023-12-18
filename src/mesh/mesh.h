@@ -1,10 +1,10 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #pragma once
 #include "common/utils.h"
 #include "common/geometry.h"
-#include "shaders/shader.h"
+#include "renderer/shader.h"
 #include "math/math.h"
 #include <string>
 
@@ -17,8 +17,14 @@ protected:
     EXPORT virtual ~Mesh();
 
 public:
-    EXPORT virtual void render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix);
+    EXPORT virtual void render();
+
+    // Instance can have it's own default shader
+    // Basically that's the only difference with main mesh
+    // They share same geometry
+    // Instances allows you to create compound mesh with different shaders on internal meshes
     EXPORT virtual Mesh *createInstance();
+
     EXPORT virtual Geometry *getGeometry();
 
     EXPORT virtual MeshStatic *getAsStatic();

@@ -9,24 +9,7 @@ extern const char *fragmentBWShader;
 
 // Black and wight effect class for screens
 // Fragment shader code is in the end of this file
-class BWEffect : public Effect
-{
-public:
-    BWEffect(const char *fragmentShader) : Effect(fragmentShader)
-    {
-        timeUniform = getUniformLocation("fTime");
-    }
 
-    void process(float delta)
-    {
-        time += delta * 0.5f;
-        use();
-        provideFloatValue(timeUniform, 1, &time);
-    }
-
-    float time = 0.0f;
-    int timeUniform = -1;
-};
 
 APPMAIN
 {
@@ -56,7 +39,9 @@ APPMAIN
 
     // BW effect layer
     auto effectLayer = stage->createLayerEffects("BW Effect Layer", 1);
-    effectLayer->addEffect(new BWEffect(fragmentBWShader));
+    auto effectBW = view->getRenderer()->createOpenGLShader(fragmentBWShader);
+    auto effectFTime = effectBW->createShaderParameter("fTime", ShaderParameterType::Float);
+    effectLayer->addEffect(effectBW, &effectFTime, 1);
 
     // Main viewing camera
     auto mainCamera = layerActors->createActor<ActorCamera>();
@@ -77,7 +62,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(1.8f, 1.8f, 1.8f), true);
+    sunComponent->setupSunLight(Vector3(1.8f, 1.8f, 1.8f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 2.0f, 1.0f));
 
     ComponentMesh *componentMesh;
 
@@ -91,7 +77,7 @@ APPMAIN
     auto plainMesh = engine->getMeshMaker()->createPlane({20.0f, 20.0f}, 4.0f);
     auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
     auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
-    auto plainShader = new PhongShader();
+    auto plainShader = view->getRenderer()->createPhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
 
@@ -104,7 +90,7 @@ APPMAIN
     // Rotating boxes for the look
     auto boxMesh = engine->getMeshMaker()->createBox({0.8f, 0.8f, 0.8f});
     auto boxTexture = engine->getResourceController()->addImage("./data/crate.jpg")->getAsTexture();
-    auto boxShader = new PhongShader();
+    auto boxShader = view->getRenderer()->createPhongShader();
     boxShader->setTexture(TextureType::Albedo, boxTexture);
 
     std::vector<Actor *> boxes;
@@ -120,7 +106,7 @@ APPMAIN
     // Screens around the scene
     const float scale = 0.008f;
     auto screenMesh = engine->getMeshMaker()->createPlane({800.0f * scale, 600.0f * scale});
-    auto screenShader = new PhongShader();
+    auto screenShader = view->getRenderer()->createPhongShader();
 
     // Here you can see how we take our final rendering texture from manually created rendering target and using it as usual texture
     screenShader->setTexture(TextureType::Albedo, screenRenderTarget->getResultTextureAsClass());
@@ -143,6 +129,7 @@ APPMAIN
 
     // Main loop
     float rotationCounter = 0.0f;
+    float time = 0.0f;
     while (!engine->isTerminationIntended())
     {
         float delta = engine->syncFrame();
@@ -159,6 +146,9 @@ APPMAIN
             angle += angleBetween;
         }
 
+        time += delta * 0.5f;
+        effectFTime->set(1, &time);
+
         // Update camera position
         const float cameraDistance = 6.0f;
         const float speed = 1.1f;
@@ -172,7 +162,7 @@ APPMAIN
         // Just rendering target is different from the default View's one
         screenCamera->setActive();
         effectLayer->setVisible(true);
-        stage->present(screenRenderTarget);
+        stage->present(view->getRenderer(), screenRenderTarget);
 
         // Now with main camera render the scene as usual
         // resulting texture from the screenRenderTarget is already insude the material for plains

@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "actor/actor.h"
@@ -12,7 +12,8 @@ Actor::Actor()
 Actor::~Actor()
 {
     removeComponents();
-    if (physicsBody){
+    if (physicsBody)
+    {
         physicsBody->clearOwner();
     }
 }
@@ -168,39 +169,23 @@ void Actor::onProcess(float delta)
 {
 }
 
-void Actor::onRender(Matrix4 &vpMatrix, std::vector<Component *> *lights)
+void Actor::onRenderQueue(RenderQueue *renderQueue)
 {
-    bHasBlended = false;
-    if (components.size() > 0)
-        for (auto it = components.begin(); it != components.end(); it++)
-            if ((*it)->isVisible())
-            {
-                if ((*it)->isUsingBlendingPhase())
-                    bHasBlended = true;
-                else
-                    (*it)->onRender(vpMatrix, &transform);
-
-                if ((*it)->isUsingLightPhase())
-                {
-                    lights->push_back((*it));
-                }
-            }
-}
-
-void Actor::onRenderShadowed(Matrix4 &vpMatrix)
-{
-    if (components.size() > 0)
-        for (auto it = components.begin(); it != components.end(); it++)
-            if ((*it)->isVisible() && !(*it)->isUsingBlendingPhase())
-                (*it)->onRenderShadow(vpMatrix, &transform);
-}
-
-void Actor::onRenderBlended(Matrix4 &vpMatrix)
-{
-    if (components.size() > 0)
-        for (auto it = components.begin(); it != components.end(); it++)
-            if ((*it)->isVisible() && (*it)->isUsingBlendingPhase())
-                (*it)->onRender(vpMatrix, &transform);
+    for (auto it = components.begin(); it != components.end(); it++)
+    {
+        if ((*it)->isVisible())
+        {
+            (*it)->onRenderQueue(renderQueue);
+        }
+    }
+    if (bShowBoundingBox && physicsWorld && physicsBody && layer && layer->getActiveCamera())
+    {
+        renderQueue->addDebugBody(physicsBody, physicsWorld->getSimScale(), layer->getActiveCamera()->getLineThickness());
+    }
+    if (bShowNormals && layer && layer->getActiveCamera())
+    {
+        renderQueue->addDebugActor(this, layer->getActiveCamera()->getLineThickness());
+    }
 }
 
 void Actor::onDestroy()

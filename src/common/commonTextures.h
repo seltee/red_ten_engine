@@ -2,12 +2,14 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
-#include "common/texture.h"
+#include "renderer/texture.h"
+
+class Renderer;
 
 class CommonTextures : public WithLogger
 {
 public:
-    void build();
+    void build(Renderer *renderer);
 
     static Texture *getBlackTexture();
     static Texture *getWhiteTexture();

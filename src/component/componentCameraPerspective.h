@@ -10,10 +10,7 @@ class ComponentCameraPerspective : public Component, public WithAudio
 {
 public:
     EXPORT ~ComponentCameraPerspective();
-
     EXPORT void onCreated();
-    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
-
     EXPORT CameraPerspective *getCamera();
 
 protected:

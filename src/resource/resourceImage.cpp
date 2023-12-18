@@ -3,7 +3,7 @@
 
 #include "resource/resourceImage.h"
 #include "loaders/stb_image.h"
-#include "opengl/glew.h"
+#include "renderer/renderer.h"
 
 ResourceImage::ResourceImage(std::string path, ByteMap byteMap, int byteMapScale) : Resource(path)
 {
@@ -22,15 +22,9 @@ Texture *ResourceImage::getAsTexture()
     unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 4);
     if (data)
     {
-        unsigned int textureID = -1;
         logger->logf("Image `%s` loaded", path.c_str());
-        glGenTextures(1, &textureID);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
+        texture = getRenderer()->createTexture(width, height, 4, data);
         stbi_image_free(data);
-        texture = new Texture(textureID);
     }
     else
     {

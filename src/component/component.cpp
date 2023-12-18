@@ -3,14 +3,14 @@
 
 #include "component/component.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include "common/commonShaders.h"
-#include "opengl/glew.h"
 #include "stage/layerActors.h"
+#include "actor/actor.h"
 #include <math.h>
 
 Component::Component()
 {
 }
+
 Component::~Component()
 {
 }
@@ -25,39 +25,12 @@ void Component::process(float delta)
 {
 }
 
-void Component::onRender(Matrix4 &vpMatrix, Transformation *tf)
+void Component::onRenderQueue(RenderQueue *renderQueue)
 {
-}
-
-void Component::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
-{
-}
-
-void Component::renderLightPhase(Matrix4 &vpMatrix, unsigned int shadowMapTexture, Camera *activeCamera)
-{
-}
-
-Matrix4 Component::preparePreShadowPhase(Vector3 cameraPosition)
-{
-    Matrix4 m;
-    return m;
 }
 
 void Component::onCreated()
 {
-}
-
-void Component::prepareColorMode()
-{
-    switch (colorMode)
-    {
-    case ComponentColorMode::Lit:
-        return glBlendFunc(GL_ZERO, GL_ONE);
-    case ComponentColorMode::Alpha:
-        return glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    case ComponentColorMode::Addition:
-        return glBlendFunc(GL_ONE, GL_ONE);
-    }
 }
 
 ShapeSphere *Component::addShapeSphere(float radius)
@@ -195,7 +168,22 @@ Matrix4 Component::getLocalspaceMatrix()
     return Matrix4(1.0f);
 }
 
+Matrix4 Component::getWorldModelMatrix()
+{
+    if (owner)
+    {
+        return *owner->transform.getModelMatrix() * *transform.getModelMatrix();
+    }
+    return Matrix4(1.0f);
+}
+
 MeshStatic *Component::getStaticMesh()
 {
     return nullptr;
+}
+
+void Component::setShaderParameters(ShaderParameter **parametersList, int parametersAmount)
+{
+    this->parametersList = parametersList;
+    this->parametersAmount = parametersAmount;
 }

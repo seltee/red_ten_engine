@@ -3,7 +3,6 @@
 
 #include "camera/cameraOrto.h"
 #include "math/glm/gtc/type_ptr.hpp"
-#include "opengl/glew.h"
 
 void CameraOrto::prepareToRender(RenderTarget *renderTarget)
 {
@@ -20,6 +19,8 @@ void CameraOrto::prepareToRender(RenderTarget *renderTarget)
 
     projectionMatrix = glm::ortho(l, r, b, t, n, f);
     this->renderTarget = renderTarget;
+
+    viewMatrix = glm::inverse(getWorldModelMatrix());
 }
 
 void CameraOrto::finishRender()

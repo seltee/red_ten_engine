@@ -5,6 +5,9 @@
 #include "common/utils.h"
 #include "common/color.h"
 #include "math/primitives.h"
+#include "renderer/renderer.h"
+#include "connector/withRenderer.h"
+#include "os/view.h"
 #include <vector>
 #include <string>
 
@@ -25,7 +28,7 @@ struct DebugBox
     Vector3 color;
 };
 
-class DebugController
+class DebugController : public WithRenderer
 {
 public:
     EXPORT void print(std::string str);

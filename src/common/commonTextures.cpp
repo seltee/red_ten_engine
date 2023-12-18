@@ -1,67 +1,31 @@
 #include "commonTextures.h"
-#include "opengl/glew.h"
+#include "renderer/renderer.h"
 
 Texture *CommonTextures::blackTexture = nullptr;
 Texture *CommonTextures::whiteTexture = nullptr;
 Texture *CommonTextures::greyTexture = nullptr;
 Texture *CommonTextures::zeroNormalTexture = nullptr;
 
-void CommonTextures::build()
+void CommonTextures::build(Renderer *renderer)
 {
     logger->logff("compiling common textures ...");
 
     // Black
     const unsigned char blackData[4] = {0x00, 0x00, 0x00, 0xff};
-    unsigned int tBlackID;
-    glGenTextures(1, &tBlackID);
-    glBindTexture(GL_TEXTURE_2D, tBlackID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, blackData);
-
-    blackTexture = new Texture(tBlackID);
+    blackTexture = renderer->createTexture(1, 1, 4, blackData);
 
     // White
     const unsigned char whiteData[4] = {0xe0, 0xe0, 0xe0, 0xff};
-    unsigned int tWhiteID;
-    glGenTextures(1, &tWhiteID);
-    glBindTexture(GL_TEXTURE_2D, tWhiteID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, whiteData);
-
-    whiteTexture = new Texture(tWhiteID);
+    whiteTexture = renderer->createTexture(1, 1, 4, whiteData);
 
     // Grey
     const unsigned char greyData[4] = {0xAA, 0xAA, 0xAA, 0xff};
-    unsigned int tGreyID;
-    glGenTextures(1, &tGreyID);
-    glBindTexture(GL_TEXTURE_2D, tGreyID);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, greyData);
-
-    greyTexture = new Texture(tGreyID);
+    greyTexture = renderer->createTexture(1, 1, 4, greyData);
 
     // Zero Normal
-    unsigned int tZeroNormalID;
     const unsigned char normalData[4] = {0x80, 0x80, 0xff, 0xff};
-    glGenTextures(1, &tZeroNormalID);
-    glBindTexture(GL_TEXTURE_2D, tZeroNormalID);
+    zeroNormalTexture = renderer->createTexture(1, 1, 4, normalData);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, normalData);
-
-    zeroNormalTexture = new Texture(tZeroNormalID);
-    
     logger->logff("common textures compiled");
 }
 

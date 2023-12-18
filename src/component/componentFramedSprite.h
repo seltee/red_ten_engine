@@ -4,17 +4,19 @@
 #pragma once
 #include "rtengine.h"
 #include "common/utils.h"
-#include "common/texture.h"
+#include "renderer/texture.h"
 #include "component/component.h"
-#include "shaders/shader.h"
+#include "renderer/shader.h"
+#include "renderer/shaderParameter.h"
+#include "connector/withRenderer.h"
 
-class ComponentFramedSprite : public Component
+class ComponentFramedSprite : public Component, public WithRenderer
 {
 public:
     EXPORT ComponentFramedSprite();
+    EXPORT ~ComponentFramedSprite();
 
-    EXPORT void onRender(Matrix4 &vpMatrix, Transformation *tf);
-    EXPORT void onRenderShadow(Matrix4 &vpMatrix, Transformation *tf);
+    EXPORT void onRenderQueue(RenderQueue *renderQueue) override final;
 
     EXPORT void setOpacity(float opacity);
     EXPORT float getOpacity();
@@ -32,7 +34,7 @@ public:
     EXPORT inline int getFramesTotalCount() { return framesTotal; };
     EXPORT inline int getFramesInLineCount() { return framesInLine; };
 
-    EXPORT Matrix4 getLocalspaceMatrix();
+    EXPORT Matrix4 getLocalspaceMatrix() override;
 
 protected:
     void calcFrameRenderSize();
@@ -47,5 +49,8 @@ protected:
     float opacity = 1.0f;
     Texture *texture = nullptr;
     Shader *shader = nullptr;
+    MeshStatic *mesh = nullptr;
     Matrix4 mAnchor;
+
+    ShaderParameter *shadersParameters[2];
 };

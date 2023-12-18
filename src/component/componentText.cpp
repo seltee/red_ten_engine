@@ -3,8 +3,6 @@
 
 #include "math/glm/gtc/type_ptr.hpp"
 #include "component/componentText.h"
-#include "opengl/glew.h"
-#include "common/commonShaders.h"
 #include <math.h>
 #include <SDL_ttf.h>
 #include <SDL.h>
@@ -16,40 +14,29 @@ ComponentText::ComponentText()
     colorMode = ComponentColorMode::Alpha;
 }
 
-EXPORT ComponentText::~ComponentText()
+ComponentText::~ComponentText()
 {
-    if (textureID != 0)
-        glDeleteTextures(1, &textureID);
+    if (texture)
+        delete texture;
 }
 
-void ComponentText::onRender(Matrix4 &vpMatrix, Transformation *tf)
+void ComponentText::onRenderQueue(RenderQueue *renderQueue)
 {
     if (isStringDirty)
         rebuildString();
 
-    if (textureID)
+    if (owner && texture)
     {
-        Matrix4 mTransform = *transform.getModelMatrix();
-        Matrix4 mModelTransform = *tf->getModelMatrix() * mTransform;
-
-        Matrix4 mOut = mModelTransform * mAnchor;
-
-        auto shader = CommonShaders::getSpriteShader();
-        shader->use(vpMatrix, mOut);
-        shader->setOpacity(opacity);
-
-        glActiveTexture((unsigned int)TextureSlot::TEXTURE_0);
-        glBindTexture(GL_TEXTURE_2D, textureID);
-
-        CommonShaders::getSpriteMesh()->useVertexArray();
-        prepareColorMode();
-
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix() * mAnchor;
+        if (colorMode == ComponentColorMode::Lit)
+        {
+            renderQueue->addMainPhase(mModel, renderQueue->getDefaultSpriteShader(), texture, renderQueue->getDefaultSpriteMesh(), parametersList, parametersAmount);
+        }
+        else
+        {
+            renderQueue->addBlendingPhase(mModel, colorMode, renderQueue->getDefaultSpriteShader(), texture, renderQueue->getDefaultSpriteMesh(), opacity, parametersList, parametersAmount);
+        }
     }
-}
-
-void ComponentText::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf){
-
 }
 
 void ComponentText::setOpacity(float opacity)
@@ -108,10 +95,10 @@ std::string ComponentText::getText()
 
 void ComponentText::rebuildString()
 {
+    
     isStringDirty = false;
-    if (textureID != 0)
-        glDeleteTextures(1, &textureID);
-    textureID = 0;
+    if (texture)
+        delete texture;
 
     if (font && font->getFont() && string.length() > 0)
     {
@@ -128,18 +115,16 @@ void ComponentText::rebuildString()
         {
             textTextureWidth = surface->pitch / 4;
             textTextureHeight = surface->h;
-
             transform.setScale(textTextureWidth, textTextureHeight);
-
-            glGenTextures(1, &textureID);
-            glBindTexture(GL_TEXTURE_2D, textureID);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textTextureWidth, textTextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, surface->pixels);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+            texture = getRenderer()->createTexture(textTextureWidth, textTextureHeight, 4, surface->pixels);
             SDL_FreeSurface(surface);
         }
     }
+}
+
+void ComponentText::setShader(Shader *shader)
+{
+    this->shader = shader;
 }
 
 int ComponentText::getWidth()

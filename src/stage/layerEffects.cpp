@@ -1,37 +1,30 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "common/commonShaders.h"
 #include "stage/layerEffects.h"
-#include "opengl/glew.h"
+#include "renderer/renderer.h"
 
 LayerEffects::LayerEffects(std::string name, int index) : Layer(name, index)
 {
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-    glGenTextures(1, &renderedTexture);
-    glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 32, 32, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-    processTrackerId = profiler->addTracker("layer effects \"" + name + "\" process");
+    effectBuffer = getRenderer()->createEffectBuffer();
     renderTrackerId = profiler->addTracker("layer effects \"" + name + "\" render");
 }
 
-void LayerEffects::addEffect(Effect *effect)
+LayerEffects::~LayerEffects()
 {
-    effects.push_back(effect);
+    getRenderer()->destroyEffectBuffer(effectBuffer);
 }
 
-void LayerEffects::removeEffect(Effect *effect)
+void LayerEffects::addEffect(Shader *effect, ShaderParameter **parameters, int parametersAmount)
+{
+    effects.push_back(ParametredShader({effect, parameters, parametersAmount}));
+}
+
+void LayerEffects::removeEffect(Shader *effect)
 {
     auto it = effects.begin();
     while (it != effects.end())
-        if ((*it) == effect)
+        if (it->shader == effect)
             it = effects.erase(it);
         else
             ++it;
@@ -42,60 +35,25 @@ void LayerEffects::clearEffects()
     effects.clear();
 }
 
-void LayerEffects::process(float delta)
+void LayerEffects::render(Renderer *renderer, RenderTarget *renderTarget)
 {
-    profiler->startTracking(processTrackerId);
-    if (effects.size() > 0)
-    {
-        for (auto it = effects.begin(); it != effects.end(); it++)
-        {
-            auto effect = *it;
-            effect->process(delta);
-        }
-    }
-    profiler->stopTracking(processTrackerId);
-}
-
-void LayerEffects::render(RenderTarget *renderTarget)
-{
+    if (!effectBuffer)
+        return;
     profiler->startTracking(renderTrackerId);
+
     if (effects.size() > 0)
     {
         int width = renderTarget->getWidth();
         int height = renderTarget->getHeight();
-        glBindTexture(GL_TEXTURE_2D, renderedTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_BLEND);
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-
-        RawShader *effectShader = CommonShaders::getEffectShader();
-        Matrix4 m;
+        effectBuffer->prepare(width, height);
 
         for (auto it = effects.begin(); it != effects.end(); it++)
         {
             auto effect = *it;
 
-            if (effect->isReady() && effect->isEnabled() && effect->getOpacity() > 0.0f)
+            if (effect.shader->isReady() && effect.shader->getOpacity() > 0.001f)
             {
-                glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-                glViewport(0, 0, width, height);
-
-                effect->use(m, m);
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, renderTarget->getResultTexture());
-                CommonShaders::getScreenMesh()->useVertexArray();
-                glDrawArrays(GL_TRIANGLES, 0, 6);
-
-                renderTarget->useResultBuffer();
-                effectShader->use(m, m);
-                effectShader->setOpacity(effect->getOpacity());
-
-                glBindTexture(GL_TEXTURE_2D, renderedTexture);
-                CommonShaders::getScreenMesh()->useVertexArray();
-                glDrawArrays(GL_TRIANGLES, 0, 6);
+                effectBuffer->render(renderer, renderTarget, &effect);
             }
         }
     }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
-#include "common/renderTarget.h"
+#include "renderer/renderTarget.h"
 #include "camera/camera.h"
 #include "stage/layer.h"
 
@@ -22,8 +22,6 @@ public:
     EXPORT float getLineThickness();
 
     EXPORT CameraType getCameraType();
-
-    RenderTarget *renderTarget = nullptr;
 
 protected:
     Layer *layer;

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "rtengine.h"
-#include "common/commonShaders.h"
 #include "stage/layerDebug.h"
 #include <SDL.h>
 #include <SDL_ttf.h>

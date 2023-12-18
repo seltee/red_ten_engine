@@ -139,23 +139,6 @@ protected:
 Texture *CratePlate::crateTexture = nullptr;
 Texture *CratePlate::plateTexture = nullptr;
 
-class SuperEffect : public Effect
-{
-public:
-    // if we provide only fragment shader, default vertex shader will be used
-    SuperEffect(const char *fragmentShader) : Effect(fragmentShader)
-    {
-        opacity = 0.0f;
-    }
-
-    void process(float delta)
-    {
-        opacity = bHelloEnabled ? fmin(opacity + delta, 1.0f) : fmax(opacity - delta, 0.0f);
-    }
-
-    bool bHelloEnabled = false;
-};
-
 extern const char *fragmentInverseShader;
 extern const char *fragmentShiftShader;
 extern const char *fragmentBWShader;
@@ -185,24 +168,36 @@ APPMAIN
     // We have now 4 layers. 3 to draw actors and 1 to apply effects
     // Note the position of effect layer. It will be below gui layer and will effect only first 2 layers with background and jojo
     auto bottomLayerActors = stage->createLayerActors("Hello Bottom Actor Layer", 0);
+    bottomLayerActors->enableSorting();
     auto bottomLayerCamera = bottomLayerActors->createActor<ActorCamera>();
     bottomLayerCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     auto topLayerActors = stage->createLayerActors("Hello Top Actor Layer", 1);
+    topLayerActors->enableSorting();
     auto topLayerCamera = topLayerActors->createActor<ActorCamera>();
     topLayerCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
+    // Effects is a plane that is rendered with specific fragment shader you create
+    // It takes previous render result and renders it to a buffer
+    // Then it renders it back to the main buffer
+    // Since renderer may use different graphic APIs be sure to check the current API and use shader for this API
     auto effectLayer = stage->createLayerEffects("Hello Effects Layer", 2);
-    auto effectJoJo = new SuperEffect(fragmentJoJoShader);
+    auto effectJoJo = view->getRenderer()->createOpenGLShader(fragmentJoJoShader);
+    effectJoJo->setOpacity(0.0f);
     effectLayer->addEffect(effectJoJo);
-    auto effectInverse = new SuperEffect(fragmentInverseShader);
+    auto effectInverse = view->getRenderer()->createOpenGLShader(fragmentInverseShader);
+    effectInverse->setOpacity(0.0f);
     effectLayer->addEffect(effectInverse);
-    auto effectBW = new SuperEffect(fragmentBWShader);
+    auto effectBW = view->getRenderer()->createOpenGLShader(fragmentBWShader);
+    effectBW->setOpacity(0.0f);
     effectLayer->addEffect(effectBW);
-    auto effectShift = new SuperEffect(fragmentShiftShader);
+    auto effectShift = view->getRenderer()->createOpenGLShader(fragmentShiftShader);
+    effectShift->setOpacity(0.0f);
     effectLayer->addEffect(effectShift);
 
     auto layerGUI = stage->createLayerActors("Hello GUI Layer", 3);
+    layerGUI->enableSorting();
+
     auto guiCamera = layerGUI->createActor<ActorCamera>();
     guiCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
@@ -240,14 +235,14 @@ APPMAIN
     topLayerActors->createActor<JoJo>();
 
     auto headerLeft = layerGUI->createActor<Actor>();
-    headerLeft->transform.setPosition(-400, -100.0f);
+    headerLeft->transform.setPosition(-400, 0.0f);
     auto textLeft = headerLeft->createComponent<ComponentText>();
     textLeft->setFont(font);
     textLeft->setText("Local Effects");
     textLeft->setColor(255, 255, 255);
 
     auto headerRight = layerGUI->createActor<Actor>();
-    headerRight->transform.setPosition(400, -100.0f);
+    headerRight->transform.setPosition(400, 0.0f);
     auto textRight = headerRight->createComponent<ComponentText>();
     textRight->setFont(font);
     textRight->setText("Global Effects");
@@ -255,16 +250,21 @@ APPMAIN
 
     GUIButton *button;
     button = layerGUI->createActor<GUIButton>();
-    button->setup(400.0f, -170.0f, "Toggle Color Inverse", GUI_BUTTON::TOGGLE_LOCAL_COLOR_INVERSE);
+    button->setup(400.0f, -70.0f, "Toggle Color Inverse", GUI_BUTTON::TOGGLE_LOCAL_COLOR_INVERSE);
 
     button = layerGUI->createActor<GUIButton>();
-    button->setup(400.0f, -240.0f, "Toggle Color Shift", GUI_BUTTON::TOGGLE_LOCAL_COLOR_SHIFT);
+    button->setup(400.0f, -140.0f, "Toggle Color Shift", GUI_BUTTON::TOGGLE_LOCAL_COLOR_SHIFT);
 
     button = layerGUI->createActor<GUIButton>();
-    button->setup(400.0f, -310.0f, "Toggle black/white", GUI_BUTTON::TOGGLE_LOCAL_COLOR_BW);
+    button->setup(400.0f, -210.0f, "Toggle black/white", GUI_BUTTON::TOGGLE_LOCAL_COLOR_BW);
 
     button = layerGUI->createActor<GUIButton>();
-    button->setup(400.0f, -380.0f, "Toggle JoJo battle", GUI_BUTTON::TOGGLE_LOCAL_COLOR_JOJO);
+    button->setup(400.0f, -280.0f, "Toggle JoJo battle", GUI_BUTTON::TOGGLE_LOCAL_COLOR_JOJO);
+
+    bool bColorJoJo = false;
+    bool bColorInverse = false;
+    bool bColorBW = false;
+    bool bColorShift = false;
 
     while (!engine->isTerminationIntended())
     {
@@ -279,18 +279,25 @@ APPMAIN
 
         stage->present(view);
 
+        // GUI enabling/disabling of the effects
         int firstPressID;
         while ((firstPressID = ActorGUIElement::getFirstPressID()))
         {
-            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_INVERSE)
-                effectInverse->bHelloEnabled = !effectInverse->bHelloEnabled;
-            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_SHIFT)
-                effectShift->bHelloEnabled = !effectShift->bHelloEnabled;
-            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_BW)
-                effectBW->bHelloEnabled = !effectBW->bHelloEnabled;
             if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_JOJO)
-                effectJoJo->bHelloEnabled = !effectJoJo->bHelloEnabled;
+                bColorJoJo = !bColorJoJo;
+            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_INVERSE)
+                bColorInverse = !bColorInverse;
+            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_SHIFT)
+                bColorShift = !bColorShift;
+            if (firstPressID == GUI_BUTTON::TOGGLE_LOCAL_COLOR_BW)
+                bColorBW = !bColorBW;
         }
+
+        // Opacity control over shader effects
+        effectJoJo->setOpacity(bColorJoJo ? fmin(effectJoJo->getOpacity() + delta, 1.0f) : fmax(effectJoJo->getOpacity() - delta, 0.0f));
+        effectInverse->setOpacity(bColorInverse ? fmin(effectInverse->getOpacity() + delta, 1.0f) : fmax(effectInverse->getOpacity() - delta, 0.0f));
+        effectShift->setOpacity(bColorShift ? fmin(effectShift->getOpacity() + delta, 1.0f) : fmax(effectShift->getOpacity() - delta, 0.0f));
+        effectBW->setOpacity(bColorBW ? fmin(effectBW->getOpacity() + delta, 1.0f) : fmax(effectBW->getOpacity() - delta, 0.0f));
     }
 
     engine->destroy();

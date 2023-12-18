@@ -13,6 +13,7 @@
 #include "component/component.h"
 #include "physics/shapes/shape.h"
 #include "physics/physicsWorld.h"
+#include "renderer/renderQueue.h"
 #include <string>
 #include <list>
 #include <vector>
@@ -57,15 +58,12 @@ public:
 
     EXPORT virtual void onSpawned();
     EXPORT virtual void onProcess(float delta);
-    EXPORT virtual void onRender(Matrix4 &vpMatrix, std::vector<Component *> *lights);
-    EXPORT virtual void onRenderShadowed(Matrix4 &vpMatrix);
-    EXPORT virtual void onRenderBlended(Matrix4 &vpMatrix);
+    EXPORT virtual void onRenderQueue(RenderQueue *renderQueue);
+
     EXPORT virtual void onDestroy();
     EXPORT virtual void onCollide(Actor *hitWith, Vector3 v);
     EXPORT virtual void onCollidePersisted(Actor *hitWith, Vector3 v);
     EXPORT virtual void onCollideStopped(Actor *hitWith);
-
-    EXPORT inline bool hasBlended() { return bHasBlended; };
 
     EXPORT inline bool hasDebugView() { return bShowBoundingBox || bShowNormals; }
     EXPORT inline void showBoundingBox(bool state) { bShowBoundingBox = state; }
@@ -84,7 +82,6 @@ protected:
     bool bIsZAxisLocked = false;
     bool bIsZRotationLocked = false;
     bool bIsVisible = true;
-    bool bHasBlended = false;
     bool bPhysicsNeedsToBeRebuild = false;
     bool bShowBoundingBox = false;
     bool bShowNormals = false;

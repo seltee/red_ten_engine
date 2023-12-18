@@ -4,7 +4,7 @@
 #pragma once
 #include "common/utils.h"
 #include "common/color.h"
-#include "common/renderTarget.h"
+#include "renderer/renderTarget.h"
 #include "stage/layer.h"
 #include "stage/layerActors.h"
 #include "stage/layerEffects.h"
@@ -14,7 +14,7 @@
 #include "connector/withProfiler.h"
 #include <list>
 
-class Stage : public WithProfiler
+class Stage : public WithProfiler, public WithDebug
 {
 public:
     Stage(std::string name);
@@ -24,7 +24,7 @@ public:
 
     EXPORT void process(float delta);
     EXPORT void present(View *view);
-    EXPORT void present(RenderTarget *renderTarget);
+    EXPORT void present(Renderer* renderer, RenderTarget *renderTarget);
 
     EXPORT void setClearColor(Color color)
     {

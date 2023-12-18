@@ -148,11 +148,11 @@ void Transformation::update()
 {
     bIsDirty = false;
 
-    mModel = glm::translate(Matrix4(1.0f), Vector3(position.x, position.y, position.z));
+    mModel = glm::translate(Matrix4(1.0f), position);
     mModel *= glm::toMat4(rotation);
     if (scale.x != 1.0f || scale.y != 1.0f || scale.z != 1.0f)
     {
-        mModel *= glm::scale(Matrix4(1.0f), Vector3(scale.x, scale.y, scale.z));
+        mModel *= glm::scale(Matrix4(1.0f), scale);
     }
 }
 

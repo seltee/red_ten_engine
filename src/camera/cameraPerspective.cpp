@@ -2,24 +2,18 @@
 // SPDX-License-Identifier: MIT
 
 #include "camera/cameraPerspective.h"
-#include "opengl/glew.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
 void CameraPerspective::prepareToRender(RenderTarget *renderTarget)
 {
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_BLEND);
-    glDisable(GL_ALPHA_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-
     float aspect = (float)renderTarget->getWidth() / (float)renderTarget->getHeight();
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
 
     projectionMatrix = glm::perspective(distance, (float)targetWidth / (float)targetHeight, nearDistance, farDistance);
     this->renderTarget = renderTarget;
+
+    viewMatrix = glm::inverse(getWorldModelMatrix());
 }
 
 void CameraPerspective::finishRender()

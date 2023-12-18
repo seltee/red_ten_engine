@@ -166,11 +166,16 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Actor Layer", 0);
+    layerActors->enableSorting();
+
+    // Camera
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
     // In this example we have 2 layers, one is our game happening (for example) and the second for gui
     auto layerGUI = stage->createLayerActors("Hello GUI Layer", 1);
+    layerGUI->enableSorting();
+
     auto guiCamera = layerGUI->createActor<ActorCamera>();
     guiCamera->setupOrtoCamera()->setWidthBasedResolution(1280);
 
@@ -287,7 +292,7 @@ APPMAIN
             }
         }
     }
-    
+
     engine->destroy();
     return 0;
 }

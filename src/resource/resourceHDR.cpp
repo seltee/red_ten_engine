@@ -3,7 +3,7 @@
 
 #include "resource/resourceHDR.h"
 #include "loaders/stb_image.h"
-#include "opengl/glew.h"
+#include "renderer/renderer.h"
 
 ResourceHDR::ResourceHDR(std::string path, float ldrScale, float ldrGamma) : Resource(path)
 {
@@ -92,23 +92,12 @@ Texture *ResourceHDR::getAsTexture()
             }
         }
 
-        unsigned int ambientTextureID = -1;
-        glGenTextures(1, &ambientTextureID);
-        glBindTexture(GL_TEXTURE_2D, ambientTextureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        unsigned int radianceTextureID = -1;
-        glGenTextures(1, &radianceTextureID);
-        glBindTexture(GL_TEXTURE_2D, radianceTextureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthBlured, heightBlured, 0, GL_RGBA, GL_UNSIGNED_BYTE, blurData);
-        glGenerateMipmap(GL_TEXTURE_2D);
+        ambientTexture = getRenderer()->createTexture(width, height, 4, data);
+        redianceTexture = getRenderer()->createTexture(widthBlured, heightBlured, 4, blurData);
 
         stbi_image_free(data);
         free(rData);
         free(blurData);
-        ambientTexture = new Texture(ambientTextureID);
-        redianceTexture = new Texture(radianceTextureID);
     }
     else
     {

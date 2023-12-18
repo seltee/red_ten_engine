@@ -42,7 +42,8 @@ APPMAIN
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
     auto sunComponent = sun->createComponent<ComponentLight>();
-    sunComponent->setupSunLight(Vector3(-1.0f, 2.0f, 1.0f), Vector3(1.9f, 1.9f, 1.9f), true);
+    sunComponent->setupSunLight(Vector3(1.9f, 1.9f, 1.9f), true);
+    sunComponent->transform.setPosition(Vector3(-1.0f, 2.0f, 1.0f));
 
     ComponentMesh *componentMesh;
 
@@ -57,7 +58,7 @@ APPMAIN
     auto plainMesh = engine->getMeshMaker()->createPlane({20.0f, 20.0f}, 4.0f);
     auto plainTextureAlbedo = engine->getResourceController()->addImage("./data/3d/pavement_albedo.jpg")->getAsTexture();
     auto plainTextureNormal = engine->getResourceController()->addImage("./data/3d/pavement_normal.jpg")->getAsTexture();
-    auto plainShader = new PhongShader();
+    auto plainShader = view->getRenderer()->createPhongShader();
     plainShader->setTexture(TextureType::Albedo, plainTextureAlbedo);
     plainShader->setTexture(TextureType::Normal, plainTextureNormal);
 
@@ -70,7 +71,7 @@ APPMAIN
     // Rotating boxes
     auto boxMesh = engine->getMeshMaker()->createBox({0.4f, 0.4f, 0.4f});
     auto boxTexture = engine->getResourceController()->addImage("./data/crate.jpg")->getAsTexture();
-    auto boxShader = new PhongShader();
+    auto boxShader = view->getRenderer()->createPhongShader();
     boxShader->setTexture(TextureType::Albedo, boxTexture);
 
     auto box1 = layerActors->createActor<Actor>();

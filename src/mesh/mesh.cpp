@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "mesh/mesh.h"
 #include "mesh/meshStatic.h"
 
@@ -9,7 +12,7 @@ Mesh::~Mesh()
 {
 }
 
-void Mesh::render(Shader *shader, Matrix4 &vpMatrix, Matrix4 &modelMatrix)
+void Mesh::render()
 {
 }
 

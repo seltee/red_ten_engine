@@ -171,6 +171,10 @@ APPMAIN
     // All new actors will be created with initialized physics
     layerActors->enablePhisics(Vector3(0.0f, -80.0f, 0.0f), 0.01f, 200);
 
+    // To disable z-buffer you need to enable sorting. 
+    // If all actors will have zero sorting index they will be shown in the same order as they are created
+    layerActors->enableSorting();
+
     // Textures setup
     auto resourceController = engine->getResourceController();
     Ball::ballTexture = resourceController->addImage("./data/ball.png")->getAsTexture();

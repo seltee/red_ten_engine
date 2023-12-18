@@ -35,8 +35,6 @@ View *ViewController::createView(std::string name)
             view->getWidth(),
             view->getHeight(),
             view->isFullscreen() ? "fullscreen" : "windowed");
-        logger->logff("Renderer: %s", view->getOGLVersion() ? view->getOGLVersion() : "no renderer");
-        logger->logff("OpenGL version supported: %s\n", view->getVersion() ? view->getVersion() : "no version");
 
         views.push_back(view);
 

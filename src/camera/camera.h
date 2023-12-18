@@ -3,13 +3,15 @@
 
 #pragma once
 #include "common/utils.h"
-#include "common/renderTarget.h"
+#include "renderer/renderTarget.h"
 #include "stage/layer.h"
 #include "math/math.h"
 #include "controller/audioController.h"
 #include "connector/withAudio.h"
 #include "math/transformation.h"
 #include <list>
+
+class Component;
 
 enum class CameraType
 {
@@ -32,9 +34,6 @@ public:
     EXPORT virtual float getWidthTargetProportion();
     EXPORT virtual float getHeightTargetProportion();
 
-    EXPORT Transformation *getOwnerTransform();
-    EXPORT void setOwnerTransform(Transformation *transform);
-
     EXPORT virtual PointWithDirection screenToWorld(float x, float y);
 
     EXPORT void setAsListenerCamera();
@@ -44,8 +43,14 @@ public:
 
     EXPORT virtual float getLineThickness();
 
+    EXPORT Matrix4 getWorldModelMatrix();
+
+    inline void setOwner(Component *owner) { this->owner = owner; }
+
+    RenderTarget *renderTarget = nullptr;
+
 protected:
     Matrix4 projectionMatrix;
     Matrix4 viewMatrix;
-    Transformation *ownerTransform = nullptr;
+    Component *owner = nullptr;
 };
