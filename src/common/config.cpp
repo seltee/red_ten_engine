@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #include "config.h"
 #include <stdio.h>
 
@@ -38,6 +41,8 @@ bool Config::loadConfig()
                 audioDevice = it->value;
             if (it->name == "shadowQuality")
                 shadowQuality = stringToQuality(it->value);
+            if (it->name == "antialiasing")
+                antialiasing = stringToAntialiasing(it->value);
         }
 
         bIsLoaded = true;
@@ -68,6 +73,8 @@ bool Config::saveConfig()
         fputs(buffer, cfgFile);
         sprintf(buffer, "%s=%s\n", "shadowQuality", qualityToString(shadowQuality).c_str());
         fputs(buffer, cfgFile);
+        sprintf(buffer, "%s=%s\n", "antialiasing", antialiasingToString(antialiasing).c_str());
+        fputs(buffer, cfgFile);
 
         fclose(cfgFile);
         return true;
@@ -91,6 +98,7 @@ std::string Config::getConfigFilePath()
 void Config::setupByQuality(RenderQuality quality)
 {
     shadowQuality = quality;
+    antialiasing = quality == RenderQuality::High ? AntiAliasing::SSAA : AntiAliasing::None;
 }
 
 bool Config::isLoaded()
@@ -178,7 +186,42 @@ RenderQuality Config::getShadowQuality()
 
 void Config::setShadowQuality(RenderQuality quality)
 {
-    this->shadowQuality = quality;
+    if (this->shadowQuality != quality)
+    {
+        this->shadowQuality = quality;
+        bIsDirty = true;
+    }
+}
+
+AntiAliasing Config::getAnialiasing()
+{
+    return antialiasing;
+}
+
+void Config::setAnialiasing(AntiAliasing state)
+{
+    if (this->antialiasing != state)
+    {
+        this->antialiasing = state;
+        bIsDirty = true;
+    }
+}
+
+float Config::getMultisamplingFactor()
+{
+    switch (this->antialiasing)
+    {
+    case AntiAliasing::SSAA:
+        return 1.25f;
+    case AntiAliasing::SSAA2:
+        return 1.5f;
+    case AntiAliasing::SSAA3:
+        return 1.75f;
+    case AntiAliasing::SSAA4:
+        return 2.0f;
+    default:
+        return 1.0f;
+    }
 }
 
 std::string Config::qualityToString(RenderQuality quality)
@@ -201,6 +244,40 @@ RenderQuality Config::stringToQuality(std::string quality)
     if (quality == "high")
         return RenderQuality::High;
     return RenderQuality::Balanced;
+}
+
+std::string Config::antialiasingToString(AntiAliasing quality)
+{
+    if (quality == AntiAliasing::None)
+        return "none";
+    if (quality == AntiAliasing::FXAA)
+        return "fxaa";
+    if (quality == AntiAliasing::SSAA)
+        return "ssaa";
+    if (quality == AntiAliasing::SSAA2)
+        return "ssaa2";
+    if (quality == AntiAliasing::SSAA3)
+        return "ssaa3";
+    if (quality == AntiAliasing::SSAA4)
+        return "ssaa4";
+    return "none";
+}
+
+AntiAliasing Config::stringToAntialiasing(std::string quality)
+{
+    if (quality == "none")
+        return AntiAliasing::None;
+    if (quality == "fxaa")
+        return AntiAliasing::FXAA;
+    if (quality == "ssaa")
+        return AntiAliasing::SSAA;
+    if (quality == "ssaa2")
+        return AntiAliasing::SSAA2;
+    if (quality == "ssaa3")
+        return AntiAliasing::SSAA3;
+    if (quality == "ssaa4")
+        return AntiAliasing::SSAA4;
+    return AntiAliasing::None;
 }
 
 bool Config::getPairFromString(char *buffer, int limit, ConfigPair *pair)

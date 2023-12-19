@@ -1,10 +1,13 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "connector/withLogger.h"
 #include "common/utils.h"
 #include <string>
 #include <vector>
 
-enum RenderQuality
+enum class RenderQuality
 {
     SuperFast = 0,
     Fast,
@@ -12,11 +15,21 @@ enum RenderQuality
     High
 };
 
+enum class AntiAliasing{
+    None = 0,
+    FXAA,
+    SSAA,
+    SSAA2,
+    SSAA3,
+    SSAA4,
+};
+
 struct ConfigPair
 {
     std::string name;
     std::string value;
 };
+
 
 class Config : public WithLogger
 {
@@ -45,9 +58,14 @@ public:
     EXPORT void setFullscreenState(bool isFullscreen);
     EXPORT RenderQuality getShadowQuality();
     EXPORT void setShadowQuality(RenderQuality quality);
+    EXPORT AntiAliasing getAnialiasing();
+    EXPORT void setAnialiasing(AntiAliasing state);
+    EXPORT float getMultisamplingFactor();
 
     EXPORT static std::string qualityToString(RenderQuality quality);
     EXPORT static RenderQuality stringToQuality(std::string quality);
+    EXPORT static std::string antialiasingToString(AntiAliasing quality);
+    EXPORT static AntiAliasing stringToAntialiasing(std::string quality);
 
 protected:
     bool getPairFromString(char *buffer, int limit, ConfigPair *pair);
@@ -63,4 +81,5 @@ protected:
     std::string audioDevice = "";
 
     RenderQuality shadowQuality = RenderQuality::High;
+    AntiAliasing antialiasing = AntiAliasing::None;
 };

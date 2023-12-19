@@ -15,6 +15,7 @@ extern const char *spriteFragmentShader;
 extern const char *screenVertexShader;
 extern const char *screenFragmentShader;
 
+extern const char *gammaFXAAFragmentShader;
 extern const char *gammaFragmentShader;
 
 extern const char *sunFragmentCode;
@@ -35,6 +36,7 @@ ShaderOpenGL *CommonOpenGLShaders::spriteShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::spriteFrameShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::screenShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::gammaShader = nullptr;
+ShaderOpenGL *CommonOpenGLShaders::gammaFXAAShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::effectShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::simpleShadowShader = nullptr;
 
@@ -106,8 +108,9 @@ void CommonOpenGLShaders::build(Renderer *renderer)
     logger->logff("compiling cube map shader ...");
     cubeMapShader = new CubeMapOpenGLShader();
 
-    logger->logff("compiling gamma shader ...");
+    logger->logff("compiling gamma shaders ...");
     gammaShader = new ShaderOpenGL(screenVertexShader, gammaFragmentShader);
+    gammaFXAAShader = new ShaderOpenGL(screenVertexShader, gammaFXAAFragmentShader);
 
     logger->logff("compiling simple shadow shader ...");
     simpleShadowShader = new ShaderOpenGL(simpleShadowVertexShader, simpleShadowFragmentShader);
@@ -143,6 +146,11 @@ InitialLightOpenGLShader *CommonOpenGLShaders::getInitialLightShader()
 ShaderOpenGL *CommonOpenGLShaders::getGammaShader()
 {
     return gammaShader;
+}
+
+ShaderOpenGL *CommonOpenGLShaders::getGammaFXAAShader()
+{
+    return gammaFXAAShader;
 }
 
 ShaderOpenGL *CommonOpenGLShaders::getSimpleShadowShader()
@@ -287,6 +295,149 @@ const char *screenFragmentShader =
     "uniform sampler2D t;\n"
     "void main() {\n"
     "   fragColor = texture(t, texCoord);\n"
+    "}\n";
+
+const char *gammaFXAAFragmentShader =
+    "#version 410 core\n"
+    "out vec4 fragColor;\n"
+    "in vec2 texCoord;\n"
+    "uniform sampler2D t;\n"
+    "uniform float fGammaEffector;\n"
+    "vec2 size = textureSize(t, 0);\n"
+    "#define FXAA_EDGE_THRESHOLD      (1.0/8.0)\n"
+    "#define FXAA_EDGE_THRESHOLD_MIN  (1.0/24.0)\n"
+    "#define FXAA_SEARCH_STEPS        32\n"
+    "#define FXAA_SEARCH_THRESHOLD    (1.0/4.0)\n"
+    "#define FXAA_SUBPIX_CAP          (3.0/4.0)\n"
+    "#define FXAA_SUBPIX_TRIM         (1.0/4.0)\n"
+    "#define FXAA_SUBPIX_TRIM_SCALE (1.0/(1.0 - FXAA_SUBPIX_TRIM))\n"
+    "float FxaaLuma(vec3 rgb) {\n"
+    "    return rgb.y * (0.587/0.299) + rgb.x;\n"
+    "}\n"
+    "vec3 FxaaLerp3(vec3 a, vec3 b, float amountOfA) {\n"
+    "    return (vec3(-amountOfA) * b) + ((a * vec3(amountOfA)) + b);\n"
+    "}\n"
+    "vec4 FxaaTexOff(sampler2D tex, vec2 pos, ivec2 off, vec2 rcpFrame) {\n"
+    "    float x = pos.x + float(off.x) * rcpFrame.x;\n"
+    "    float y = pos.y + float(off.y) * rcpFrame.y;\n"
+    "    return texture(tex, vec2(x, y));\n"
+    "}\n"
+    "vec3 FxaaPixelShader(vec2 pos, sampler2D tex, vec2 rcpFrame)\n"
+    "{\n"
+    "    vec3 rgbN = FxaaTexOff(tex, pos.xy, ivec2( 0,-1), rcpFrame).xyz;\n"
+    "    vec3 rgbW = FxaaTexOff(tex, pos.xy, ivec2(-1, 0), rcpFrame).xyz;\n"
+    "    vec3 rgbM = FxaaTexOff(tex, pos.xy, ivec2( 0, 0), rcpFrame).xyz;\n"
+    "    vec3 rgbE = FxaaTexOff(tex, pos.xy, ivec2( 1, 0), rcpFrame).xyz;\n"
+    "    vec3 rgbS = FxaaTexOff(tex, pos.xy, ivec2( 0, 1), rcpFrame).xyz;\n"
+    "    float lumaN = FxaaLuma(rgbN);\n"
+    "    float lumaW = FxaaLuma(rgbW);\n"
+    "    float lumaM = FxaaLuma(rgbM);\n"
+    "    float lumaE = FxaaLuma(rgbE);\n"
+    "    float lumaS = FxaaLuma(rgbS);\n"
+    "    float rangeMin = min(lumaM, min(min(lumaN, lumaW), min(lumaS, lumaE)));\n"
+    "    float rangeMax = max(lumaM, max(max(lumaN, lumaW), max(lumaS, lumaE)));\n"
+    "    float range = rangeMax - rangeMin;\n"
+    "    if(range < max(FXAA_EDGE_THRESHOLD_MIN, rangeMax * FXAA_EDGE_THRESHOLD))\n"
+    "    {\n"
+    "        return rgbM;\n"
+    "    }\n"
+    "    vec3 rgbL = rgbN + rgbW + rgbM + rgbE + rgbS;\n"
+    "    float lumaL = (lumaN + lumaW + lumaE + lumaS) * 0.25;\n"
+    "    float rangeL = abs(lumaL - lumaM);\n"
+    "    float blendL = max(0.0, (rangeL / range) - FXAA_SUBPIX_TRIM) * FXAA_SUBPIX_TRIM_SCALE; \n"
+    "    blendL = min(FXAA_SUBPIX_CAP, blendL);\n"
+    "    vec3 rgbNW = FxaaTexOff(tex, pos.xy, ivec2(-1,-1), rcpFrame).xyz;\n"
+    "    vec3 rgbNE = FxaaTexOff(tex, pos.xy, ivec2( 1,-1), rcpFrame).xyz;\n"
+    "    vec3 rgbSW = FxaaTexOff(tex, pos.xy, ivec2(-1, 1), rcpFrame).xyz;\n"
+    "    vec3 rgbSE = FxaaTexOff(tex, pos.xy, ivec2( 1, 1), rcpFrame).xyz;\n"
+    "    rgbL += (rgbNW + rgbNE + rgbSW + rgbSE);\n"
+    "    rgbL *= vec3(1.0/9.0);\n"
+    "    float lumaNW = FxaaLuma(rgbNW);\n"
+    "    float lumaNE = FxaaLuma(rgbNE);\n"
+    "    float lumaSW = FxaaLuma(rgbSW);\n"
+    "    float lumaSE = FxaaLuma(rgbSE);\n"
+    "    float edgeVert = \n"
+    "        abs((0.25 * lumaNW) + (-0.5 * lumaN) + (0.25 * lumaNE)) +\n"
+    "        abs((0.50 * lumaW ) + (-1.0 * lumaM) + (0.50 * lumaE )) +\n"
+    "        abs((0.25 * lumaSW) + (-0.5 * lumaS) + (0.25 * lumaSE));\n"
+    "    float edgeHorz = \n"
+    "        abs((0.25 * lumaNW) + (-0.5 * lumaW) + (0.25 * lumaSW)) +\n"
+    "        abs((0.50 * lumaN ) + (-1.0 * lumaM) + (0.50 * lumaS )) +\n"
+    "        abs((0.25 * lumaNE) + (-0.5 * lumaE) + (0.25 * lumaSE));\n"
+    "        \n"
+    "    bool horzSpan = edgeHorz >= edgeVert;\n"
+    "    float lengthSign = horzSpan ? -rcpFrame.y : -rcpFrame.x;\n"
+    "    if(!horzSpan)\n"
+    "    {\n"
+    "        lumaN = lumaW;\n"
+    "        lumaS = lumaE;\n"
+    "    }\n"
+    "    float gradientN = abs(lumaN - lumaM);\n"
+    "    float gradientS = abs(lumaS - lumaM);\n"
+    "    lumaN = (lumaN + lumaM) * 0.5;\n"
+    "    lumaS = (lumaS + lumaM) * 0.5;\n"
+    "    if (gradientN < gradientS)\n"
+    "    {\n"
+    "        lumaN = lumaS;\n"
+    "        lumaN = lumaS;\n"
+    "        gradientN = gradientS;\n"
+    "        lengthSign *= -1.0;\n"
+    "    }\n"
+    "    vec2 posN;\n"
+    "    posN.x = pos.x + (horzSpan ? 0.0 : lengthSign * 0.5);\n"
+    "    posN.y = pos.y + (horzSpan ? lengthSign * 0.5 : 0.0);\n"
+    "    gradientN *= FXAA_SEARCH_THRESHOLD;\n"
+    "    vec2 posP = posN;\n"
+    "    vec2 offNP = horzSpan ? vec2(rcpFrame.x, 0.0) : vec2(0.0, rcpFrame.y); \n"
+    "    float lumaEndN = lumaN;\n"
+    "    float lumaEndP = lumaN;\n"
+    "    bool doneN = false;\n"
+    "    bool doneP = false;\n"
+    "    posN += offNP * vec2(-1.0, -1.0);\n"
+    "    posP += offNP * vec2( 1.0,  1.0);\n"
+    "    for(int i = 0; i < FXAA_SEARCH_STEPS; i++) {\n"
+    "        if(!doneN)\n"
+    "        {\n"
+    "            lumaEndN = FxaaLuma(texture(tex, posN.xy).xyz);\n"
+    "        }\n"
+    "        if(!doneP)\n"
+    "        {\n"
+    "            lumaEndP = FxaaLuma(texture(tex, posP.xy).xyz);\n"
+    "        }\n"
+    "        doneN = doneN || (abs(lumaEndN - lumaN) >= gradientN);\n"
+    "        doneP = doneP || (abs(lumaEndP - lumaN) >= gradientN);\n"
+    "        if(doneN && doneP)\n"
+    "        {\n"
+    "            break;\n"
+    "        }\n"
+    "        if(!doneN)\n"
+    "        {\n"
+    "            posN -= offNP;\n"
+    "        }\n"
+    "        if(!doneP)\n"
+    "        {\n"
+    "            posP += offNP;\n"
+    "        }\n"
+    "    }\n"
+    "    float dstN = horzSpan ? pos.x - posN.x : pos.y - posN.y;\n"
+    "    float dstP = horzSpan ? posP.x - pos.x : posP.y - pos.y;\n"
+    "    bool directionN = dstN < dstP;\n"
+    "    lumaEndN = directionN ? lumaEndN : lumaEndP;\n"
+    "    if(((lumaM - lumaN) < 0.0) == ((lumaEndN - lumaN) < 0.0))\n"
+    "    {\n"
+    "        lengthSign = 0.0;\n"
+    "    }\n"
+    "    float spanLength = (dstP + dstN);\n"
+    "    dstN = directionN ? dstN : dstP;\n"
+    "    float subPixelOffset = (0.5 + (dstN * (-1.0/spanLength))) * lengthSign;\n"
+    "    vec3 rgbF = texture(tex, vec2(\n"
+    "        pos.x + (horzSpan ? 0.0 : subPixelOffset),\n"
+    "        pos.y + (horzSpan ? subPixelOffset : 0.0))).xyz;\n"
+    "    return FxaaLerp3(rgbL, rgbF, blendL); \n"
+    "}\n"
+    "void main() {\n"
+    "   fragColor = vec4(FxaaPixelShader(texCoord, t, vec2(1.0 / size.x, 1.0 / size.y)), texture(t, texCoord).a) * 1.0;\n"
+    "   fragColor.rgb = 1.055 * pow(fragColor.rgb, vec3(fGammaEffector)) - vec3(0.055);\n"
     "}\n";
 
 const char *gammaFragmentShader =

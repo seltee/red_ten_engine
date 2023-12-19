@@ -15,6 +15,10 @@
 #include <SDL.h>
 #include <algorithm>
 
+RendererOpenGL::RendererOpenGL(Config *config) : Renderer(config)
+{
+}
+
 bool RendererOpenGL::isAvailable()
 {
     return true;
@@ -318,7 +322,7 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     glDisable(GL_DEPTH_TEST);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    ShaderOpenGL *gammaShader = CommonOpenGLShaders::getGammaShader();
+    ShaderOpenGL *gammaShader = (config->getAnialiasing() == AntiAliasing::FXAA) ? CommonOpenGLShaders::getGammaFXAAShader() : CommonOpenGLShaders::getGammaShader();
     gammaShader->use(m1, m2);
 
     glActiveTexture(GL_TEXTURE0);

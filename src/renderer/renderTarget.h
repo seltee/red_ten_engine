@@ -9,7 +9,7 @@
 class RenderTarget
 {
 public:
-    RenderTarget(int width, int height, RenderQuality quality);
+    RenderTarget(int width, int height, RenderQuality quality, float multiSampling);
     ~RenderTarget();
 
     inline int getWidth() { return width; }
@@ -45,7 +45,9 @@ protected:
     unsigned int resultTexture;
 
     int width, height;
+    int resultWidth, resultHeight;
     int shadowMapSize;
 
     Texture *resultTextureAsClass = nullptr;
+    float multiSampling = 1.0f;
 };

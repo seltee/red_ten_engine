@@ -25,7 +25,7 @@ bool View::makeWindow()
     if (!RendererOpenGL::isAvailable())
         return false;
 
-    renderer = new RendererOpenGL();
+    renderer = new RendererOpenGL(config);
     // renderer = new RendererVulkan();
 
     renderer->preInit();
@@ -173,5 +173,5 @@ void View::updateFrameBuffer()
     printf("Create render target %i %i\n", drawableWidth, drawableHeight);
     if (renderTarget)
         delete renderTarget;
-    renderTarget = new RenderTarget(drawableWidth, drawableHeight, config->getShadowQuality());
+    renderTarget = new RenderTarget(drawableWidth, drawableHeight, config->getShadowQuality(), config->getMultisamplingFactor());
 }

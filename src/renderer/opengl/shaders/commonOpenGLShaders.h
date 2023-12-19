@@ -22,6 +22,7 @@ public:
     EXPORT static ShaderOpenGL *getScreenShader();
     EXPORT static ShaderOpenGL *getEffectShader();
     EXPORT static ShaderOpenGL *getGammaShader();
+    EXPORT static ShaderOpenGL *getGammaFXAAShader();
     EXPORT static ShaderOpenGL *getSimpleShadowShader();
 
     EXPORT static InitialLightOpenGLShader *getInitialLightShader();
@@ -46,6 +47,7 @@ protected:
     static ShaderOpenGL *spriteFrameShader;
     static ShaderOpenGL *screenShader;
     static ShaderOpenGL *gammaShader;
+    static ShaderOpenGL *gammaFXAAShader;
     static ShaderOpenGL *effectShader;
     static ShaderOpenGL *simpleShadowShader;
 

@@ -50,7 +50,7 @@ View *ViewController::createView(std::string name)
 
 RenderTarget *ViewController::createRenderTarget(int width, int height, RenderQuality renderQuality)
 {
-    return new RenderTarget(width, height, renderQuality);
+    return new RenderTarget(width, height, renderQuality, 1.0f);
 }
 
 void ViewController::destroyRenderTarget(RenderTarget *renderTarget)

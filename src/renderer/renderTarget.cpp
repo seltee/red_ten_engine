@@ -5,10 +5,22 @@
 #include "renderer/opengl/glew.h"
 #include "renderer/opengl/textureOpenGL.h"
 
-RenderTarget::RenderTarget(int width, int height, RenderQuality quality)
+RenderTarget::RenderTarget(int width, int height, RenderQuality quality, float multiSampling)
 {
-    this->width = width;
-    this->height = height;
+    this->multiSampling = multiSampling;
+    if (multiSampling == 1.0f)
+    {
+        this->width = width;
+        this->height = height;
+    }
+    else
+    {
+        this->width = width * multiSampling;
+        this->height = height * multiSampling;
+    }
+
+    resultWidth = width;
+    resultHeight = height;
 
     switch (quality)
     {
@@ -32,31 +44,39 @@ RenderTarget::RenderTarget(int width, int height, RenderQuality quality)
     // Rendering images
     glGenTextures(1, &gAlbedoSpec);
     glBindTexture(GL_TEXTURE_2D, gAlbedoSpec);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glGenTextures(1, &gNormal);
     glBindTexture(GL_TEXTURE_2D, gNormal);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, this->width, this->height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glGenTextures(1, &gPosition);
     glBindTexture(GL_TEXTURE_2D, gPosition);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, this->width, this->height, 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glGenTextures(1, &lightningTexture);
     glBindTexture(GL_TEXTURE_2D, lightningTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, this->width, this->height, 0, GL_RGBA, GL_FLOAT, NULL);
+    if (multiSampling == 1.0f)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
 
     glGenTextures(1, &resultTexture);
     glBindTexture(GL_TEXTURE_2D, resultTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, resultWidth, resultHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -93,7 +113,7 @@ RenderTarget::RenderTarget(int width, int height, RenderQuality quality)
     // Depth buffer
     glGenRenderbuffers(1, &depthbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->width, this->height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -179,12 +199,13 @@ unsigned int RenderTarget::getResultTexture()
 void RenderTarget::useResultBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, resultBuffer);
+    glViewport(0, 0, resultWidth, resultHeight);
 }
 
 void RenderTarget::setupResultBuffer(bool clear, Vector4 clearColor)
 {
-    glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, resultBuffer);
+    glViewport(0, 0, resultWidth, resultHeight);
     if (clear)
     {
         glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -194,8 +215,8 @@ void RenderTarget::setupResultBuffer(bool clear, Vector4 clearColor)
 
 void RenderTarget::setupNewFrame(bool clear)
 {
-    glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+    glViewport(0, 0, width, height);
     if (clear)
     {
         glClearColor(0.0, 0.0, 0.0, 0.0);
@@ -205,8 +226,8 @@ void RenderTarget::setupNewFrame(bool clear)
 
 void RenderTarget::setupLightning(bool clear)
 {
-    glViewport(0, 0, width, height);
     glBindFramebuffer(GL_FRAMEBUFFER, lightningBuffer);
+    glViewport(0, 0, width, height);
     if (clear)
     {
         glClearColor(0.0, 0.0, 0.0, 0.0);

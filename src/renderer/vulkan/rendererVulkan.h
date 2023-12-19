@@ -8,6 +8,7 @@
 class RendererVulkan : public Renderer, public WithLogger
 {
 public:
+    RendererVulkan(Config *config);
     ~RendererVulkan();
 
     static bool isAvailable();

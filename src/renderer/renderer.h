@@ -7,6 +7,7 @@
 #include "renderer/renderQueue.h"
 #include "renderer/phongShader.h"
 #include "renderer/shader.h"
+#include "common/config.h"
 
 class EffectBuffer;
 class RenderTarget;
@@ -14,7 +15,7 @@ class RenderTarget;
 class Renderer
 {
 public:
-    EXPORT Renderer();
+    EXPORT Renderer(Config *config);
     EXPORT virtual ~Renderer();
 
     // called before window creation
@@ -56,4 +57,5 @@ public:
 
 protected:
     RenderQueue *renderQueue;
+    Config *config;
 };

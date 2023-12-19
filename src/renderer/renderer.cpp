@@ -4,9 +4,10 @@
 #include "renderer/renderer.h"
 #include "renderer/opengl/meshStaticOpenGL.h"
 
-Renderer::Renderer()
+Renderer::Renderer(Config *config)
 {
     renderQueue = new RenderQueue();
+    this->config = config;
 }
 
 Renderer::~Renderer()

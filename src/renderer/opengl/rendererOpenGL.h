@@ -9,6 +9,8 @@
 class RendererOpenGL : public Renderer, public WithLogger, public WithDebug
 {
 public:
+    EXPORT RendererOpenGL(Config *config);
+
     EXPORT static bool isAvailable();
 
     // called before window creation

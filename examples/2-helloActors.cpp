@@ -77,6 +77,9 @@ APPMAIN
     config->setWindowHeight(800);
     config->setFullscreenState(false);
 
+    // Enable antialiasing
+    config->setAnialiasing(AntiAliasing::SSAA);
+
     // View setup
     auto viewController = engine->getViewController();
     auto view = viewController->createView("Example \"2. Hello Actors\"");

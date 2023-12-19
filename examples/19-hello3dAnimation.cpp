@@ -126,6 +126,9 @@ APPMAIN
     config->setWindowHeight(viewController->getPrimaryScreenHeight() * 0.8f);
     config->setFullscreenState(false);
 
+    // Enable antialiasing
+    config->setAnialiasing(AntiAliasing::SSAA);
+
     // View setup
     auto view = viewController->createView("Example \"19. Hello Animation\"");
 

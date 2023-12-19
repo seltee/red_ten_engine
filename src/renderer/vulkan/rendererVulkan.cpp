@@ -4,6 +4,10 @@
 #include <vector>
 #include <string.h>
 
+RendererVulkan::RendererVulkan(Config *config) : Renderer(config)
+{
+}
+
 RendererVulkan::~RendererVulkan()
 {
     if (physicalDevice)
