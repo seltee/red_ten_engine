@@ -26,6 +26,22 @@ AudioBase::AudioBase(Config *config)
         }
         logger->logf("");
     }
+
+    SDL_AudioSpec spec;
+    char *defaultAudioName = nullptr;
+    SDL_GetDefaultAudioInfo(&defaultAudioName, &spec, 0);
+
+    if (defaultAudioName)
+    {
+        logger->logf("Default auido device: %s, freq %i\n", defaultAudioName, spec.freq);
+        this->defaultAudioName = defaultAudioName;
+        SDL_free(defaultAudioName);
+    }
+    else
+    {
+        this->defaultAudioName = "none";
+        logger->logf("No default audio device\n");
+    }
 }
 
 AudioBase::~AudioBase()

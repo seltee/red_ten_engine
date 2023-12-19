@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "audioController.h"
@@ -9,18 +9,16 @@ AudioController::AudioController(Config *config)
 {
     audioBase = new AudioBase(config);
     audioBase->getDevicesList(&devicesList);
-    std::string prefferedDevice;
 
     if (devicesList.size() == 0)
     {
         logger->logff("No sound devices found");
-        logger->logff("Installation of OpenAL libraries might be required");
         return;
     }
 
-    prefferedDevice = devicesList.at(0);
+    std::string prefferedDevice = audioBase->getDefaultDeviceName() != "none" ? audioBase->getDefaultDeviceName() : devicesList.at(0);
     config->setCurrentAudioDevice(prefferedDevice);
-    logger->logff("Auto selected %s for audio", prefferedDevice.c_str());
+    logger->logff("Selected %s for audio", prefferedDevice.c_str());
 
     if (!audioBase->setup(prefferedDevice))
     {

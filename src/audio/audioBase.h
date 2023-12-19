@@ -2,11 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
-#include <string>
-#include <vector>
 #include "math/math.h"
 #include "common/config.h"
 #include "connector/withLogger.h"
+#include <string>
+#include <vector>
 
 class AudioSource;
 
@@ -34,6 +34,8 @@ public:
     inline std::vector<AudioSource *> *getSources() { return &sources; }
     inline unsigned char *getBuffer() { return buffer; }
 
+    inline std::string getDefaultDeviceName() { return defaultAudioName; };
+
 protected:
     std::vector<AudioSource *> sources;
     std::vector<std::string> devicesList;
@@ -49,4 +51,6 @@ protected:
 
     Vector3 vPosition;
     Vector3 vDirection;
+
+    std::string defaultAudioName;
 };
