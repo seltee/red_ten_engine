@@ -78,13 +78,14 @@ void RendererOpenGL::presentToScreen(RenderTarget *renderTarget)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-Texture *RendererOpenGL::createTexture(int width, int height, int bytesPerPixel, const void *data)
+Texture *RendererOpenGL::createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps)
 {
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    if (bCreateMipmaps)
+        glGenerateMipmap(GL_TEXTURE_2D);
     return new TextureOpengGL(textureID);
 }
 

@@ -12,6 +12,8 @@ ComponentText::ComponentText()
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
     colorMode = ComponentColorMode::Alpha;
+    shader = getRenderer()->getDefaultSpriteShader();
+    mesh = getRenderer()->getDefaultSpriteMesh();
 }
 
 ComponentText::~ComponentText()
@@ -20,21 +22,24 @@ ComponentText::~ComponentText()
         delete texture;
 }
 
-void ComponentText::onRenderQueue(RenderQueue *renderQueue)
+void ComponentText::process(float delta)
 {
     if (isStringDirty)
         rebuildString();
+}
 
+void ComponentText::onRenderQueue(RenderQueue *renderQueue)
+{
     if (owner && texture)
     {
         Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix() * mAnchor;
         if (colorMode == ComponentColorMode::Lit)
         {
-            renderQueue->addMainPhase(mModel, renderQueue->getDefaultSpriteShader(), texture, renderQueue->getDefaultSpriteMesh(), parametersList, parametersAmount);
+            renderQueue->addMainPhase(mModel, shader, texture, mesh, parametersList, parametersAmount);
         }
         else
         {
-            renderQueue->addBlendingPhase(mModel, colorMode, renderQueue->getDefaultSpriteShader(), texture, renderQueue->getDefaultSpriteMesh(), opacity, parametersList, parametersAmount);
+            renderQueue->addBlendingPhase(mModel, colorMode, shader, texture, mesh, opacity, parametersList, parametersAmount);
         }
     }
 }
@@ -95,7 +100,6 @@ std::string ComponentText::getText()
 
 void ComponentText::rebuildString()
 {
-    
     isStringDirty = false;
     if (texture)
         delete texture;
@@ -116,7 +120,7 @@ void ComponentText::rebuildString()
             textTextureWidth = surface->pitch / 4;
             textTextureHeight = surface->h;
             transform.setScale(textTextureWidth, textTextureHeight);
-            texture = getRenderer()->createTexture(textTextureWidth, textTextureHeight, 4, surface->pixels);
+            texture = getRenderer()->createTexture(textTextureWidth, textTextureHeight, 4, surface->pixels, false);
             SDL_FreeSurface(surface);
         }
     }

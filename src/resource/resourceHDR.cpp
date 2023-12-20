@@ -92,8 +92,8 @@ Texture *ResourceHDR::getAsTexture()
             }
         }
 
-        ambientTexture = getRenderer()->createTexture(width, height, 4, data);
-        redianceTexture = getRenderer()->createTexture(widthBlured, heightBlured, 4, blurData);
+        ambientTexture = getRenderer()->createTexture(width, height, 4, data, false);
+        redianceTexture = getRenderer()->createTexture(widthBlured, heightBlured, 4, blurData, false);
 
         stbi_image_free(data);
         free(rData);

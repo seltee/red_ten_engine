@@ -30,8 +30,6 @@ void RenderQueue::addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture
     {
         RenderElement *element = &renderElements[lastElement];
         mainPhaseElements[lastElementMainPhase] = element;
-        lastElementMainPhase++;
-        lastElement++;
 
         element->mModel = mModel;
         element->mModelViewProjection = mViewProjection * mModel;
@@ -42,6 +40,9 @@ void RenderQueue::addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture
         element->opacity = 1.0f;
         element->parameters = parameters;
         element->parametersAmount = parametersAmount;
+
+        lastElementMainPhase++;
+        lastElement++;
     }
 }
 
@@ -51,8 +52,6 @@ void RenderQueue::addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode
     {
         RenderElement *element = &renderElements[lastElement];
         blendPhaseElements[lastElementBlendPhase] = element;
-        lastElementBlendPhase++;
-        lastElement++;
 
         element->mModel = mModel;
         element->mModelViewProjection = mViewProjection * mModel;
@@ -63,6 +62,9 @@ void RenderQueue::addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode
         element->opacity = opacity;
         element->parameters = parameters;
         element->parametersAmount = parametersAmount;
+
+        lastElementBlendPhase++;
+        lastElement++;
     }
 }
 
@@ -72,11 +74,12 @@ void RenderQueue::addShadowCaster(Matrix4 &mModel, MeshStatic *mesh)
     {
         RenderElement *element = &renderElements[lastElement];
         shadowCasterElements[lastShadowCasterElement] = element;
-        lastShadowCasterElement++;
-        lastElement++;
 
         element->mModel = mModel;
         element->mesh = mesh;
+
+        lastShadowCasterElement++;
+        lastElement++;
     }
 }
 
@@ -85,13 +88,14 @@ void RenderQueue::addLight(LightType type, Vector3 position, Vector3 color, floa
     if (lastElementLight < MAX_LIGHTS)
     {
         RenderElementLight *element = &lightElements[lastElementLight];
-        lastElementLight++;
 
         element->type = type;
         element->position = position;
         element->color = color;
         element->affectDistance = affectDistance;
         element->bCastShadows = bCastShadows;
+
+        lastElementLight++;
     }
 }
 
@@ -100,12 +104,13 @@ void RenderQueue::addDebugBody(PhysicsBody *body, float symScale, float lineThic
     if (body && lastDebugElement < MAX_DEBUG_ELEMENTS)
     {
         RenderElementDebug *element = &debugElements[lastDebugElement];
-        lastDebugElement++;
 
         element->body = body;
         element->actor = nullptr;
         element->symScale = symScale;
         element->lineThickness = lineThickness;
+
+        lastDebugElement++;
     }
 }
 
@@ -114,11 +119,12 @@ void RenderQueue::addDebugActor(Actor *actor, float lineThickness)
     if (actor && lastDebugElement < MAX_DEBUG_ELEMENTS)
     {
         RenderElementDebug *element = &debugElements[lastDebugElement];
-        lastDebugElement++;
 
         element->body = nullptr;
         element->actor = actor;
         element->symScale = 1.0f;
         element->lineThickness = lineThickness;
+
+        lastDebugElement++;
     }
 }

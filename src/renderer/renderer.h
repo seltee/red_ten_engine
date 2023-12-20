@@ -26,7 +26,7 @@ public:
 
     EXPORT virtual void presentToScreen(RenderTarget *renderTarget);
 
-    EXPORT virtual Texture *createTexture(int width, int height, int bytesPerPixel, const void *data);
+    EXPORT virtual Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) = 0;
     EXPORT virtual MeshStatic *createStaticMesh();
 
     EXPORT virtual void renderDebugLine(Vector3 a, Vector3 b, Matrix4 *mProjectionView, float thickness, Vector3 color);

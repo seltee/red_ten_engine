@@ -21,9 +21,8 @@ public:
     EXPORT ~MeshCompound();
 
     EXPORT void render();
-    EXPORT void prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators);
+    EXPORT void prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators, Transformation **indexTransformations);
     EXPORT void queueAnimation(RenderQueue *renderQueue, Shader *shader, MeshCompoundCache *cache, bool bCastShadows);
-    
 
     EXPORT Mesh *createInstance();
 
@@ -33,11 +32,16 @@ public:
 
     EXPORT MeshStatic *getAsStatic();
 
+    EXPORT inline int getMeshAmount() { return static_cast<int>(nodes.size()); }
+
+    // -1 if not found
+    EXPORT int getMeshIndex(std::string name);
+
 protected:
     MeshCompoundNode *getNodeByMesh(Mesh *mesh);
     MeshCompoundNode *getNodeByName(std::string &name);
     Matrix4 getTransformationMatrix(MeshCompoundNode *node);
-    Matrix4 getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators);
+    Matrix4 getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators, Transformation **indexTransformations);
 
     std::vector<MeshCompoundNode *> nodes;
     MeshStatic *meshStatic = nullptr;
@@ -46,9 +50,9 @@ protected:
 class MeshCompoundNode
 {
 public:
-    MeshCompoundNode() {}
-    MeshCompoundNode(MeshStatic *mesh) { this->mesh = mesh; }
+    MeshCompoundNode(MeshStatic *mesh, int index) { this->mesh = mesh; this->index = index; }
     Transformation transform;
     MeshStatic *mesh = nullptr;
     MeshCompoundNode *parent = nullptr;
+    int index = -1;
 };

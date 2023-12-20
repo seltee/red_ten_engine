@@ -109,10 +109,6 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     // Render queue
     renderer->render(renderTarget);
 
-    /*
-        debug->renderAll(&mProjectionView);
-    */
-
     profiler->stopTracking(renderingTrackerId);
 }
 

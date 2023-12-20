@@ -23,7 +23,7 @@ public:
     GUIButton() : ActorGUIElement()
     {
         registerClassName("Gui Button");
-        setActiveArea(200.0f, 48.0f);
+        setActiveArea(400.0f, 48.0f);
         setSelectiveIndex(index++);
 
         // Component text is just a usual component, but have some functions to setup text parameters

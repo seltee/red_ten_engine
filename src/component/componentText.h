@@ -10,12 +10,13 @@
 #include "component/component.h"
 #include "resource/resourceFont.h"
 
-class ComponentText : public Component, WithLogger, public WithRenderer
+class ComponentText : public Component, public WithLogger, public WithRenderer
 {
 public:
     EXPORT ComponentText();
     EXPORT ~ComponentText();
 
+    EXPORT void process(float delta) override final;
     EXPORT void onRenderQueue(RenderQueue *renderQueue) override final;
 
     EXPORT void setOpacity(float opacity);
@@ -46,4 +47,5 @@ protected:
 
     int textTextureWidth = 0, textTextureHeight = 0;
     Shader *shader = nullptr;
+    MeshStatic *mesh = nullptr;
 };

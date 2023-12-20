@@ -27,11 +27,6 @@ void Renderer::presentToScreen(RenderTarget *renderTarget)
 {
 }
 
-Texture *Renderer::createTexture(int width, int height, int bytesPerPixel, const void *data)
-{
-    return nullptr;
-}
-
 MeshStatic *Renderer::createStaticMesh()
 {
     return new MeshStaticOpenGL();

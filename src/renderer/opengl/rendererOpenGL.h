@@ -21,7 +21,7 @@ public:
 
     EXPORT void presentToScreen(RenderTarget *renderTarget) final override;
 
-    EXPORT Texture *createTexture(int width, int height, int bytesPerPixel, const void *data) final override;
+    EXPORT Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) final override;
 
     EXPORT unsigned int getWindowFlags() final override;
 

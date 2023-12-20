@@ -16,6 +16,7 @@ class ComponentAnimatedMesh : public Component
 {
 public:
     EXPORT ComponentAnimatedMesh();
+    EXPORT ~ComponentAnimatedMesh();
 
     EXPORT void process(float delta) override;
 
@@ -30,14 +31,21 @@ public:
 
     EXPORT Animator *createAnimator(Animation *animation);
 
+    EXPORT Transformation *getNodeTransformation(std::string name);
+
     EXPORT inline void enableShadowCasting() { bCastShadows = true; };
     EXPORT inline void disableShadowCasting() { bCastShadows = false; };
     EXPORT inline bool isShadowCasting() { return bCastShadows; }
 
 protected:
+    void deleteTransforms();
+
     MeshCompound *mesh = nullptr;
     Shader *shader = nullptr;
     std::vector<Animator *> animators;
     MeshCompoundCache cache;
     bool bCastShadows = true;
+
+    Transformation **meshTransforms = nullptr;
+    int transformsAmount = 0;
 };

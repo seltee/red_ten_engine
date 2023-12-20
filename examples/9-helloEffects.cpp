@@ -40,7 +40,7 @@ public:
     GUIButton() : ActorGUIElement()
     {
         registerClassName("Gui Button");
-        setActiveArea(200.0f, 48.0f);
+        setActiveArea(400.0f, 48.0f);
         setSelectiveIndex(index++);
 
         textShadowSprite = createComponent<ComponentText>();

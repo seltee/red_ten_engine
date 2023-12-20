@@ -34,7 +34,7 @@ void MeshCompound::queueAnimation(RenderQueue *renderQueue, Shader *shader, Mesh
     }
 }
 
-void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators)
+void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators, Transformation **indexTransformations)
 {
     cache->clear();
     for (auto node : nodes)
@@ -43,19 +43,10 @@ void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, 
         // printf("%f %f %f\n", node->transform.getPosition().x, node->transform.getPosition().y, node->transform.getPosition().z);
         // printf("%f %f %f\n", node->transform.getScale().x, node->transform.getScale().y, node->transform.getScale().z);
 
-        Matrix4 local = modelMatrix * getAnimatedTransformationMatrix(cache, node, animators);
+        Matrix4 local = modelMatrix * getAnimatedTransformationMatrix(cache, node, animators, indexTransformations);
         cache->addEntry(node, local);
     }
 }
-/*
-void MeshCompound::renderAnimation(Shader *shader, Matrix4 &vpMatrix, MeshCompoundCache *cache)
-{
-    for (auto &container : cache->entriesToRender)
-    {
-        // container.node->mesh->render(shader, vpMatrix, container.model);
-    }
-}
-*/
 
 Mesh *MeshCompound::createInstance()
 {
@@ -69,7 +60,7 @@ Mesh *MeshCompound::createInstance()
 
 MeshCompoundNode *MeshCompound::addMesh(MeshStatic *mesh)
 {
-    auto newNode = new MeshCompoundNode(mesh);
+    auto newNode = new MeshCompoundNode(mesh, static_cast<int>(nodes.size()));
     nodes.push_back(newNode);
     return newNode;
 }
@@ -165,6 +156,18 @@ MeshStatic *MeshCompound::getAsStatic()
     return meshStatic;
 }
 
+int MeshCompound::getMeshIndex(std::string name)
+{
+    int i = 0;
+    for (auto &it : nodes)
+    {
+        if (it->mesh->getName() == name)
+            return i;
+        i++;
+    }
+    return -1;
+}
+
 MeshCompoundNode *MeshCompound::getNodeByMesh(Mesh *mesh)
 {
     for (auto &it : nodes)
@@ -215,7 +218,7 @@ Matrix4 MeshCompound::getTransformationMatrix(MeshCompoundNode *node)
     }
 }
 
-Matrix4 MeshCompound::getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators)
+Matrix4 MeshCompound::getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators, Transformation **indexTransformations)
 {
     AnimationTarget *target = nullptr;
     Animator *animator = nullptr;
@@ -235,23 +238,58 @@ Matrix4 MeshCompound::getAnimatedTransformationMatrix(MeshCompoundCache *cache, 
 
     if (!target || !animator)
     {
-        if (node->parent)
+        if (indexTransformations)
         {
-            return getAnimatedTransformationMatrix(cache, node->parent, animators) * *node->transform.getModelMatrix();
+            Matrix4 local;
+            if (node->parent)
+                local = getAnimatedTransformationMatrix(cache, node->parent, animators, indexTransformations) * *node->transform.getModelMatrix();
+            else
+                local = getTransformationMatrix(node);
+            if (indexTransformations[node->index])
+            {
+                local *= *indexTransformations[node->index]->getModelMatrix();
+            }
+            return local;
         }
         else
-            return getTransformationMatrix(node);
+        {
+            if (node->parent)
+                return getAnimatedTransformationMatrix(cache, node->parent, animators, indexTransformations) * *node->transform.getModelMatrix();
+            else
+                return getTransformationMatrix(node);
+        }
     }
 
     Transformation transformation;
     target->getTransformByTime(animator->time, &transformation);
-    if (!node->parent)
+    if (indexTransformations)
     {
-        return *transformation.getModelMatrix();
+        Matrix4 local;
+        if (!node->parent)
+        {
+            local = *transformation.getModelMatrix();
+        }
+        else
+        {
+            Matrix4 parentTransformation = getAnimatedTransformationMatrix(cache, node->parent, animators, indexTransformations);
+            local = parentTransformation * *transformation.getModelMatrix();
+        }
+        if (indexTransformations[node->index])
+        {
+            local *= *indexTransformations[node->index]->getModelMatrix();
+        }
+        return local;
     }
     else
     {
-        Matrix4 parentTransformation = getAnimatedTransformationMatrix(cache, node->parent, animators);
-        return parentTransformation * *transformation.getModelMatrix();
+        if (!node->parent)
+        {
+            return *transformation.getModelMatrix();
+        }
+        else
+        {
+            Matrix4 parentTransformation = getAnimatedTransformationMatrix(cache, node->parent, animators, indexTransformations);
+            return parentTransformation * *transformation.getModelMatrix();
+        }
     }
 }

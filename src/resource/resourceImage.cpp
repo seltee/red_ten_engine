@@ -23,7 +23,7 @@ Texture *ResourceImage::getAsTexture()
     if (data)
     {
         logger->logf("Image `%s` loaded", path.c_str());
-        texture = getRenderer()->createTexture(width, height, 4, data);
+        texture = getRenderer()->createTexture(width, height, 4, data, true);
         stbi_image_free(data);
     }
     else

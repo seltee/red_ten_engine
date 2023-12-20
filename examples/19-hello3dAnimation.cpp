@@ -11,28 +11,17 @@ public:
     {
         auto resourceController = RTEngine::getInstance()->getResourceController();
 
-        if (!floorMesh)
-            floorMesh = resourceController->addMesh("./data/3d/ground.fbx")->getAsMeshStatic();
+        floorMesh = resourceController->addMesh("./data/3d/ground.fbx")->getAsMeshStatic();
+        treeMesh = resourceController->addMesh("./data/3d/tree.fbx")->getAsMeshStatic();
+        treeMeshLod = resourceController->addMesh("./data/3d/tree_lod.fbx")->getAsMeshStatic();
 
-        if (!treeMesh)
-            treeMesh = resourceController->addMesh("./data/3d/tree.fbx")->getAsMeshStatic();
+        floorShader = getRenderer()->createPhongShader();
+        auto floorAlbedoTexture = resourceController->addImage("./data/3d/ground_albedo.jpg")->getAsTexture();
+        floorShader->setTexture(TextureType::Albedo, floorAlbedoTexture);
 
-        if (!treeMeshLod)
-            treeMeshLod = resourceController->addMesh("./data/3d/tree_lod.fbx")->getAsMeshStatic();
-
-        if (!floorShader)
-        {
-            floorShader = getRenderer()->createPhongShader();
-            auto floorAlbedoTexture = resourceController->addImage("./data/3d/ground_albedo.jpg")->getAsTexture();
-            floorShader->setTexture(TextureType::Albedo, floorAlbedoTexture);
-        }
-
-        if (!treeShader)
-        {
-            treeShader = getRenderer()->createPhongShader();
-            auto treeAlbedoTexture = resourceController->addImage("./data/3d/tree_albedo.jpg")->getAsTexture();
-            treeShader->setTexture(TextureType::Albedo, treeAlbedoTexture);
-        }
+        treeShader = getRenderer()->createPhongShader();
+        auto treeAlbedoTexture = resourceController->addImage("./data/3d/tree_albedo.jpg")->getAsTexture();
+        treeShader->setTexture(TextureType::Albedo, treeAlbedoTexture);
 
         auto floorComponent = createComponent<ComponentMesh>();
         floorComponent->setMesh(floorMesh);
@@ -97,17 +86,109 @@ public:
         treeComponent->addLod(treeMeshLod, 32.0f);
     }
 
-    static Mesh *floorMesh;
-    static Mesh *treeMesh;
-    static Mesh *treeMeshLod;
-    static PhongShader *floorShader;
-    static PhongShader *treeShader;
+    MeshStatic *floorMesh = nullptr;
+    MeshStatic *treeMesh = nullptr;
+    MeshStatic *treeMeshLod = nullptr;
+    PhongShader *treeShader = nullptr;
+    PhongShader *floorShader = nullptr;
 };
-PhongShader *Ground::floorShader = nullptr;
-Mesh *Ground::floorMesh = nullptr;
-PhongShader *Ground::treeShader = nullptr;
-Mesh *Ground::treeMesh = nullptr;
-Mesh *Ground::treeMeshLod = nullptr;
+
+class Robot : public ActorPawn, WithRenderer
+{
+public:
+    Robot() : ActorPawn(this)
+    {
+        auto resourceController = RTEngine::getInstance()->getResourceController();
+
+        // Animated mesh is loaded as MeshCompound.
+        // MeshCompound has a set of static meshes with each having an own transformation
+        auto animatedMeshResource = resourceController->addMesh("./data/3d/robot.fbx");
+        auto animatedMesh = animatedMeshResource->getAsMeshCompound();
+
+        transform.setScale(0.25f, 0.25f, 0.25f);
+        transform.setRotation(Vector3(0.0f, CONST_PI / -2.0f, 0.0f));
+        transform.setPosition(0.0f, -0.01f, 0.0f);
+
+        auto animMeshShader = getRenderer()->createPhongShader();
+        auto animMeshAlbedoTexture = resourceController->addImage("./data/3d/robot_texture_base.jpg")->getAsTexture();
+        auto animMeshNormalTexture = resourceController->addImage("./data/3d/robot_texture_nor.jpg")->getAsTexture();
+        auto animMeshRoughTexture = resourceController->addImage("./data/3d/robot_texture_rough.jpg")->getAsTexture();
+
+        animMeshShader->setTexture(TextureType::Albedo, animMeshAlbedoTexture);
+        animMeshShader->setTexture(TextureType::Normal, animMeshNormalTexture);
+        animMeshShader->setTexture(TextureType::Roughness, animMeshRoughTexture);
+
+        // Animation and MeshCompound are static data shared between meshes
+        auto animComponent = createComponent<ComponentAnimatedMesh>();
+        animComponent->setMesh(animatedMesh);
+        animComponent->setShader(animMeshShader);
+        animComponent->transform.setScale(0.01f, 0.01f, 0.01f);
+        bodyTransformation = animComponent->getNodeTransformation("Body");
+        handLTransformation = animComponent->getNodeTransformation("Hand.L");
+        handRTransformation = animComponent->getNodeTransformation("Hand.R");
+
+        // To animate a MeshCompound you need to create an individual animation descriptor called Animator
+        // Animator holds such parameters as speed, current time moment and current state
+        // Animator bond to Component so each component you want to animate should contain it's own Animator
+        // Animator is being updated inside ComponentAnimatedMesh on each Actor's update
+        auto animator = animComponent->createAnimator(animatedMeshResource->getFirstAnimation());
+        animator->speed = 1.4f;
+        animator->play();
+
+        // First we create an input type with function to receive the input itself and make an action base on it
+        auto inputX = registerAxisCallback(&Robot::controlX);
+        // Second we will add the dependences of this input type around your gamepad, mouse, keyboard and other input devices
+        // Second parameter is a multiplier of device input making it here in range from -400 to 400
+        // Note that keyboard usually have input of 0 to 1, but axises have input from -1 to 1.
+        // Also some gamepad axises may have -1 in their rest position, like triggers
+        inputX->addKeyboardBinding(KeyboardCodes::D, 1.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::A, -1.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::RIGHT, 1.0f);
+        inputX->addKeyboardBinding(KeyboardCodes::LEFT, -1.0f);
+        inputX->addGamepadAxisBinding(GamepadAxisCode::LEFT_AXIS_X, 1.0f);
+
+        auto inputY = registerAxisCallback(&Robot::controlY);
+        inputY->addKeyboardBinding(KeyboardCodes::S, -1.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::W, 1.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::DOWN, -1.0f);
+        inputY->addKeyboardBinding(KeyboardCodes::UP, 1.0f);
+        inputY->addGamepadAxisBinding(GamepadAxisCode::LEFT_AXIS_Y, -1.0f);
+    }
+
+    void onProcess(float delta)
+    {
+        bodyRotation = warpAngle(bodyRotation + moveX * delta);
+        handRotation = warpAngle(handRotation - moveY * delta);
+
+        if (handRotation > 0.8f)
+            handRotation = 0.8f;
+        if (handRotation < -0.5f)
+            handRotation = -0.5f;
+
+        bodyTransformation->setRotation(Vector3(0.0f, 0.0f, bodyRotation));
+
+        handLTransformation->setRotation(Vector3(handRotation, 0.0f, 0.0f));
+        handRTransformation->setRotation(Vector3(handRotation, 0.0f, 0.0f));
+    }
+
+    void controlX(InputType type, int deviceIndex, int index, float axis)
+    {
+        moveX = axis;
+    }
+
+    void controlY(InputType type, int deviceIndex, int index, float axis)
+    {
+        moveY = axis;
+    }
+
+    Transformation *bodyTransformation;
+    Transformation *handRTransformation;
+    Transformation *handLTransformation;
+    float bodyRotation = 0.0f;
+    float handRotation = 0.0f;
+    float moveX = 0.0f;
+    float moveY = 0.0f;
+};
 
 APPMAIN
 {
@@ -164,38 +245,8 @@ APPMAIN
         grounds.push_back(ground);
     }
 
-    // Animated mesh is loaded as MeshCompound.
-    // MeshCompound has a set of static meshes with each having an own transformation
-    auto animatedMeshResource = resourceController->addMesh("./data/3d/robot.fbx");
-    auto animatedMesh = animatedMeshResource->getAsMeshCompound();
-
-    auto animMeshShader = view->getRenderer()->createPhongShader();
-    auto animMeshAlbedoTexture = resourceController->addImage("./data/3d/robot_texture_base.jpg")->getAsTexture();
-    auto animMeshNormalTexture = resourceController->addImage("./data/3d/robot_texture_nor.jpg")->getAsTexture();
-    auto animMeshRoughTexture = resourceController->addImage("./data/3d/robot_texture_rough.jpg")->getAsTexture();
-
-    animMeshShader->setTexture(TextureType::Albedo, animMeshAlbedoTexture);
-    animMeshShader->setTexture(TextureType::Normal, animMeshNormalTexture);
-    animMeshShader->setTexture(TextureType::Roughness, animMeshRoughTexture);
-
-    auto animActor = layerActors->createActor<Actor>();
-    animActor->transform.setScale(0.25f, 0.25f, 0.25f);
-    animActor->transform.setRotation(Vector3(0.0f, CONST_PI / -2.0f, 0.0f));
-    animActor->transform.setPosition(0.0f, -0.01f, 0.0f);
-
-    // Animation and MeshCompound are static data shared between meshes
-    auto animComponent = animActor->createComponent<ComponentAnimatedMesh>();
-    animComponent->setMesh(animatedMesh);
-    animComponent->setShader(animMeshShader);
-    animComponent->transform.setScale(0.01f, 0.01f, 0.01f);
-
-    // To animate a MeshCompound you need to create an individual animation descriptor called Animator
-    // Animator holds such parameters as speed, current time moment and current state
-    // Animator bond to Component so each component you want to animate should contain it's own Animator
-    // Animator is being updated inside ComponentAnimatedMesh on each Actor's update
-    auto animator = animComponent->createAnimator(animatedMeshResource->getFirstAnimation());
-    animator->speed = 1.4f;
-    animator->play();
+    // Animated mesh
+    layerActors->createActor<Robot>();
 
     // Sun with shadow casting
     auto sun = layerActors->createActor<Actor>();
