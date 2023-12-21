@@ -1,6 +1,4 @@
 #include "physicsWorld.h"
-#include <future>
-#include <thread>
 #include <mutex>
 #include <chrono>
 
@@ -141,8 +139,8 @@ void PhysicsWorld::process(float delta)
     {
         deltaAccumulator -= subStep;
 
-        CollisionCollector collisionCollector;
-        std::vector<BodyPair> pairs;
+        pairs.clear();
+        collisionCollector.clear();
 
         applyForces();
         findCollisionPairs(&pairs);
@@ -170,159 +168,147 @@ void PhysicsWorld::removeDestroyed()
 std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
 {
     std::vector<PhysicsBodyPoint> points;
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     Segment rayLocal = Segment(ray.a * simScale, ray.b * simScale);
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
 
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(std::async(_ray, currentBody, bodies.end(), rayLocal, &points));
-        else
-        {
-            futures.push_back(std::async(_ray, currentBody, currentBody + bodiesPerThread, rayLocal, &points));
-            currentBody += bodiesPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
+
+        core->queueJob([currentBody, end, &rayLocal, &points]
+                       { _ray(currentBody, end, rayLocal, &points); });
+
+        currentBody += bodiesPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
     return points;
 }
 
 // Prepare global before multiple physics steps
 void PhysicsWorld::prepareBodies()
 {
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(std::async(_prepareBody, currentBody, bodies.end()));
-        else
-        {
-            futures.push_back(std::async(_prepareBody, currentBody, currentBody + bodiesPerThread));
-            currentBody += bodiesPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
+
+        core->queueJob([currentBody, end]
+                       { _prepareBody(currentBody, end); });
+
+        currentBody += bodiesPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
 }
 
 // Process gravitation and forces on each body
 void PhysicsWorld::applyForces()
 {
+    float subStep = this->subStep;
     Vector3 localGravity = gravity * simScale;
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(std::async(_processBody, currentBody, bodies.end(), subStep, localGravity));
-        else
-        {
-            futures.push_back(std::async(_processBody, currentBody, currentBody + bodiesPerThread, subStep, localGravity));
-            currentBody += bodiesPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
+        core->queueJob([currentBody, end, subStep, localGravity]
+                       { _processBody(currentBody, end, subStep, localGravity); });
+
+        currentBody += bodiesPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
 }
 
 void PhysicsWorld::findCollisionPairs(std::vector<BodyPair> *pairs)
 {
     // find possible collision pairs
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
-    std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
     int bodiesPerThread = bodies.size() / maxThreads;
+    std::vector<PhysicsBody *> *pBodies = &bodies;
+    std::vector<PhysicsBody *>::iterator currentBody = pBodies->begin();
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(std::async(_collectPairs, currentBody, bodies.end(), &bodies, pairs));
-        else
-        {
-            futures.push_back(std::async(_collectPairs, currentBody, currentBody + bodiesPerThread, &bodies, pairs));
-            currentBody += bodiesPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? pBodies->end() : currentBody + bodiesPerThread;
+
+        core->queueJob([currentBody, end, pBodies, pairs]
+                       { _collectPairs(currentBody, end, pBodies, pairs); });
+
+        currentBody += bodiesPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
 }
 
 void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollector *collisionCollector)
 {
     // find exact collisions
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
-    std::vector<BodyPair>::iterator currentPair = pairs->begin();
     int pairsPerThread = pairs->size() / maxThreads;
+    std::vector<BodyPair>::iterator currentPair = pairs->begin();
+    auto collisionDispatcher = &this->collisionDispatcher;
+
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(
-                std::async(_collide, currentPair, pairs->end(), &collisionDispatcher, collisionCollector));
-        else
-        {
-            futures.push_back(
-                std::async(_collide, currentPair, currentPair + pairsPerThread, &collisionDispatcher, collisionCollector));
-            currentPair += pairsPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? pairs->end() : currentPair + pairsPerThread;
+
+        core->queueJob([currentPair, end, collisionDispatcher, collisionCollector]
+                       { _collide(currentPair, end, collisionDispatcher, collisionCollector); });
+
+        currentPair += pairsPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
 }
 
 void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
 {
-    // solve collision pairs
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
     if (collisionCollector->pairs.size() > 0)
     {
-        futures.clear();
-        std::vector<CollisionPair>::iterator currentCollisionPair = collisionCollector->pairs.begin();
         int pairsPerThread = collisionCollector->pairs.size() / maxThreads;
+        std::vector<CollisionPair>::iterator currentCollisionPair = collisionCollector->pairs.begin();
+
+        float simScale = this->simScale;
+        float subStep = this->subStep;
         for (int i = 0; i < maxThreads; i++)
         {
-            if (i == maxThreads - 1)
-                futures.push_back(
-                    std::async(_solve, currentCollisionPair, collisionCollector->pairs.end(), simScale, subStep));
-            else
-            {
-                futures.push_back(
-                    std::async(_solve, currentCollisionPair, currentCollisionPair + pairsPerThread, simScale, subStep));
-                currentCollisionPair += pairsPerThread;
-            }
+            auto end = (i == maxThreads - 1) ? collisionCollector->pairs.end() : currentCollisionPair + pairsPerThread;
+
+            core->queueJob([currentCollisionPair, end, simScale, subStep]
+                           { _solve(currentCollisionPair, end, simScale, subStep); });
+
+            currentCollisionPair += pairsPerThread;
         }
-        for (auto &ft : futures)
-            ft.wait();
+        while (core->isBusy())
+        {
+        };
     }
 }
 
 void PhysicsWorld::finishStep()
 {
-    std::vector<std::future<void>> futures;
-    futures.reserve(maxThreads);
     int bodiesPerThread = bodies.size() / maxThreads;
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
+    float subStep = this->subStep;
+
     for (int i = 0; i < maxThreads; i++)
     {
-        if (i == maxThreads - 1)
-            futures.push_back(std::async(_finishBody, currentBody, bodies.end(), subStep));
-        else
-        {
-            futures.push_back(std::async(_finishBody, currentBody, currentBody + bodiesPerThread, subStep));
-            currentBody += bodiesPerThread;
-        }
+        auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
+
+        core->queueJob([currentBody, end, subStep]
+                       { _finishBody(currentBody, end, subStep); });
+
+        currentBody += bodiesPerThread;
     }
-    for (auto &ft : futures)
-        ft.wait();
+    while (core->isBusy())
+    {
+    };
 }
 
 void PhysicsWorld::triggerCollisionEvents(CollisionCollector *collisionCollector)

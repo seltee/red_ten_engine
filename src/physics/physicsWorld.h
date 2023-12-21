@@ -5,6 +5,7 @@
 #include "physics/collisionDispatcher.h"
 #include "physics/shapes/shape.h"
 #include "connector/withLogger.h"
+#include "connector/withCore.h"
 #include <vector>
 
 struct BodyPair
@@ -13,10 +14,9 @@ struct BodyPair
     PhysicsBody *b;
 };
 
-
 class Actor;
 
-class PhysicsWorld : public WithLogger
+class PhysicsWorld : public WithLogger, public WithCore
 {
 public:
     EXPORT PhysicsWorld(const Vector3 &gravity, float simScale, int stepsPerSecond);
@@ -49,4 +49,6 @@ protected:
 
     float simScale = 0.01f;
     int maxThreads;
+    std::vector<BodyPair> pairs;
+    CollisionCollector collisionCollector;
 };

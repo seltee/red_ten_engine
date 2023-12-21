@@ -23,6 +23,7 @@ public:
         lock.unlock();
     }
 
+    EXPORT inline void clear() { pairs.clear(); }
     std::vector<CollisionPair> pairs;
 
 protected:

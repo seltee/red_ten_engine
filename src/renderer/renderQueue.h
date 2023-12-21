@@ -70,12 +70,6 @@ public:
     EXPORT void addDebugBody(PhysicsBody *body, float symScale, float lineThickness);
     EXPORT void addDebugActor(Actor *actor, float lineThickness);
 
-    inline void setDefaultSpriteShader(Shader *spriteShader) { this->defaultSpriteShader = spriteShader; }
-    inline Shader *getDefaultSpriteShader() { return this->defaultSpriteShader; }
-
-    inline void setDefaultSpriteMesh(MeshStatic *spriteMesh) { this->defaultSpriteMesh = spriteMesh; }
-    inline MeshStatic *getDefaultSpriteMesh() { return this->defaultSpriteMesh; }
-
     inline void enableSorting() { bUseSort = true; };
     inline void disableSorting() { bUseSort = false; }
     inline bool isUsingSorting() { return bUseSort; };
@@ -116,14 +110,16 @@ public:
     inline void setEnvHDRRotation(float rotation) { this->envHDRRotation = rotation; }
     inline float getEnvHDRRotation() { return this->envHDRRotation; }
 
+    std::atomic<bool> bDone = false;
+
 protected:
     Matrix4 mViewProjection;
 
     RenderElement renderElements[MAX_RENDER_ELEMENTS];
-    int lastElement = 0;
+    std::atomic<int> lastElement = 0;
 
     RenderElement *mainPhaseElements[MAX_RENDER_ELEMENTS];
-    int lastElementMainPhase = 0;
+    std::atomic<int> lastElementMainPhase = 0;
 
     RenderElement *blendPhaseElements[MAX_RENDER_ELEMENTS];
     int lastElementBlendPhase = 0;
@@ -136,9 +132,6 @@ protected:
 
     RenderElementDebug debugElements[MAX_DEBUG_ELEMENTS];
     int lastDebugElement = 0;
-
-    Shader *defaultSpriteShader = nullptr;
-    MeshStatic *defaultSpriteMesh = nullptr;
 
     bool bUseSort = false;
     Vector3 ambientLight;

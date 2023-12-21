@@ -3,6 +3,7 @@
 
 #include "renderer/renderQueue.h"
 #include "actor/actor.h"
+#include <mutex>
 
 RenderQueue::RenderQueue()
 {

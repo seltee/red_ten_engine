@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#include "core/core.h"
 #include "common/utils.h"
 #include "common/soundPlayer.h"
 #include "common/pawn.h"
@@ -117,4 +118,6 @@ public:
     EXPORT bool isTerminationIntended();
 
     EXPORT void destroy();
+
+    Core *core;
 };

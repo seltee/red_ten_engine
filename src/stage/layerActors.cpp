@@ -81,8 +81,6 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
 
     renderQueue->reset();
     renderQueue->setViewProjectionMatrix(mProjectionView);
-    renderQueue->setDefaultSpriteShader(renderer->getDefaultSpriteShader());
-    renderQueue->setDefaultSpriteMesh(renderer->getDefaultSpriteMesh());
     renderQueue->setAmbientLight(ambientColor);
     renderQueue->setCameraPosition(cmPosition);
     renderQueue->setHDRTexture(HDRTexture);
@@ -98,12 +96,20 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     renderQueue->setEnvHDRRotation(HDRRotation);
 
     // Put elements to queues
-    for (auto &actor : actors)
+    if (actors.size() > 0)
     {
-        if (actor->isVisible())
-        {
-            actor->onRenderQueue(renderQueue);
-        }
+        auto actorsList = this->actors;
+        renderQueue->bDone = false;
+        core->queueJob([actorsList, renderQueue]
+                       {
+                            for (auto &actor : actorsList)
+                            {
+                                if (actor->isVisible())
+                                {
+                                    actor->onRenderQueue(renderQueue);
+                                }
+                            }
+                            renderQueue->bDone = true; });
     }
 
     // Render queue

@@ -59,7 +59,7 @@ EXMDIR = examples
 OBJDIR = objects
 BINDIR = bin
  
-OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/glew.o ${OBJDIR}/transformation.o \
+OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/core.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/glew.o ${OBJDIR}/transformation.o \
 			${OBJDIR}/layer.o ${OBJDIR}/layerActors.o ${OBJDIR}/layerEffects.o  ${OBJDIR}/layerDebug.o ${OBJDIR}/input.o ${OBJDIR}/entity.o ${OBJDIR}/pawn.o \
 			${OBJDIR}/effectBuffer.o ${OBJDIR}/effectBufferOpenGL.o \
 			${OBJDIR}/camera.o ${OBJDIR}/cameraOrto.o ${OBJDIR}/cameraPerspective.o \
@@ -82,7 +82,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/view.o ${OBJDIR}/stage.o ${OBJDIR}/gl
 			${OBJDIR}/cubeMapOpenGLShader.o ${OBJDIR}/initialLightOpenGLShader.o ${OBJDIR}/phongShader.o  \
 			${OBJDIR}/shaderParameter.o ${OBJDIR}/shaderParameterOpenGL.o \
 			${OBJDIR}/withLogger.o ${OBJDIR}/withDebug.o ${OBJDIR}/withRepository.o ${OBJDIR}/withMeshMaker.o ${OBJDIR}/withAudio.o ${OBJDIR}/withProfiler.o \
-			${OBJDIR}/withRenderer.o \
+			${OBJDIR}/withRenderer.o ${OBJDIR}/withCore.o \
 			${OBJDIR}/soundPlayer.o ${OBJDIR}/childProcess.o \
 			${OBJDIR}/config.o ${OBJDIR}/mesh.o ${OBJDIR}/geometry.o ${OBJDIR}/dm_sans.o \
 			${OBJDIR}/physicsWorld.o ${OBJDIR}/physicsBody.o ${OBJDIR}/hull.o \
@@ -110,6 +110,9 @@ all: engine examples
 engine: $(TARGET)
 ${OBJDIR}/rtengine.o: ${SRCDIR}/rtengine.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/rtengine.o ${SRCDIR}/rtengine.cpp
+
+${OBJDIR}/core.o: ${SRCDIR}/core/core.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/core.o ${SRCDIR}/core/core.cpp
 
 ${OBJDIR}/viewController.o: ${SRCDIR}/controller/viewController.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/viewController.o ${SRCDIR}/controller/viewController.cpp
@@ -332,6 +335,9 @@ ${OBJDIR}/withProfiler.o: ${SRCDIR}/connector/withProfiler.cpp
 	
 ${OBJDIR}/withRenderer.o: ${SRCDIR}/connector/withRenderer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/withRenderer.o ${SRCDIR}/connector/withRenderer.cpp
+
+${OBJDIR}/withCore.o: ${SRCDIR}/connector/withCore.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/withCore.o ${SRCDIR}/connector/withCore.cpp
 
 ${OBJDIR}/soundPlayer.o: ${SRCDIR}/common/soundPlayer.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/soundPlayer.o ${SRCDIR}/common/soundPlayer.cpp

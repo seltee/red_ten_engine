@@ -37,6 +37,10 @@ RTEngine::RTEngine(std::string configFilePath, bool showConsole)
     }
 
     Config *config = nullptr;
+
+    core = new Core();
+    WithCore::setGlobalCore(core);
+
     if (!logController)
     {
         logController = new LogController("log.txt");

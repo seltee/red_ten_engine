@@ -151,28 +151,32 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
         glEnable(GL_DEPTH_TEST);
 
     elements = renderQueue->getMainPhaseElements();
-    amount = renderQueue->getMainPhaseElementsAmount();
-
-    for (int i = 0; i < amount; i++)
+    int i = 0;
+    do
     {
-        RenderElement *element = elements[i];
-        if (element->shader && element->mesh)
+        amount = renderQueue->getMainPhaseElementsAmount();
+        while (i < amount)
         {
-            element->shader->use(element->mModel, element->mModelViewProjection);
-
-            if (element->texture)
+            RenderElement *element = elements[i];
+            if (element->shader && element->mesh)
             {
-                reinterpret_cast<TextureOpengGL *>(element->texture)->bind(TextureSlot::TEXTURE_0);
-            }
+                element->shader->use(element->mModel, element->mModelViewProjection);
 
-            if (element->parametersAmount > 0)
-            {
-                setupShaderParameters(element->parameters, element->parametersAmount);
-            }
+                if (element->texture)
+                {
+                    reinterpret_cast<TextureOpengGL *>(element->texture)->bind(TextureSlot::TEXTURE_0);
+                }
 
-            element->mesh->render();
+                if (element->parametersAmount > 0)
+                {
+                    setupShaderParameters(element->parameters, element->parametersAmount);
+                }
+
+                element->mesh->render();
+            }
+            i++;
         }
-    }
+    } while (!renderQueue->bDone || core->isBusy() || i < renderQueue->getMainPhaseElementsAmount());
 
     // === Blending phase ===
     elements = renderQueue->getBlendingPhaseElements();
@@ -183,11 +187,13 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     {
         auto comparesort = [](const void *p, const void *q)
         { 
-        Vector3 p1 = Vector3(reinterpret_cast<const RenderElement*>(p)->mModelViewProjection * Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-        Vector3 p2 = Vector3(reinterpret_cast<const RenderElement*>(q)->mModelViewProjection * Vector4(0.0f, 0.0f, 0.0f, 1.0f));
-        float len1 = p1.z;
-        float len2 = p2.z;
-        return len1 >= len2; };
+            Matrix4 m1 = reinterpret_cast<const RenderElement*>(p)->mModelViewProjection;
+            Matrix4 m2 = reinterpret_cast<const RenderElement*>(q)->mModelViewProjection;
+            Vector3 p1 = Vector3(m1 * Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            Vector3 p2 = Vector3(m2 * Vector4(0.0f, 0.0f, 0.0f, 1.0f));
+            float len1 = p1.z;
+            float len2 = p2.z;
+            return len1 >= len2; };
 
         std::sort(elements, elements + amount, comparesort);
     }
@@ -198,7 +204,8 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
         RenderElement *element = elements[i];
         if (element->shader && element->mesh)
         {
-            element->shader->use(element->mModel, element->mModelViewProjection);
+            Matrix4 m = element->mModelViewProjection;
+            element->shader->use(element->mModel, m);
 
             if (element->texture)
             {

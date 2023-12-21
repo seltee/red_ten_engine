@@ -5,8 +5,9 @@
 #include "renderer/renderer.h"
 #include "connector/withLogger.h"
 #include "connector/withDebug.h"
+#include "connector/withCore.h"
 
-class RendererOpenGL : public Renderer, public WithLogger, public WithDebug
+class RendererOpenGL : public Renderer, public WithLogger, public WithDebug, public WithCore
 {
 public:
     EXPORT RendererOpenGL(Config *config);

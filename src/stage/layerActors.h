@@ -10,12 +10,14 @@
 #include "math/math.h"
 #include "physics/physicsWorld.h"
 #include "connector/withProfiler.h"
+#include "connector/withCore.h"
 #include "renderer/renderer.h"
 #include <list>
 
 class LayerActors : public Layer,
                     public WithDebug,
-                    public WithProfiler
+                    public WithProfiler,
+                    public WithCore
 {
 public:
     LayerActors(std::string name, int index);
@@ -29,7 +31,7 @@ public:
     }
 
     EXPORT void process(float delta) override;
-    EXPORT void render(Renderer* renderer, RenderTarget *renderTarget) override;
+    EXPORT void render(Renderer *renderer, RenderTarget *renderTarget) override;
     EXPORT void prepareNewActor(Actor *actor);
     EXPORT void enablePhisics(const Vector3 &gravity, float simScale = 1.0f, int stepsPerSecond = 100);
     EXPORT void enableSorting();

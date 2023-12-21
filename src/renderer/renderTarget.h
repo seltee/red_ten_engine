@@ -12,8 +12,8 @@ public:
     RenderTarget(int width, int height, RenderQuality quality, float multiSampling);
     ~RenderTarget();
 
-    inline int getWidth() { return width; }
-    inline int getHeight() { return height; }
+    inline int getWidth() { return resultWidth; }
+    inline int getHeight() { return resultHeight; }
 
     unsigned int getPositionTexture();
     unsigned int getNormalTexture();
