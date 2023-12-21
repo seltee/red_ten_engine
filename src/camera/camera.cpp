@@ -92,3 +92,14 @@ Matrix4 Camera::getWorldModelMatrix()
     }
     return Matrix4(1.0f);
 }
+
+Vector3 Camera::getDirection()
+{
+    if (owner){
+        Matrix4 m = owner->getWorldModelMatrix();
+        Vector4 p1 = owner->getWorldModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        Vector4 p2 = owner->getWorldModelMatrix() * Vector4(0.0f, 0.0f, 1.0f, 1.0f);
+        return Vector3(glm::normalize(p2 - p1));
+    }
+    return Vector3(0.0f, 0.0f, 1.0f);
+}

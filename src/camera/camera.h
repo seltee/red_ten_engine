@@ -44,6 +44,7 @@ public:
     EXPORT virtual float getLineThickness();
 
     EXPORT Matrix4 getWorldModelMatrix();
+    EXPORT Vector3 getDirection();
 
     inline void setOwner(Component *owner) { this->owner = owner; }
 

@@ -15,7 +15,8 @@ LightningOpenGLShader::LightningOpenGLShader(const char *vertex, const char *fra
     locV3LightColor = glGetUniformLocation(programm, "lightColor");
     locV3LightDirection = glGetUniformLocation(programm, "lightDir");
     locFAffectDistance = glGetUniformLocation(programm, "affectDistance");
-    locV3CameraPos = glGetUniformLocation(programm, "cameraPos");
+    locV3CameraPosition = glGetUniformLocation(programm, "cameraPos");
+    locV3CameraDirection = glGetUniformLocation(programm, "cameraDir");
 
     locTGAlbedoSpec = glGetUniformLocation(programm, "tAlbedoSpec");
     locTGNormal = glGetUniformLocation(programm, "tNormal");
@@ -56,35 +57,34 @@ bool LightningOpenGLShader::use(Matrix4 &mModel, Matrix4 &mModelViewProjection)
 
 void LightningOpenGLShader::setLightColor(Vector3 &v)
 {
-    if (locV3LightColor != -1)
-        glUniform3fv(locV3LightColor, 1, value_ptr(v));
+    glUniform3fv(locV3LightColor, 1, value_ptr(v));
 }
 
 void LightningOpenGLShader::setLightDirection(Vector3 &v)
 {
-    if (locV3LightDirection != -1)
-        glUniform3fv(locV3LightDirection, 1, value_ptr(v));
+    glUniform3fv(locV3LightDirection, 1, value_ptr(v));
 }
 
 void LightningOpenGLShader::setAffectDistance(float value)
 {
-    if (locFAffectDistance != -1)
-        glUniform1f(locFAffectDistance, value);
+    glUniform1f(locFAffectDistance, value);
 }
 void LightningOpenGLShader::setLightSpaceMatrix(Matrix4 &mLightSpace)
 {
-    if (locMLightSpace != -1)
-        glUniformMatrix4fv(locMLightSpace, 1, GL_FALSE, value_ptr(mLightSpace));
+    glUniformMatrix4fv(locMLightSpace, 1, GL_FALSE, value_ptr(mLightSpace));
 }
 
 void LightningOpenGLShader::setCameraPosition(Vector3 &v)
 {
-    if (locV3CameraPos != -1)
-        glUniform3fv(locV3CameraPos, 1, value_ptr(v));
+    glUniform3fv(locV3CameraPosition, 1, value_ptr(v));
+}
+
+void LightningOpenGLShader::setCameraDirection(Vector3 &v)
+{
+    glUniform3fv(locV3CameraDirection, 1, value_ptr(v));
 }
 
 void LightningOpenGLShader::setLightPosition(Vector3 &v)
 {
-    if (locV3Position != -1)
-        glUniform3fv(locV3Position, 1, value_ptr(v));
+    glUniform3fv(locV3Position, 1, value_ptr(v));
 }

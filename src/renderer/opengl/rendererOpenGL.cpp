@@ -105,6 +105,9 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     // Common parameters
     Vector3 ambientLight = renderQueue->getAmbientLight();
     Vector3 cameraPosition = renderQueue->getCameraPosition();
+    bool useCameraDirectionForLights = renderQueue->isUsingCameraDirectionForLights();
+    Vector3 cameraDirection = useCameraDirectionForLights ? renderQueue->getCameraDirection() : Vector3(0.0f, 0.0f, 0.0f);
+    
     TextureOpengGL *HDRRadianceTexture =
         reinterpret_cast<TextureOpengGL *>(renderQueue->getHDRRadianceTexture() ? renderQueue->getHDRRadianceTexture() : CommonTextures::getBlackTexture());
     TextureOpengGL *HDRTexture =
@@ -247,6 +250,7 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     initialLightShader->setTextureRadiance(HDRRadianceTexture->getGLTextureId());
     initialLightShader->setTextureEnvironment(HDRTexture->getGLTextureId());
     initialLightShader->setCameraPosition(cameraPosition);
+    initialLightShader->setCameraDirection(cameraDirection);
     initialLightShader->setAmbientColor(glm::value_ptr(ambientLight));
 
     CommonOpenGLShaders::getScreenMesh()->useVertexArray();
@@ -512,6 +516,8 @@ void RendererOpenGL::setupShaderParameters(ShaderParameter **parameters, int amo
 void RendererOpenGL::renderSun(Vector3 &direction, Vector3 &color)
 {
     Vector3 cameraPosition = renderQueue->getCameraPosition();
+    bool useCameraDirectionForLights = renderQueue->isUsingCameraDirectionForLights();
+    Vector3 cameraDirection = useCameraDirectionForLights ? renderQueue->getCameraDirection() : Vector3(0.0f, 0.0f, 0.0f);
     auto lightShader = CommonOpenGLShaders::getSunShader();
     Matrix4 m;
     lightShader->use(m, m);
@@ -519,6 +525,7 @@ void RendererOpenGL::renderSun(Vector3 &direction, Vector3 &color)
     lightShader->setLightDirection(direction);
     lightShader->setLightColor(color);
     lightShader->setCameraPosition(cameraPosition);
+    lightShader->setCameraDirection(cameraDirection);
 
     CommonOpenGLShaders::getScreenMesh()->useVertexArray();
     glBlendFunc(GL_ONE, GL_ONE);
@@ -530,6 +537,8 @@ void RendererOpenGL::renderSunWithShadows(RenderTarget *renderTarget, Vector3 &d
     // First render all shadow casters into shadow texture
     bool useFrontFace = renderTarget->getShadowMapSize() < 2048;
     Vector3 cameraPosition = renderQueue->getCameraPosition();
+    bool useCameraDirectionForLights = renderQueue->isUsingCameraDirectionForLights();
+    Vector3 cameraDirection = useCameraDirectionForLights ? renderQueue->getCameraDirection() : Vector3(0.0f, 0.0f, 0.0f);
     RenderElement **elements = renderQueue->getShadowCasterElements();
     int shadowCasterElementsAmount = renderQueue->getShadowCasterElementsAmount();
     Matrix4 m;
@@ -598,6 +607,7 @@ void RendererOpenGL::renderSunWithShadows(RenderTarget *renderTarget, Vector3 &d
     lightShader->setLightDirection(direction);
     lightShader->setLightColor(color);
     lightShader->setCameraPosition(cameraPosition);
+    lightShader->setCameraDirection(cameraDirection);
 
     CommonOpenGLShaders::getScreenMesh()->useVertexArray();
     glBlendFunc(GL_ONE, GL_ONE);

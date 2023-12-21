@@ -16,6 +16,7 @@ public:
     EXPORT void setTextureRadiance(unsigned int radianceID);
     EXPORT void setTextureEnvironment(unsigned int environmentID);
     EXPORT void setCameraPosition(Vector3 &position);
+    EXPORT void setCameraDirection(Vector3 &direction);
     EXPORT void setAmbientColor(float *ambientColor);
 
 protected:
@@ -25,6 +26,7 @@ protected:
     unsigned int locTRadiance;
     unsigned int locTEnvironment;
     unsigned int locCameraPosition;
+    unsigned int locCameraDirection;
     unsigned int locAmbientColor;
 
     static const char *internalVertexShader;

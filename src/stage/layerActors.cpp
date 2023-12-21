@@ -76,6 +76,7 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     Matrix4 mProjectionView = *activeCamera->getProjectionMatrix() * mView;
     Vector4 cm4position = activeCamera->getWorldModelMatrix() * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
     Vector3 cmPosition = Vector3(cm4position.x, cm4position.y, cm4position.z);
+    Vector3 cmDirection = activeCamera->getDirection();
 
     RenderQueue *renderQueue = renderer->getRenderQueue();
 
@@ -83,9 +84,11 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     renderQueue->setViewProjectionMatrix(mProjectionView);
     renderQueue->setAmbientLight(ambientColor);
     renderQueue->setCameraPosition(cmPosition);
+    renderQueue->setCameraDirection(cmDirection);
     renderQueue->setHDRTexture(HDRTexture);
     renderQueue->setHDRRadianceTexture(HDRRadianceTexture);
     renderQueue->setGamma(gamma);
+    renderQueue->setUseCameraDirectionForLights(activeCamera->getCameraType() == CameraType::Orto);
 
     if (bUseSorting)
         renderQueue->enableSorting();

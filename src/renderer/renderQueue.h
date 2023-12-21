@@ -95,6 +95,9 @@ public:
     inline void setCameraPosition(Vector3 &cameraPosition) { this->cameraPosition = cameraPosition; }
     inline Vector3 getCameraPosition() { return this->cameraPosition; }
 
+    inline void setCameraDirection(Vector3 &cameraDirection) { this->cameraDirection = cameraDirection; }
+    inline Vector3 getCameraDirection() { return this->cameraDirection; }
+
     inline void setHDRRadianceTexture(Texture *texture) { this->HDRRadianceTexture = texture; }
     inline Texture *getHDRRadianceTexture() { return this->HDRRadianceTexture; }
 
@@ -109,6 +112,9 @@ public:
 
     inline void setEnvHDRRotation(float rotation) { this->envHDRRotation = rotation; }
     inline float getEnvHDRRotation() { return this->envHDRRotation; }
+
+    inline void setUseCameraDirectionForLights(bool state) { this->bUseCameraDirectionForLights = state; }
+    inline bool isUsingCameraDirectionForLights() { return this->bUseCameraDirectionForLights; }
 
     std::atomic<bool> bDone = false;
 
@@ -134,8 +140,10 @@ protected:
     int lastDebugElement = 0;
 
     bool bUseSort = false;
+    bool bUseCameraDirectionForLights = false;
     Vector3 ambientLight;
     Vector3 cameraPosition;
+    Vector3 cameraDirection;
     Texture *HDRRadianceTexture = nullptr;
     Texture *HDRTexture = nullptr;
     float gamma = 1.0f;

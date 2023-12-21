@@ -16,6 +16,7 @@ public:
     EXPORT void setAffectDistance(float value);
     EXPORT void setLightSpaceMatrix(Matrix4 &mLightSpace);
     EXPORT void setCameraPosition(Vector3 &v);
+    EXPORT void setCameraDirection(Vector3 &v);
     EXPORT void setLightPosition(Vector3 &v);
 
     int locV3Position;
@@ -25,7 +26,8 @@ public:
     int locV3LightDirection;
     int locFAffectDistance;
 
-    int locV3CameraPos;
+    int locV3CameraPosition;
+    int locV3CameraDirection;
 
     int locTGAlbedoSpec;
     int locTGNormal;

@@ -27,6 +27,7 @@ const char *InitialLightOpenGLShader::internalFragmentShader =
     "uniform sampler2D tEnvironment;\n"
     "uniform vec3 vf3ambientColor;\n"
     "uniform vec3 cameraPos;\n"
+    "uniform vec3 cameraDir;\n"
     "vec2 texelSize = 1.0 / textureSize(tRadiance, 0);\n"
     ""
     "const vec2 invAtan = vec2(0.1591, 0.3183);\n"
@@ -73,7 +74,7 @@ const char *InitialLightOpenGLShader::internalFragmentShader =
     "   const float HDRSwitch = 0.5;\n"
     "   vec3 F0 = vec3(0.04);\n"
     "   F0 = mix(F0, Albedo, Metallic);\n"
-    "   vec3 V = normalize(cameraPos - FragPos);\n"
+    "   vec3 V = dot(cameraDir, cameraDir) == 0 ? normalize(cameraPos - FragPos) : cameraDir;\n"
     "   vec3 kS = fresnelSchlickRoughness(max(dot(Normal, V), 0.0), F0, Roughness); \n"
     "   vec3 kD = 1.0 - kS;\n"
     "   vec2 uv = SampleSphericalMap(Normal);\n"
@@ -96,6 +97,7 @@ InitialLightOpenGLShader::InitialLightOpenGLShader() : ShaderOpenGL(internalVert
     locTRadiance = getUniformLocation("tRadiance");
     locTEnvironment = getUniformLocation("tEnvironment");
     locCameraPosition = getUniformLocation("cameraPos");
+    locCameraDirection = getUniformLocation("cameraDir");
     locAmbientColor = getUniformLocation("vf3ambientColor");
 }
 
@@ -139,7 +141,12 @@ void InitialLightOpenGLShader::setCameraPosition(Vector3 &position)
     glUniform3fv(locCameraPosition, 1, value_ptr(position));
 }
 
+void InitialLightOpenGLShader::setCameraDirection(Vector3 &direction)
+{
+    glUniform3fv(locCameraDirection, 1, value_ptr(direction));
+}
+
 void InitialLightOpenGLShader::setAmbientColor(float *ambientColor)
 {
-     glUniform3fv(locAmbientColor, 1, ambientColor);
+    glUniform3fv(locAmbientColor, 1, ambientColor);
 }
