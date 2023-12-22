@@ -11,7 +11,8 @@ enum class TextureType
     Normal = 1,
     Specular = 2,
     Emission = 3,
-    Roughness = 4
+    Roughness = 4,
+    Shadow = 5,
 };
 
 class PhongShader : public Shader
@@ -22,5 +23,7 @@ protected:
 public:
     EXPORT virtual void setTexture(TextureType type, Texture *texture);
     EXPORT virtual bool use(Matrix4 &mModel, Matrix4 &mModelViewProjection) override;
-    EXPORT virtual bool useShadow(Matrix4 &mModel, Matrix4 &mModelViewProjection) override;
+
+    // Note - should be destroyed with destroyShaderParameter when no longer in use or component is deleted
+    EXPORT virtual ShaderParameter *createShaderUVParameter();
 };

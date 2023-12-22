@@ -103,7 +103,7 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
 			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT} \
-			19-hello3dAnimation${EXT}
+			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT}
 
 all: engine examples
 
@@ -623,6 +623,14 @@ ${OBJDIR}/19-hello3dAnimation.o: ${EXMDIR}/19-hello3dAnimation.cpp ${EXMDIR}/hel
 19-hello3dAnimation${EXT}: ${OBJDIR}/19-hello3dAnimation.o
 	$(LD) ${EFLAGS} ${OBJDIR}/19-hello3dAnimation.o -o 19-hello3dAnimation${EXT}
 	${MOVE} 19-hello3dAnimation${EXT} ${BINDIR}/19-hello3dAnimation${EXT}
+
+${OBJDIR}/20-hello3dSprites.o: ${EXMDIR}/20-hello3dSprites.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/20-hello3dSprites.o ${EXMDIR}/20-hello3dSprites.cpp
+
+20-hello3dSprites${EXT}: ${OBJDIR}/20-hello3dSprites.o
+	$(LD) ${EFLAGS} ${OBJDIR}/20-hello3dSprites.o -o 20-hello3dSprites${EXT}
+	${MOVE} 20-hello3dSprites${EXT} ${BINDIR}/20-hello3dSprites${EXT}
+
 
 
 # llvm-objcopy

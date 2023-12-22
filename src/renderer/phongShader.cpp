@@ -20,7 +20,7 @@ bool PhongShader::use(Matrix4 &mModel, Matrix4 &mModelViewProjection)
     return false;
 }
 
-bool PhongShader::useShadow(Matrix4 &mModel, Matrix4 &mModelViewProjection)
+ShaderParameter *PhongShader::createShaderUVParameter()
 {
-    return false;
+    return nullptr;
 }

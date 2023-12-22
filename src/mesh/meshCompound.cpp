@@ -30,7 +30,7 @@ void MeshCompound::queueAnimation(RenderQueue *renderQueue, Shader *shader, Mesh
     {
         renderQueue->addMainPhase(container.model, shader, nullptr, container.node->mesh->getAsStatic(), nullptr, 0);
         if (bCastShadows)
-            renderQueue->addShadowCaster(container.model, container.node->mesh->getAsStatic());
+            renderQueue->addShadowCaster(container.model, container.node->mesh->getAsStatic(), nullptr, uvShiftSize);
     }
 }
 

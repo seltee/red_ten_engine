@@ -29,6 +29,8 @@ public:
     EXPORT ShaderParameter *createShaderParameter(const char *name, ShaderParameterType type) override;
     EXPORT void destroyShaderParameter(ShaderParameter *parameter) override;
 
+    EXPORT void setUVShiftSize(Vector4 &v) override;
+
     int locMModelViewProjection;
     int locFOpacity;
     int locV3Normal;
@@ -38,4 +40,6 @@ protected:
 
     const char *vertexCode = nullptr;
     const char *fragmentCode = nullptr;
+
+    int locUVShiftSize = -1;
 };

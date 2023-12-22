@@ -15,11 +15,6 @@ bool Shader::use(Matrix4 &mModel, Matrix4 &mModelViewProjection)
     return false;
 }
 
-bool Shader::useShadow(Matrix4 &mModel, Matrix4 &mModelViewProjection)
-{
-    return false;
-}
-
 bool Shader::compile(unsigned short type, const char *code, unsigned int *shader)
 {
     return false;
@@ -35,5 +30,14 @@ ShaderParameter *Shader::createShaderParameter(const char *name, ShaderParameter
 }
 
 void Shader::destroyShaderParameter(ShaderParameter *parameter)
+{
+}
+
+Texture *Shader::getShadowTexture()
+{
+    return nullptr;
+}
+
+void Shader::setUVShiftSize(Vector4 &v)
 {
 }

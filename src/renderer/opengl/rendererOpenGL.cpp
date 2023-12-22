@@ -107,11 +107,14 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     Vector3 cameraPosition = renderQueue->getCameraPosition();
     bool useCameraDirectionForLights = renderQueue->isUsingCameraDirectionForLights();
     Vector3 cameraDirection = useCameraDirectionForLights ? renderQueue->getCameraDirection() : Vector3(0.0f, 0.0f, 0.0f);
-    
+
     TextureOpengGL *HDRRadianceTexture =
         reinterpret_cast<TextureOpengGL *>(renderQueue->getHDRRadianceTexture() ? renderQueue->getHDRRadianceTexture() : CommonTextures::getBlackTexture());
     TextureOpengGL *HDRTexture =
         reinterpret_cast<TextureOpengGL *>(renderQueue->getHDRTexture() ? renderQueue->getHDRTexture() : CommonTextures::getBlackTexture());
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
 
     renderTarget->setupLightning();
     renderTarget->setupNewFrame();
@@ -147,6 +150,7 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
     glBlendFunc(GL_ONE, GL_ZERO);
     glDepthFunc(GL_LESS);
     glDepthMask(GL_TRUE);
+    glEnable(GL_CULL_FACE);
 
     if (renderQueue->isUsingSorting())
         glDisable(GL_DEPTH_TEST);
@@ -181,9 +185,67 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
         }
     } while (!renderQueue->bDone || core->isBusy() || i < renderQueue->getMainPhaseElementsAmount());
 
+    // === Initial lightning phase ===
+    renderTarget->setupLightning(false);
+
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+
+    auto initialLightShader = CommonOpenGLShaders::getInitialLightShader();
+    initialLightShader->use(m1, m2);
+
+    initialLightShader->setTextureAlbedo(renderTarget->getAlbedoTexture());
+    initialLightShader->setTextureNormal(renderTarget->getNormalTexture());
+    initialLightShader->setTexturePosition(renderTarget->getPositionTexture());
+    initialLightShader->setTextureRadiance(HDRRadianceTexture->getGLTextureId());
+    initialLightShader->setTextureEnvironment(HDRTexture->getGLTextureId());
+    initialLightShader->setCameraPosition(cameraPosition);
+    initialLightShader->setCameraDirection(cameraDirection);
+    initialLightShader->setAmbientColor(glm::value_ptr(ambientLight));
+
+    CommonOpenGLShaders::getScreenMesh()->useVertexArray();
+
+    glBlendFunc(GL_ONE, GL_ONE);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // === Lightning phase ===
+    RenderElementLight *lightElements = renderQueue->getLightElements();
+    amount = renderQueue->getLightElementsAmount();
+
+    for (int i = 0; i < amount; i++)
+    {
+        RenderElementLight *element = &lightElements[i];
+        if (element->type == LightType::Sun)
+        {
+            Vector3 normal = glm::length2(element->position) != 0 ? glm::normalize(element->position) : Vector3(0.0f, -1.0f, 0.0f);
+            if (element->bCastShadows)
+                renderSunWithShadows(renderTarget, normal, element->color, element->affectDistance);
+            else
+                renderSun(normal, element->color);
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(GL_FALSE);
+        }
+        if (element->type == LightType::Omni)
+        {
+            if (element->bCastShadows)
+                renderOmniWithShadows(renderTarget, element->position, element->color, element->affectDistance);
+            else
+                renderOmni(element->position, element->color, element->affectDistance);
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(GL_FALSE);
+        }
+    }
+
     // === Blending phase ===
     elements = renderQueue->getBlendingPhaseElements();
     amount = renderQueue->getBlendingPhaseElementsAmount();
+
+    if (renderQueue->isUsingSorting())
+        glDisable(GL_DEPTH_TEST);
+    else
+        glEnable(GL_DEPTH_TEST);
+
 
     // Sorting
     if (!renderQueue->isUsingSorting())
@@ -238,55 +300,12 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
         }
     }
 
-    // === Initial lightning phase ===
-    renderTarget->setupLightning(false);
-
-    auto initialLightShader = CommonOpenGLShaders::getInitialLightShader();
-    initialLightShader->use(m1, m2);
-
-    initialLightShader->setTextureAlbedo(renderTarget->getAlbedoTexture());
-    initialLightShader->setTextureNormal(renderTarget->getNormalTexture());
-    initialLightShader->setTexturePosition(renderTarget->getPositionTexture());
-    initialLightShader->setTextureRadiance(HDRRadianceTexture->getGLTextureId());
-    initialLightShader->setTextureEnvironment(HDRTexture->getGLTextureId());
-    initialLightShader->setCameraPosition(cameraPosition);
-    initialLightShader->setCameraDirection(cameraDirection);
-    initialLightShader->setAmbientColor(glm::value_ptr(ambientLight));
-
-    CommonOpenGLShaders::getScreenMesh()->useVertexArray();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-
-    // === Lightning phase ===
-    RenderElementLight *lightElements = renderQueue->getLightElements();
-    amount = renderQueue->getLightElementsAmount();
-
-    for (int i = 0; i < amount; i++)
-    {
-        RenderElementLight *element = &lightElements[i];
-        if (element->type == LightType::Sun)
-        {
-            Vector3 normal = glm::length2(element->position) != 0 ? glm::normalize(element->position) : Vector3(0.0f, -1.0f, 0.0f);
-            if (element->bCastShadows)
-                renderSunWithShadows(renderTarget, normal, element->color, element->affectDistance);
-            else
-                renderSun(normal, element->color);
-        }
-        if (element->type == LightType::Omni)
-        {
-            if (element->bCastShadows)
-                renderOmniWithShadows(renderTarget, element->position, element->color, element->affectDistance);
-            else
-                renderOmni(element->position, element->color, element->affectDistance);
-        }
-    }
-
     // === Debug Phase ===
     RenderElementDebug *debugElements = renderQueue->getDebugElements();
     amount = renderQueue->getDebugElementsAmount();
+
+    glDisable(GL_DEPTH_TEST);
+
     for (int i = 0; i < amount; i++)
     {
         RenderElementDebug *element = &debugElements[i];
@@ -544,6 +563,7 @@ void RendererOpenGL::renderSunWithShadows(RenderTarget *renderTarget, Vector3 &d
     Matrix4 m;
 
     glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
     if (useFrontFace)
         glFrontFace(GL_CW);
@@ -573,7 +593,17 @@ void RendererOpenGL::renderSunWithShadows(RenderTarget *renderTarget, Vector3 &d
         if (element->mesh)
         {
             Matrix4 mModelViewProjection = mLightViewProjection * element->mModel;
-            CommonOpenGLShaders::getSimpleShadowShader()->use(element->mModel, mModelViewProjection);
+            if (element->texture)
+            {
+                reinterpret_cast<TextureOpengGL *>(element->texture)->bind(TextureSlot::TEXTURE_0);
+                CommonOpenGLShaders::getTexturedShadowShader()->use(element->mModel, mModelViewProjection);
+                CommonOpenGLShaders::getTexturedShadowShader()->setUVShiftSize(element->uvShiftSize);
+            }
+            else
+            {
+                CommonOpenGLShaders::getSimpleShadowShader()->use(element->mModel, mModelViewProjection);
+            }
+
             element->mesh->render();
         }
     }

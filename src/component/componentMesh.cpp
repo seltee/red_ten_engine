@@ -27,55 +27,32 @@ void ComponentMesh::onRenderQueue(RenderQueue *renderQueue)
                 else
                     break;
             }
-            renderQueue->addMainPhase(mModel, shader, nullptr, toRender->getAsStatic(), parametersList, parametersAmount);
-            if (bCastShadows)
-                renderQueue->addShadowCaster(mModel, toRender->getAsStatic());
-        }
-        else
-        {
-            renderQueue->addMainPhase(mModel, shader, nullptr, mesh->getAsStatic(), parametersList, parametersAmount);
-            if (bCastShadows)
-                renderQueue->addShadowCaster(mModel, mesh->getAsStatic());
-        }
-    }
-}
-
-/*
-void ComponentMesh::onRender(Matrix4 &vpMatrix, Transformation *tf)
-{
-    if (mesh)
-    {
-        Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        //prepareColorMode();
-        if (lods.size() > 0)
-        {
-            float distance = fabsf((vpMatrix * mModelTransform * Vector4(0, 0, 0, 1.0f)).z);
-            Mesh *toRender = mesh;
-            for (auto &lod : lods)
+            if (bRenderShape)
             {
-                if (lod.distance < distance)
-                    toRender = lod.mesh;
+                if (colorMode == ComponentColorMode::Lit)
+                    renderQueue->addMainPhase(mModel, shader, nullptr, toRender->getAsStatic(), parametersList, parametersAmount);
                 else
-                    break;
+                    renderQueue->addBlendingPhase(mModel, colorMode, shader, nullptr, toRender->getAsStatic(), 1.0f, parametersList, parametersAmount);
             }
-            toRender->getAsStatic()->render(shader, vpMatrix, mModelTransform);
+
+            if (bCastShadows)
+                renderQueue->addShadowCaster(mModel, toRender->getAsStatic(), shader ? shader->getShadowTexture() : nullptr, uvShadowShiftSize);
         }
         else
         {
-            mesh->getAsStatic()->render(shader, vpMatrix, mModelTransform);
+            if (bRenderShape)
+            {
+                if (colorMode == ComponentColorMode::Lit)
+                    renderQueue->addMainPhase(mModel, shader, nullptr, mesh->getAsStatic(), parametersList, parametersAmount);
+                else
+                    renderQueue->addBlendingPhase(mModel, colorMode, shader, nullptr, mesh->getAsStatic(), 1.0f, parametersList, parametersAmount);
+            }
+
+            if (bCastShadows)
+                renderQueue->addShadowCaster(mModel, mesh->getAsStatic(), shader ? shader->getShadowTexture() : nullptr, uvShadowShiftSize);
         }
     }
 }
-
-void ComponentMesh::onRenderShadow(Matrix4 &vpMatrix, Transformation *tf)
-{
-    if (mesh)
-    {
-        Matrix4 mModelTransform = *tf->getModelMatrix() * *transform.getModelMatrix();
-        mesh->render(shader, vpMatrix, mModelTransform);
-    }
-}
-*/
 
 void ComponentMesh::setMesh(Mesh *mesh)
 {
@@ -102,6 +79,15 @@ Matrix4 ComponentMesh::getLocalspaceMatrix()
 MeshStatic *ComponentMesh::getStaticMesh()
 {
     return mesh->getAsStatic();
+}
+
+void ComponentMesh::lookAt(Vector3 &point, bool bUseGlobalTranformation)
+{
+    transform.setRotation(Vector3(0.0f, 0.0f, 0.0f));
+    Matrix4 m = glm::inverse(bUseGlobalTranformation ? getWorldModelMatrix() : *transform.getModelMatrix());
+    Vector4 localPoint = m * Vector4(point, 1.0f);
+    Vector3 dif = glm::normalize(glm::vec3(localPoint));
+    transform.setRotation(glm::quatLookAtRH(dif, Vector3(0.0f, 1.0f, 0.0f)) * Quat(Vector3(CONST_PI / 2.0f, CONST_PI, 0.0f)));
 }
 
 void ComponentMesh::addLod(Mesh *mesh, float distance)

@@ -48,6 +48,7 @@ bool ShaderOpenGL::build()
 
             locMModelViewProjection = glGetUniformLocation(programm, "mModelViewProjection");
             locFOpacity = glGetUniformLocation(programm, "fOpacity");
+            locUVShiftSize = glGetUniformLocation(programm, "v4uvShiftSize");
 
             bIsReady = true;
             return true;
@@ -170,7 +171,14 @@ void ShaderOpenGL::showCompilationError(unsigned int shader)
 
 void ShaderOpenGL::destroyShaderParameter(ShaderParameter *parameter)
 {
-    if (parameter){
+    if (parameter)
+    {
         delete parameter;
     }
+}
+
+void ShaderOpenGL::setUVShiftSize(Vector4 &v)
+{
+    if (programm != -1)
+        glUniform4fv(locUVShiftSize, 1, value_ptr(v));
 }

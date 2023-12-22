@@ -30,11 +30,19 @@ public:
 
     EXPORT MeshStatic *getStaticMesh() override;
 
+    EXPORT void lookAt(Vector3 &point, bool bUseGlobalTranformation = true);
+
     EXPORT void addLod(Mesh *mesh, float distance);
 
     EXPORT inline void enableShadowCasting() { bCastShadows = true; };
     EXPORT inline void disableShadowCasting() { bCastShadows = false; };
     EXPORT inline bool isShadowCasting() { return bCastShadows; }
+    EXPORT inline void enableShapeCasting() { bRenderShape = true; };
+    EXPORT inline void disableShapeCasting() { bRenderShape = false; };
+    EXPORT inline bool isShapeCasting() { return bRenderShape; }
+
+    EXPORT inline void setShadowShiftSize(Vector4 &uvShadowShiftSize) { this->uvShadowShiftSize = uvShadowShiftSize; }
+    EXPORT inline Vector4 getShadowShiftSize() { return this->uvShadowShiftSize; }
 
 protected:
     Mesh *mesh = nullptr;
@@ -42,4 +50,7 @@ protected:
 
     std::vector<ComponentMeshLod> lods;
     bool bCastShadows = true;
+    bool bRenderShape = true;
+
+    Vector4 uvShadowShiftSize = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 };

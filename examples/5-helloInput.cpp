@@ -157,6 +157,7 @@ APPMAIN
 
     // Layers and camera setup
     auto layerActors = stage->createLayerActors("Hello Input", 0);
+    layerActors->enableSorting();
     auto camera = layerActors->createActor<ActorCamera>();
     camera->setupOrtoCamera()->setWidthBasedResolution(1280);
 

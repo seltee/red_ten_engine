@@ -69,7 +69,7 @@ void RenderQueue::addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode
     }
 }
 
-void RenderQueue::addShadowCaster(Matrix4 &mModel, MeshStatic *mesh)
+void RenderQueue::addShadowCaster(Matrix4 &mModel, MeshStatic *mesh, Texture *texture, Vector4 &uvShiftSize)
 {
     if (lastShadowCasterElement < MAX_RENDER_ELEMENTS && lastElement < MAX_RENDER_ELEMENTS && mesh)
     {
@@ -78,6 +78,8 @@ void RenderQueue::addShadowCaster(Matrix4 &mModel, MeshStatic *mesh)
 
         element->mModel = mModel;
         element->mesh = mesh;
+        element->texture = texture;
+        element->uvShiftSize = uvShiftSize;
 
         lastShadowCasterElement++;
         lastElement++;

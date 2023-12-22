@@ -45,12 +45,18 @@ protected:
 
     std::vector<MeshCompoundNode *> nodes;
     MeshStatic *meshStatic = nullptr;
+
+    Vector4 uvShiftSize = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 };
 
 class MeshCompoundNode
 {
 public:
-    MeshCompoundNode(MeshStatic *mesh, int index) { this->mesh = mesh; this->index = index; }
+    MeshCompoundNode(MeshStatic *mesh, int index)
+    {
+        this->mesh = mesh;
+        this->index = index;
+    }
     Transformation transform;
     MeshStatic *mesh = nullptr;
     MeshCompoundNode *parent = nullptr;

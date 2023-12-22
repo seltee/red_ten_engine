@@ -3,6 +3,7 @@
 #include "math/glm/vec4.hpp"
 #include "math/glm/gtc/quaternion.hpp"
 #include "math/glm/gtx/quaternion.hpp"
+#include "math/glm/gtc/type_ptr.hpp"
 #include <math.h>
 
 typedef glm::vec4 Vector4;

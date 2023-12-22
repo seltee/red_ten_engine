@@ -129,6 +129,11 @@ RenderTarget::RenderTarget(int width, int height, RenderQuality quality, float m
     unsigned int lightningAttachments[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, lightningAttachments);
 
+    // Lightning is using same depth buffer
+    glBindRenderbuffer(GL_RENDERBUFFER, depthbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->width, this->height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthbuffer);
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // Result buffer
@@ -231,7 +236,7 @@ void RenderTarget::setupLightning(bool clear)
     if (clear)
     {
         glClearColor(0.0, 0.0, 0.0, 0.0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 }
 

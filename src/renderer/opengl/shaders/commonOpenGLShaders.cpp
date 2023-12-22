@@ -28,6 +28,9 @@ extern const char *debugCubeFragmentCode;
 extern const char *simpleShadowVertexShader;
 extern const char *simpleShadowFragmentShader;
 
+extern const char *texturedShadowVertexShader;
+extern const char *texturedShadowFragmentShader;
+
 MeshStatic *CommonOpenGLShaders::spriteMesh = nullptr;
 MeshStatic *CommonOpenGLShaders::cubeMesh = nullptr;
 MeshStatic *CommonOpenGLShaders::screenMesh = nullptr;
@@ -39,6 +42,7 @@ ShaderOpenGL *CommonOpenGLShaders::gammaShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::gammaFXAAShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::effectShader = nullptr;
 ShaderOpenGL *CommonOpenGLShaders::simpleShadowShader = nullptr;
+ShaderOpenGL *CommonOpenGLShaders::texturedShadowShader = nullptr;
 
 InitialLightOpenGLShader *CommonOpenGLShaders::initialLightShader = nullptr;
 LightningOpenGLShader *CommonOpenGLShaders::sunShader = nullptr;
@@ -112,8 +116,9 @@ void CommonOpenGLShaders::build(Renderer *renderer)
     gammaShader = new ShaderOpenGL(screenVertexShader, gammaFragmentShader);
     gammaFXAAShader = new ShaderOpenGL(screenVertexShader, gammaFXAAFragmentShader);
 
-    logger->logff("compiling simple shadow shader ...");
+    logger->logff("compiling shadow shaders ...");
     simpleShadowShader = new ShaderOpenGL(simpleShadowVertexShader, simpleShadowFragmentShader);
+    texturedShadowShader = new ShaderOpenGL(texturedShadowVertexShader, texturedShadowFragmentShader);
 
     logger->logff("shaders compiled\n");
 }
@@ -158,6 +163,11 @@ ShaderOpenGL *CommonOpenGLShaders::getSimpleShadowShader()
     return simpleShadowShader;
 }
 
+ShaderOpenGL *CommonOpenGLShaders::getTexturedShadowShader()
+{
+    return texturedShadowShader;
+}
+
 LightningOpenGLShader *CommonOpenGLShaders::getSunShader()
 {
     return sunShader;
@@ -185,8 +195,8 @@ CubeMapOpenGLShader *CommonOpenGLShaders::getCubeMapShader()
 
 float spriteData[] = {
     1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
     1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
     0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
     0.0f, 0.0f, 0.0f, 0.0f, 1.0f};
@@ -692,4 +702,27 @@ const char *simpleShadowFragmentShader =
     "out vec4 fragColor;\n"
     "void main() {\n"
     "   fragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
+    "}\n";
+
+const char *texturedShadowVertexShader =
+    "#version 410 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec3 aNormal;\n"
+    "layout (location = 2) in vec2 aTexCoord;\n"
+    "out vec2 texCoord;\n"
+    "uniform mat4 mModelViewProjection;\n"
+    "uniform vec4 v4uvShiftSize;\n"
+    "void main() {\n"
+    "   gl_Position = mModelViewProjection * vec4(aPos, 1.0);\n"
+    "   texCoord = vec2(v4uvShiftSize.x, v4uvShiftSize.y) + aTexCoord * vec2(v4uvShiftSize.z, v4uvShiftSize.w);\n"
+    "}\n";
+
+const char *texturedShadowFragmentShader =
+    "#version 410 core\n"
+    "out vec4 fragColor;\n"
+    "in vec2 texCoord;\n"
+    "uniform sampler2D t;\n"
+    "void main() {\n"
+    "   fragColor = texture(t, texCoord);\n"
+    "   if (fragColor.a < 0.5){ discard; }\n"
     "}\n";

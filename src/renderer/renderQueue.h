@@ -34,6 +34,7 @@ struct RenderElement
     float opacity;
     ShaderParameter **parameters;
     int parametersAmount;
+    Vector4 uvShiftSize;
 };
 
 struct RenderElementLight
@@ -64,7 +65,7 @@ public:
 
     EXPORT void addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture, MeshStatic *mesh, ShaderParameter **parameters, int parametersAmount);
     EXPORT void addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode, Shader *shader, Texture *texture, MeshStatic *mesh, float opacity, ShaderParameter **parameters, int parametersAmount);
-    EXPORT void addShadowCaster(Matrix4 &mModel, MeshStatic *mesh);
+    EXPORT void addShadowCaster(Matrix4 &mModel, MeshStatic *mesh, Texture *texture, Vector4 &uvShiftSize);
     EXPORT void addLight(LightType type, Vector3 position, Vector3 color, float affectDistance, bool bCastShadows);
 
     EXPORT void addDebugBody(PhysicsBody *body, float symScale, float lineThickness);
