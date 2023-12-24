@@ -8,6 +8,7 @@
 #include "renderer/phongShader.h"
 #include "renderer/shader.h"
 #include "common/config.h"
+#include <vector>
 
 class EffectBuffer;
 class RenderTarget;
@@ -27,6 +28,8 @@ public:
     EXPORT virtual void presentToScreen(RenderTarget *renderTarget);
 
     EXPORT virtual Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) = 0;
+    EXPORT virtual void destroyTexture(Texture *texture) = 0;
+
     EXPORT virtual MeshStatic *createStaticMesh();
 
     EXPORT virtual void renderDebugLine(Vector3 a, Vector3 b, Matrix4 *mProjectionView, float thickness, Vector3 color);
@@ -41,16 +44,15 @@ public:
     EXPORT virtual Shader *getDefaultSpriteShader();
     EXPORT virtual Shader *getDefaultFramedSpriteShader();
     EXPORT virtual Shader *getDefaultCubeMapShader();
-    
     EXPORT virtual MeshStatic *getDefaultSpriteMesh();
     EXPORT virtual MeshStatic *getDefaultCubeMesh();
 
     EXPORT virtual PhongShader *createPhongShader();
 
-    EXPORT virtual Shader *createOpenGLShader(const char *fragmentCode);
-    EXPORT virtual Shader *createOpenGLShader(const char *vertexCode, const char *fragmentCode);
-    EXPORT virtual Shader *createVulkanShader(const char *fragmentCode);
-    EXPORT virtual Shader *createVulkanShader(const char *vertexCode, const char *fragmentCode);
+    EXPORT virtual Shader *createOpenGLShader(const std::string &fragmentCode);
+    EXPORT virtual Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode);
+    EXPORT virtual Shader *createVulkanShader(const std::string &fragmentCode);
+    EXPORT virtual Shader *createVulkanShader(const std::string &vertexCode, const std::string &fragmentCode);
 
     EXPORT virtual EffectBuffer *createEffectBuffer();
     EXPORT virtual void destroyEffectBuffer(EffectBuffer *effectBuffer);

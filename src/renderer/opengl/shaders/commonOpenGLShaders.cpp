@@ -3,33 +3,34 @@
 
 #include "renderer/opengl/shaders/commonOpenGLShaders.h"
 #include "renderer/renderer.h"
+#include <string>
 
 extern float spriteData[];
 extern float screenData[];
 extern float cubeData[];
 
-extern const char *spriteVertexShader;
-extern const char *spriteFramedVertexShader;
-extern const char *spriteFragmentShader;
+extern const std::string spriteVertexShader;
+extern const std::string spriteFramedVertexShader;
+extern const std::string spriteFragmentShader;
 
-extern const char *screenVertexShader;
-extern const char *screenFragmentShader;
+extern const std::string screenVertexShader;
+extern const std::string screenFragmentShader;
 
-extern const char *gammaFXAAFragmentShader;
-extern const char *gammaFragmentShader;
+extern const std::string gammaFXAAFragmentShader;
+extern const std::string gammaFragmentShader;
 
-extern const char *sunFragmentCode;
-extern const char *sunWithShadowFragmentCode;
-extern const char *omniFragmentCode;
+extern const std::string sunFragmentCode;
+extern const std::string sunWithShadowFragmentCode;
+extern const std::string omniFragmentCode;
 
-extern const char *debugCubeVertexCode;
-extern const char *debugCubeFragmentCode;
+extern const std::string debugCubeVertexCode;
+extern const std::string debugCubeFragmentCode;
 
-extern const char *simpleShadowVertexShader;
-extern const char *simpleShadowFragmentShader;
+extern const std::string simpleShadowVertexShader;
+extern const std::string simpleShadowFragmentShader;
 
-extern const char *texturedShadowVertexShader;
-extern const char *texturedShadowFragmentShader;
+extern const std::string texturedShadowVertexShader;
+extern const std::string texturedShadowFragmentShader;
 
 MeshStatic *CommonOpenGLShaders::spriteMesh = nullptr;
 MeshStatic *CommonOpenGLShaders::cubeMesh = nullptr;
@@ -247,7 +248,7 @@ float cubeData[] = {
     0.5f, -0.5f, 0.5f,
     0.5f, -0.5f, -0.5f};
 
-const char *spriteVertexShader =
+const std::string spriteVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
@@ -258,7 +259,7 @@ const char *spriteVertexShader =
     "   texCoord = aTexCoord;\n"
     "}\n";
 
-const char *spriteFramedVertexShader =
+const std::string spriteFramedVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
@@ -271,7 +272,7 @@ const char *spriteFramedVertexShader =
     "   texCoord = vec2(aTexCoord.x * aTexCoordMul.x + aTexCoordShift.x, aTexCoord.y * aTexCoordMul.y + aTexCoordShift.y);\n"
     "}\n";
 
-const char *spriteFragmentShader =
+const std::string spriteFragmentShader =
     "#version 410 core\n"
     "layout (location = 0) out vec4 gAlbedoSpec;\n"
     "layout (location = 1) out vec4 gNormal;\n"
@@ -288,7 +289,7 @@ const char *spriteFragmentShader =
     "   gEmission = vec3(0.0, 0.0, 0.0);\n"
     "}\n";
 
-const char *screenVertexShader =
+const std::string screenVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
@@ -298,7 +299,7 @@ const char *screenVertexShader =
     "   texCoord = aTexCoord;\n"
     "}\n";
 
-const char *screenFragmentShader =
+const std::string screenFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"
@@ -307,7 +308,7 @@ const char *screenFragmentShader =
     "   fragColor = texture(t, texCoord);\n"
     "}\n";
 
-const char *gammaFXAAFragmentShader =
+const std::string gammaFXAAFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"
@@ -450,7 +451,7 @@ const char *gammaFXAAFragmentShader =
     "   fragColor.rgb = 1.055 * pow(fragColor.rgb, vec3(fGammaEffector)) - vec3(0.055);\n"
     "}\n";
 
-const char *gammaFragmentShader =
+const std::string gammaFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"
@@ -461,7 +462,7 @@ const char *gammaFragmentShader =
     "   fragColor.rgb = 1.055 * pow(fragColor.rgb, vec3(fGammaEffector)) - vec3(0.055);\n"
     "}\n";
 
-const char *sunFragmentCode =
+const std::string sunFragmentCode =
     "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
@@ -538,7 +539,7 @@ const char *sunFragmentCode =
     "   FragColor = vec4(Light, 0.0);\n"
     "}\n";
 
-const char *sunWithShadowFragmentCode =
+const std::string sunWithShadowFragmentCode =
     "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
@@ -567,9 +568,7 @@ const char *sunWithShadowFragmentCode =
     "           vec2 coords = projCoords.xy + vec2(x, y) * texelSize;\n"
     "           if (coords.x >= 0.0 && coords.x < 1.0 && coords.y >= 0.0 && coords.y < 1.0){\n"
     "               float pcfDepth = texture(tShadowMap, coords).r;\n"
-    "               shadow += (currentDepth - bias > pcfDepth) || currentDepth > 1.0 ? 1.0 : 0.0;\n"
-    "           } else {\n"
-    "               shadow += 0.0;\n"
+    "               shadow += step(step(currentDepth - bias, pcfDepth) + currentDepth, 1.0);\n"
     "           }\n"
     "       }\n"
     "   }\n"
@@ -587,11 +586,9 @@ const char *sunWithShadowFragmentCode =
     "   float a      = roughness*roughness;\n"
     "   float a2     = a*a;\n"
     "   float NdotH  = max(dot(N, H), 0.0);\n"
-    "   float NdotH2 = NdotH*NdotH;\n"
-    "   float num   = a2;\n"
-    "   float denom = (NdotH2 * (a2 - 1.0) + 1.0);\n"
+    "   float denom = (NdotH * NdotH * (a2 - 1.0) + 1.0);\n"
     "   denom = PI * denom * denom;\n"
-    "   return num / denom;\n"
+    "   return a2 / denom;\n"
     "}\n"
     ""
     "float GeometrySchlickGGX(float NdotV, float roughness)\n"
@@ -652,7 +649,7 @@ const char *sunWithShadowFragmentCode =
 // attenuation - float attenuation = 1.0 / (distance * distance);, always 1 for sun
 // vec3 radiance     = lightColors[i] * attenuation;  always lightColor
 
-const char *omniFragmentCode =
+const std::string omniFragmentCode =
     "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
@@ -673,7 +670,7 @@ const char *omniFragmentCode =
     "   FragColor = vec4(light, 0.0);\n"
     "}\n";
 
-const char *debugCubeVertexCode =
+const std::string debugCubeVertexCode =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "uniform mat4 mModelViewProjection;\n"
@@ -681,7 +678,7 @@ const char *debugCubeVertexCode =
     "   gl_Position = mModelViewProjection * vec4(aPos, 1.0);\n"
     "}\n";
 
-const char *debugCubeFragmentCode =
+const std::string debugCubeFragmentCode =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "uniform vec3 color;\n"
@@ -689,7 +686,7 @@ const char *debugCubeFragmentCode =
     "   fragColor = vec4(color, 1.0);\n"
     "}\n";
 
-const char *simpleShadowVertexShader =
+const std::string simpleShadowVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "uniform mat4 mModelViewProjection;\n"
@@ -697,14 +694,14 @@ const char *simpleShadowVertexShader =
     "   gl_Position = mModelViewProjection * vec4(aPos, 1.0);\n"
     "}\n";
 
-const char *simpleShadowFragmentShader =
+const std::string simpleShadowFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "void main() {\n"
     "   fragColor = vec4(1.0, 1.0, 1.0, 1.0);\n"
     "}\n";
 
-const char *texturedShadowVertexShader =
+const std::string texturedShadowVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec3 aNormal;\n"
@@ -717,7 +714,7 @@ const char *texturedShadowVertexShader =
     "   texCoord = vec2(v4uvShiftSize.x, v4uvShiftSize.y) + aTexCoord * vec2(v4uvShiftSize.z, v4uvShiftSize.w);\n"
     "}\n";
 
-const char *texturedShadowFragmentShader =
+const std::string texturedShadowFragmentShader =
     "#version 410 core\n"
     "out vec4 fragColor;\n"
     "in vec2 texCoord;\n"

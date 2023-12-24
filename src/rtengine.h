@@ -97,6 +97,8 @@ protected:
 
     static RTEngine *instance;
 
+    Core *core = nullptr;
+
 public:
     EXPORT static RTEngine *getInstance(std::string configFilePath = "./cfg", bool showConsole = true);
 
@@ -108,8 +110,9 @@ public:
     EXPORT static ConfigController *getConfigController();
     EXPORT static DebugController *getDebugController();
     EXPORT static ProfilerController *getProfilerController();
-
     EXPORT static MeshMaker *getMeshMaker();
+
+    EXPORT inline Core *getCore() { return core; };
 
     EXPORT void openUrl(const char *url);
 
@@ -118,6 +121,4 @@ public:
     EXPORT bool isTerminationIntended();
 
     EXPORT void destroy();
-
-    Core *core;
 };

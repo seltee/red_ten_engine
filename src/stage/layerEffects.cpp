@@ -41,7 +41,7 @@ void LayerEffects::render(Renderer *renderer, RenderTarget *renderTarget)
         return;
     profiler->startTracking(renderTrackerId);
 
-    if (effects.size() > 0)
+    if (!effects.empty())
     {
         int width = renderTarget->getWidth();
         int height = renderTarget->getHeight();

@@ -16,7 +16,7 @@ void ComponentMesh::onRenderQueue(RenderQueue *renderQueue)
     {
         Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix();
 
-        if (lods.size() > 0)
+        if (!lods.empty())
         {
             float distance = fabsf((*renderQueue->getViewProjectionMatrix() * mModel * Vector4(0, 0, 0, 1.0f)).z);
             Mesh *toRender = mesh;

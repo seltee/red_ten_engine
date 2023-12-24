@@ -6,7 +6,7 @@
 #include "renderer/opengl/glew.h"
 #include <string.h>
 
-LightningOpenGLShader::LightningOpenGLShader(const char *vertex, const char *fragment) : ShaderOpenGL(vertex, fragment)
+LightningOpenGLShader::LightningOpenGLShader(const std::string &vertex, const std::string &fragment) : ShaderOpenGL(vertex, fragment)
 {
     build();
     locV3Position = glGetUniformLocation(programm, "v3Position");

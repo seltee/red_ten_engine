@@ -3,6 +3,7 @@
 
 #pragma once
 #include <math.h>
+#include <string>
 
 #define CONST_PI 3.1415926f
 #define CONST_PI2 6.2831853f

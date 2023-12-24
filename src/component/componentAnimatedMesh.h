@@ -32,6 +32,8 @@ public:
     EXPORT Animator *createAnimator(Animation *animation);
 
     EXPORT Transformation *getNodeTransformation(std::string name);
+    EXPORT Matrix4 getNodeMatrix(int index, bool includeParents, bool includeAnimation);
+    EXPORT int getMeshNodeIndex(const std::string name);
 
     EXPORT inline void enableShadowCasting() { bCastShadows = true; };
     EXPORT inline void disableShadowCasting() { bCastShadows = false; };

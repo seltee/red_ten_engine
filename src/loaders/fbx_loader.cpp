@@ -326,12 +326,12 @@ void FBXLoader::sendToMeshDescriptor(MeshDescriptor *meshDescriptor)
                 Node *elementUVs = geometry->findNode("LayerElementUV");
                 Node *elementNormals = geometry->findNode("LayerElementNormal");
 
-                if (vertices && vertices->bindedData.size() > 0)
+                if (vertices && !vertices->bindedData.empty())
                 {
                     auto nodeData = vertices->bindedData.at(0);
                     current->provideVertex((double *)nodeData.data, nodeData.numElements);
                 }
-                if (polygonVertexIndex && polygonVertexIndex->bindedData.size() > 0)
+                if (polygonVertexIndex && !polygonVertexIndex->bindedData.empty())
                 {
                     auto nodeData = polygonVertexIndex->bindedData.at(0);
                     current->providePolygonIndexes((int *)nodeData.data, nodeData.numElements);
@@ -340,12 +340,12 @@ void FBXLoader::sendToMeshDescriptor(MeshDescriptor *meshDescriptor)
                 {
                     Node *UVs = elementUVs->findNode("UV");
                     Node *UVIndexes = elementUVs->findNode("UVIndex");
-                    if (UVs && UVs->bindedData.size() > 0)
+                    if (UVs && !UVs->bindedData.empty())
                     {
                         auto nodeData = UVs->bindedData.at(0);
                         current->provideUVData((double *)nodeData.data, nodeData.numElements);
                     }
-                    if (UVIndexes && UVIndexes->bindedData.size() > 0)
+                    if (UVIndexes && !UVIndexes->bindedData.empty())
                     {
                         auto nodeData = UVIndexes->bindedData.at(0);
                         current->provideUVIndexes((int *)nodeData.data, nodeData.numElements);

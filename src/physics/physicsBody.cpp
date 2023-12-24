@@ -43,7 +43,7 @@ void PhysicsBody::finishStep(float delta)
 {
     if (glm::length2(translationAccumulator) > 0.0000000001f)
     {
-        if (constraints.size() > 0)
+        if (!constraints.empty())
             for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
                 translationAccumulator = (*constraint)->processTranslation(translationAccumulator);
 
@@ -56,7 +56,7 @@ void PhysicsBody::finishStep(float delta)
     {
         motion->checkLimits();
 
-        if (constraints.size() > 0)
+        if (!constraints.empty())
             for (auto constraint = constraints.begin(); constraint != constraints.end(); constraint++)
                 (*constraint)->processMotion(motion);
 

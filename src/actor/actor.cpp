@@ -104,7 +104,7 @@ void Actor::setZAxisRotationLocked(bool state)
 void Actor::process(float delta)
 {
     onProcess(delta);
-    if (components.size() > 0)
+    if (!components.empty())
     {
         auto it = components.begin();
         while (it != components.end())
@@ -192,7 +192,7 @@ void Actor::onDestroy()
 {
     Destroyable::onDestroy();
 
-    if (components.size() > 0)
+    if (!components.empty())
         for (auto it = components.begin(); it != components.end(); it++)
             (*it)->destroy();
 
@@ -221,7 +221,7 @@ void Actor::updatePhysics()
 {
     bPhysicsNeedsToBeRebuild = false;
 
-    if (physicsWorld && components.size() > 0)
+    if (physicsWorld && !components.empty())
     {
         int collisionsAmount = 0;
         for (auto component = components.begin(); component != components.end(); component++)
@@ -239,12 +239,12 @@ void Actor::updatePhysics()
             for (auto component = components.begin(); component != components.end(); component++)
             {
                 auto shapes = &(*component)->shapes;
-                if (shapes->size() > 0)
+                if (!shapes->empty())
                     for (auto shape = shapes->begin(); shape != shapes->end(); shape++)
                         shapesList.push_back(*shape);
             }
 
-            if (shapesList.size() > 0)
+            if (!shapesList.empty())
             {
                 physicsBody = physicsWorld->createPhysicsBody(shapesList.at(0), this);
                 physicsBody->setRelation(&transform, this);

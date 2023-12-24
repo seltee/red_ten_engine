@@ -139,10 +139,10 @@ protected:
 Texture *CratePlate::crateTexture = nullptr;
 Texture *CratePlate::plateTexture = nullptr;
 
-extern const char *fragmentInverseShader;
-extern const char *fragmentShiftShader;
-extern const char *fragmentBWShader;
-extern const char *fragmentJoJoShader;
+extern const std::string fragmentInverseShader;
+extern const std::string fragmentShiftShader;
+extern const std::string fragmentBWShader;
+extern const std::string fragmentJoJoShader;
 
 // Effects are technically shaders applied to the whole rendered layer
 APPMAIN
@@ -308,7 +308,7 @@ APPMAIN
 // Screen here is represented in 0-1 on each axis inside texCoord
 // There is no vertex shaders because we use the default one
 
-const char *fragmentInverseShader = "#version 410 core\n"
+const std::string fragmentInverseShader = "#version 410 core\n"
                                     "out vec4 fragColor;\n"
                                     "in vec2 texCoord;\n"
                                     "uniform sampler2D t;\n"
@@ -317,7 +317,7 @@ const char *fragmentInverseShader = "#version 410 core\n"
                                     "  fragColor = vec4(1.0 - color.x, 1.0 - color.y, 1.0 - color.z, color.w);\n"
                                     "}\n";
 
-const char *fragmentShiftShader = "#version 410 core\n"
+const std::string fragmentShiftShader = "#version 410 core\n"
                                   "out vec4 fragColor;\n"
                                   "in vec2 texCoord;\n"
                                   "uniform sampler2D t;\n"
@@ -329,7 +329,7 @@ const char *fragmentShiftShader = "#version 410 core\n"
                                   "  fragColor = vec4(rightColor.x, leftColor.y, color.z, color.w);\n"
                                   "}\n";
 
-const char *fragmentBWShader = "#version 410 core\n"
+const std::string fragmentBWShader = "#version 410 core\n"
                                "out vec4 fragColor;\n"
                                "in vec2 texCoord;\n"
                                "uniform sampler2D t;\n"
@@ -339,7 +339,7 @@ const char *fragmentBWShader = "#version 410 core\n"
                                "  fragColor = vec4(m, m, m, 1.0);\n"
                                "}\n";
 
-const char *fragmentJoJoShader = "#version 410 core\n"
+const std::string fragmentJoJoShader = "#version 410 core\n"
                                  "out vec4 fragColor;\n"
                                  "in vec2 texCoord;\n"
                                  "uniform sampler2D t;\n"

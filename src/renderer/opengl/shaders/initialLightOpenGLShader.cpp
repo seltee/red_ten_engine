@@ -6,7 +6,71 @@
 #include "math/math.h"
 #include "math/glm/gtc/type_ptr.hpp"
 
-const char *InitialLightOpenGLShader::internalVertexShader =
+InitialLightOpenGLShader::InitialLightOpenGLShader() : ShaderOpenGL(internalVertexShader, internalFragmentShader)
+{
+    build();
+    locTDefuse = getUniformLocation("tAlbedo");
+    locTNormal = getUniformLocation("tNormal");
+    locTPosition = getUniformLocation("tPosition");
+    locTRadiance = getUniformLocation("tRadiance");
+    locTEnvironment = getUniformLocation("tEnvironment");
+    locCameraPosition = getUniformLocation("cameraPos");
+    locCameraDirection = getUniformLocation("cameraDir");
+    locAmbientColor = getUniformLocation("vf3ambientColor");
+}
+
+void InitialLightOpenGLShader::setTextureAlbedo(unsigned int albedoID)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, albedoID);
+    glUniform1i(locTDefuse, 0);
+}
+
+void InitialLightOpenGLShader::setTextureNormal(unsigned int normalID)
+{
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, normalID);
+    glUniform1i(locTNormal, 1);
+}
+
+void InitialLightOpenGLShader::setTexturePosition(unsigned int positionID)
+{
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, positionID);
+    glUniform1i(locTPosition, 2);
+}
+
+void InitialLightOpenGLShader::setTextureRadiance(unsigned int radianceID)
+{
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, radianceID);
+    glUniform1i(locTRadiance, 3);
+}
+
+void InitialLightOpenGLShader::setTextureEnvironment(unsigned int environmentID)
+{
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, environmentID);
+    glUniform1i(locTEnvironment, 4);
+}
+
+void InitialLightOpenGLShader::setCameraPosition(Vector3 &position)
+{
+    glUniform3fv(locCameraPosition, 1, value_ptr(position));
+}
+
+void InitialLightOpenGLShader::setCameraDirection(Vector3 &direction)
+{
+    glUniform3fv(locCameraDirection, 1, value_ptr(direction));
+}
+
+void InitialLightOpenGLShader::setAmbientColor(float *ambientColor)
+{
+    glUniform3fv(locAmbientColor, 1, ambientColor);
+}
+
+
+const std::string InitialLightOpenGLShader::internalVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "layout (location = 1) in vec2 aTexCoord;\n"
@@ -16,7 +80,7 @@ const char *InitialLightOpenGLShader::internalVertexShader =
     "   texCoord = aTexCoord;\n"
     "}\n";
 
-const char *InitialLightOpenGLShader::internalFragmentShader =
+const std::string InitialLightOpenGLShader::internalFragmentShader =
     "#version 410 core\n"
     "out vec4 FragColor;\n"
     "in vec2 texCoord;\n"
@@ -87,66 +151,3 @@ const char *InitialLightOpenGLShader::internalFragmentShader =
     "   vec3 Ambient = (kD * Diffuse) * AO;\n"
     "   FragColor = vec4(Ambient, AlbedoAlpha);\n"
     "}\n";
-
-InitialLightOpenGLShader::InitialLightOpenGLShader() : ShaderOpenGL(internalVertexShader, internalFragmentShader)
-{
-    build();
-    locTDefuse = getUniformLocation("tAlbedo");
-    locTNormal = getUniformLocation("tNormal");
-    locTPosition = getUniformLocation("tPosition");
-    locTRadiance = getUniformLocation("tRadiance");
-    locTEnvironment = getUniformLocation("tEnvironment");
-    locCameraPosition = getUniformLocation("cameraPos");
-    locCameraDirection = getUniformLocation("cameraDir");
-    locAmbientColor = getUniformLocation("vf3ambientColor");
-}
-
-void InitialLightOpenGLShader::setTextureAlbedo(unsigned int albedoID)
-{
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, albedoID);
-    glUniform1i(locTDefuse, 0);
-}
-
-void InitialLightOpenGLShader::setTextureNormal(unsigned int normalID)
-{
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, normalID);
-    glUniform1i(locTNormal, 1);
-}
-
-void InitialLightOpenGLShader::setTexturePosition(unsigned int positionID)
-{
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, positionID);
-    glUniform1i(locTPosition, 2);
-}
-
-void InitialLightOpenGLShader::setTextureRadiance(unsigned int radianceID)
-{
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, radianceID);
-    glUniform1i(locTRadiance, 3);
-}
-
-void InitialLightOpenGLShader::setTextureEnvironment(unsigned int environmentID)
-{
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, environmentID);
-    glUniform1i(locTEnvironment, 4);
-}
-
-void InitialLightOpenGLShader::setCameraPosition(Vector3 &position)
-{
-    glUniform3fv(locCameraPosition, 1, value_ptr(position));
-}
-
-void InitialLightOpenGLShader::setCameraDirection(Vector3 &direction)
-{
-    glUniform3fv(locCameraDirection, 1, value_ptr(direction));
-}
-
-void InitialLightOpenGLShader::setAmbientColor(float *ambientColor)
-{
-    glUniform3fv(locAmbientColor, 1, ambientColor);
-}

@@ -168,6 +168,36 @@ int MeshCompound::getMeshIndex(std::string name)
     return -1;
 }
 
+Matrix4 MeshCompound::getTransformationMatrixByIndex(int index)
+{
+    if (index >= 0 && index < nodes.size())
+    {
+        MeshCompoundNode *node = nodes.at(index);
+        return *node->transform.getModelMatrix();
+    }
+    return Matrix4(1.0f);
+}
+
+Matrix4 MeshCompound::getTransformationMatrixWithParentingByIndex(int index)
+{
+    if (index >= 0 && index < nodes.size())
+    {
+        MeshCompoundNode *node = nodes.at(index);
+        return getTransformationMatrix(node);
+    }
+    return Matrix4(1.0f);
+}
+
+Matrix4 MeshCompound::getAnimatedTransformationMatrixByIndex(int index, MeshCompoundCache *cache, std::vector<Animator *> &animators, Transformation **indexTransformations)
+{
+    if (index >= 0 && index < nodes.size())
+    {
+        MeshCompoundNode *node = nodes.at(index);
+        return getAnimatedTransformationMatrix(cache, node, animators, indexTransformations);
+    }
+    return Matrix4(1.0f);
+}
+
 MeshCompoundNode *MeshCompound::getNodeByMesh(Mesh *mesh)
 {
     for (auto &it : nodes)

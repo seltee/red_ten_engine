@@ -8,7 +8,7 @@
 class LightningOpenGLShader : public ShaderOpenGL
 {
 public:
-    EXPORT LightningOpenGLShader(const char *vertex, const char *fragment);
+    EXPORT LightningOpenGLShader(const std::string &vertex, const std::string &fragment);
 
     EXPORT bool use(Matrix4 &mModel, Matrix4 &mModelViewProjection) override;
     EXPORT void setLightColor(Vector3 &v);

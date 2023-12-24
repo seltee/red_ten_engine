@@ -77,6 +77,34 @@ void CameraOrto::setHeightBasedResolution(float height)
     mainLine = height;
 }
 
+PointWithDirection CameraOrto::screenToWorld(float x, float y)
+{
+    PointWithDirection out;
+    if (!renderTarget)
+        return out;
+
+    float halfWidth = renderTarget->getWidth() / 2.0f;
+    float halfHeight = renderTarget->getHeight() / 2.0f;
+
+    Matrix4 mView = glm::inverse(projectionMatrix * *getViewMatrix());
+
+    Vector4 near = Vector4((x - halfWidth) / halfWidth, -1 * (y - halfHeight) / halfHeight, 0.0f, 1.0);
+    Vector4 far = Vector4((x - halfWidth) / halfWidth, -1 * (y - halfHeight) / halfHeight, 1.0f, 1.0);
+
+    Vector4 nearResult = mView * near;
+    Vector4 farResult = mView * far;
+    nearResult /= nearResult.w;
+    farResult /= farResult.w;
+
+    out.vDirection = glm::normalize(Vector3(farResult - nearResult));
+
+    out.vPosition = Vector3({nearResult.x,
+                             nearResult.y,
+                             nearResult.z});
+
+    return out;
+}
+
 float CameraOrto::getLineThickness()
 {
     return 1.2f;

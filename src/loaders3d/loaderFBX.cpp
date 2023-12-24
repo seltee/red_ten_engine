@@ -111,12 +111,12 @@ void LoaderFBX::reload()
             FBXNode *elementUVs = it->findNode("LayerElementUV");
             FBXNode *elementNormals = it->findNode("LayerElementNormal");
 
-            if (vertices && vertices->bindedData.size() > 0)
+            if (vertices && !vertices->bindedData.empty())
             {
                 auto nodeData = vertices->bindedData.at(0);
                 descriptor.provideVertex((double *)nodeData.data, nodeData.numElements);
             }
-            if (polygonVertexIndex && polygonVertexIndex->bindedData.size() > 0)
+            if (polygonVertexIndex && !polygonVertexIndex->bindedData.empty())
             {
                 auto nodeData = polygonVertexIndex->bindedData.at(0);
                 descriptor.providePolygonIndexes((int *)nodeData.data, nodeData.numElements);
@@ -125,12 +125,12 @@ void LoaderFBX::reload()
             {
                 FBXNode *UVs = elementUVs->findNode("UV");
                 FBXNode *UVIndexes = elementUVs->findNode("UVIndex");
-                if (UVs && UVs->bindedData.size() > 0)
+                if (UVs && !UVs->bindedData.empty())
                 {
                     auto nodeData = UVs->bindedData.at(0);
                     descriptor.provideUVData((double *)nodeData.data, nodeData.numElements);
                 }
-                if (UVIndexes && UVIndexes->bindedData.size() > 0)
+                if (UVIndexes && !UVIndexes->bindedData.empty())
                 {
                     auto nodeData = UVIndexes->bindedData.at(0);
                     descriptor.provideUVIndexes((int *)nodeData.data, nodeData.numElements);
@@ -348,7 +348,7 @@ void LoaderFBX::reload()
     }
 
     // setting up animation
-    if (animStacks.size() > 0)
+    if (!animStacks.empty())
     {
         auto animNames = getAnimationNames();
         for (auto &animName : animNames)

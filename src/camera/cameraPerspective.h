@@ -10,12 +10,12 @@
 class CameraPerspective : public Camera
 {
 public:
-    EXPORT void prepareToRender(RenderTarget *renderTarget);
-    EXPORT void finishRender();
-    EXPORT int getWidth();
-    EXPORT int getHeight();
-    EXPORT float getWidthTargetProportion();
-    EXPORT float getHeightTargetProportion();
+    EXPORT void prepareToRender(RenderTarget *renderTarget) override;
+    EXPORT void finishRender() override;
+    EXPORT int getWidth() override;
+    EXPORT int getHeight() override;
+    EXPORT float getWidthTargetProportion() override;
+    EXPORT float getHeightTargetProportion() override;
 
     EXPORT void setWidthBasedResolution(float width);
     EXPORT void setHeightBasedResolution(float height);
@@ -24,11 +24,11 @@ public:
     EXPORT void setNearDistance(float nearDistance);
     EXPORT void setFov(float fov);
 
-    EXPORT PointWithDirection screenToWorld(float x, float y);
+    EXPORT PointWithDirection screenToWorld(float x, float y) override;
 
-    EXPORT float getLineThickness();
+    EXPORT float getLineThickness() override;
 
-    EXPORT CameraType getCameraType();
+    EXPORT CameraType getCameraType() override;
 
 protected:
     Layer *layer;

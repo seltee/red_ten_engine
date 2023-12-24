@@ -4,15 +4,20 @@
 #pragma once
 #include "common/utils.h"
 #include "renderer/shader.h"
+#include "renderer/opengl/textureBindingOpenGL.h"
+#include <vector>
 
 class ShaderOpenGL : public Shader
 {
 public:
-    EXPORT ShaderOpenGL(const char *vertex, const char *fragment);
+    EXPORT ShaderOpenGL(const std::string &vertex, const std::string &fragment);
+    EXPORT ~ShaderOpenGL();
 
     EXPORT virtual bool build() override;
     EXPORT bool use(Matrix4 &mModel, Matrix4 &mModelViewProjection) override;
     EXPORT virtual bool compile(unsigned short type, const char *code, unsigned int *shader) override;
+
+    TextureBinding *addTextureBinding(std::string parameterName) override;
 
     EXPORT void setOpacity(float value) override;
 
@@ -32,14 +37,19 @@ public:
     EXPORT void setUVShiftSize(Vector4 &v) override;
 
     int locMModelViewProjection;
+    int locMModel;
+    int locMNormal;
     int locFOpacity;
     int locV3Normal;
+
 
 protected:
     EXPORT void showCompilationError(unsigned int shader) override;
 
-    const char *vertexCode = nullptr;
-    const char *fragmentCode = nullptr;
+    std::string vertexCode;
+    std::string fragmentCode;
 
     int locUVShiftSize = -1;
+
+    std::vector<TextureBindingOpenGL *> bindings;
 };

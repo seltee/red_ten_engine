@@ -4,6 +4,7 @@
 #pragma once
 #include "renderer/opengl/shaders/shaderOpenGL.h"
 #include "renderer/texture.h"
+#include <string>
 
 class InitialLightOpenGLShader : public ShaderOpenGL
 {
@@ -29,6 +30,6 @@ protected:
     unsigned int locCameraDirection;
     unsigned int locAmbientColor;
 
-    static const char *internalVertexShader;
-    static const char *internalFragmentShader;
+    static const std::string internalVertexShader;
+    static const std::string internalFragmentShader;
 };

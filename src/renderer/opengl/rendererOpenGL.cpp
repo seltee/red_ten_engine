@@ -54,9 +54,9 @@ bool RendererOpenGL::init(void *window)
     oglVersion = (char *)glGetString(GL_RENDERER); // get renderer string
     version = (char *)glGetString(GL_VERSION);     // version as a string
 
-    logger->logff("Opengl initialized", oglVersion, version);
-    logger->logff("Renderer: %s", oglVersion ? oglVersion : "no renderer");
-    logger->logff("OpenGL version supported: %s\n", version ? version : "no version");
+    logger->logff("Opengl initialized", oglVersion.c_str(), version.c_str());
+    logger->logff("Renderer: %s", oglVersion.c_str() ? oglVersion.c_str() : "no renderer");
+    logger->logff("OpenGL version supported: %s\n", version.c_str() ? version.c_str() : "no version");
 
     return true;
 }
@@ -83,10 +83,19 @@ Texture *RendererOpenGL::createTexture(int width, int height, int bytesPerPixel,
     unsigned int textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    int pixelType = bytesPerPixel == 4 ? GL_RGBA : GL_RGB;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, pixelType, width, height, 0, pixelType, GL_UNSIGNED_BYTE, data);
     if (bCreateMipmaps)
         glGenerateMipmap(GL_TEXTURE_2D);
+
     return new TextureOpengGL(textureID);
+}
+
+void RendererOpenGL::destroyTexture(Texture *texture)
+{
+    delete texture;
 }
 
 unsigned int RendererOpenGL::getWindowFlags()
@@ -245,7 +254,6 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
         glDisable(GL_DEPTH_TEST);
     else
         glEnable(GL_DEPTH_TEST);
-
 
     // Sorting
     if (!renderQueue->isUsingSorting())
@@ -456,9 +464,9 @@ PhongShader *RendererOpenGL::createPhongShader()
     return new PhongOpenGLShader();
 }
 
-Shader *RendererOpenGL::createOpenGLShader(const char *fragmentCode)
+Shader *RendererOpenGL::createOpenGLShader(const std::string &fragmentCode)
 {
-    const char *internalScreenVertexCode =
+    std::string internalScreenVertexCode =
         "#version 410 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "layout (location = 1) in vec2 aTexCoord;\n"
@@ -473,7 +481,7 @@ Shader *RendererOpenGL::createOpenGLShader(const char *fragmentCode)
     return newShader;
 }
 
-Shader *RendererOpenGL::createOpenGLShader(const char *vertexCode, const char *fragmentCode)
+Shader *RendererOpenGL::createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode)
 {
     ShaderOpenGL *newShader = new ShaderOpenGL(vertexCode, fragmentCode);
     newShader->build();

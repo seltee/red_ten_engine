@@ -70,7 +70,8 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/core.o ${OBJDIR}/view.o ${OBJDIR}/sta
 			${OBJDIR}/shapePlain.o ${OBJDIR}/shapeConvex.o ${OBJDIR}/shapeCapsule.o \
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
 			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceHDR.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
-			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o ${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o \
+			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
+			${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o ${OBJDIR}/textureBinding.o ${OBJDIR}/textureBindingOpenGL.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
@@ -356,6 +357,12 @@ ${OBJDIR}/texture.o: ${SRCDIR}/renderer/texture.cpp
 
 ${OBJDIR}/textureOpenGL.o: ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/textureOpenGL.o ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
+
+${OBJDIR}/textureBinding.o: ${SRCDIR}/renderer/textureBinding.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/textureBinding.o ${SRCDIR}/renderer/textureBinding.cpp
+
+${OBJDIR}/textureBindingOpenGL.o: ${SRCDIR}/renderer/opengl/textureBindingOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/textureBindingOpenGL.o ${SRCDIR}/renderer/opengl/textureBindingOpenGL.cpp
 
 ${OBJDIR}/phongOpenGLShader.o: ${SRCDIR}/renderer/opengl/shaders/phongOpenGLShader.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/phongOpenGLShader.o ${SRCDIR}/renderer/opengl/shaders/phongOpenGLShader.cpp

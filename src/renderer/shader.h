@@ -7,10 +7,13 @@
 #include "connector/withLogger.h"
 #include "renderer/shaderParameter.h"
 #include "renderer/texture.h"
+#include "renderer/textureBinding.h"
 
 class Shader : public WithLogger
 {
 public:
+    virtual ~Shader();
+
     EXPORT virtual bool build();
     EXPORT virtual bool use(Matrix4 &mModel, Matrix4 &mModelViewProjection);
 
@@ -27,6 +30,8 @@ public:
     EXPORT virtual Texture *getShadowTexture();
 
     EXPORT virtual void setUVShiftSize(Vector4 &v);
+
+    EXPORT virtual TextureBinding *addTextureBinding(const std::string parameterName);
 
 protected:
     EXPORT virtual void showCompilationError(unsigned int shader);

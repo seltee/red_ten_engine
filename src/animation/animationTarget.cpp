@@ -10,7 +10,7 @@ AnimationTarget::AnimationTarget(std::string targetName)
 
 float AnimationTarget::getAnimationTimeLength()
 {
-    if (keys.size() > 0)
+    if (!keys.empty())
     {
         return keys.at(keys.size() - 1).timeStamp;
     }

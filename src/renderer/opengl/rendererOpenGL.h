@@ -23,6 +23,7 @@ public:
     EXPORT void presentToScreen(RenderTarget *renderTarget) final override;
 
     EXPORT Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) final override;
+    EXPORT void destroyTexture(Texture *texture) override;
 
     EXPORT unsigned int getWindowFlags() final override;
 
@@ -40,14 +41,14 @@ public:
 
     EXPORT PhongShader *createPhongShader() override;
 
-    EXPORT Shader *createOpenGLShader(const char *fragmentCode) override;
-    EXPORT Shader *createOpenGLShader(const char *vertexCode, const char *fragmentCode) override;
+    EXPORT Shader *createOpenGLShader(const std::string &fragmentCode) override;
+    EXPORT Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode) override;
 
     EXPORT EffectBuffer *createEffectBuffer() override;
     EXPORT void destroyEffectBuffer(EffectBuffer *effectBuffer) override;
 
-    EXPORT inline const char *getOglVersion() { return oglVersion; }
-    EXPORT inline const char *getVersion() { return version; }
+    EXPORT inline std::string getOglVersion() { return oglVersion; }
+    EXPORT inline std::string getVersion() { return version; }
 
 protected:
     void setupShaderParameters(ShaderParameter **parameters, int amount);
@@ -57,6 +58,6 @@ protected:
     void renderOmni(Vector3 &position, Vector3 &color, float affectDistance);
     void renderOmniWithShadows(RenderTarget *renderTarget, Vector3 &position, Vector3 &color, float affectDistance);
 
-    const char *oglVersion = nullptr;
-    const char *version = nullptr;
+    std::string oglVersion;
+    std::string version;
 };

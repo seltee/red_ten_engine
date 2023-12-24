@@ -68,7 +68,7 @@ Geometry *ResourceMesh::getGeometry()
 
 Animation *ResourceMesh::getFirstAnimation()
 {
-    return animations.size() > 0 ? animations.at(0) : nullptr;
+    return !animations.empty() ? animations.at(0) : nullptr;
 }
 
 std::vector<Animation *> ResourceMesh::getAnimations()

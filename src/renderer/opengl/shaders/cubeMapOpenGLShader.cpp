@@ -5,7 +5,23 @@
 #include "renderer/opengl/glew.h"
 #include "renderer/opengl/textureOpenGL.h"
 
-const char *CubeMapOpenGLShader::internalVertexShader =
+CubeMapOpenGLShader::CubeMapOpenGLShader() : ShaderOpenGL(internalVertexShader, internalFragmentShader)
+{
+    build();
+    locTCubeMap = getUniformLocation("tCubeMap");
+}
+
+void CubeMapOpenGLShader::setCubeMap(Texture *texture)
+{
+    if (texture)
+    {
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<TextureOpengGL *>(texture)->getGLTextureId());
+        glUniform1i(locTCubeMap, 0);
+    }
+}
+
+const std::string CubeMapOpenGLShader::internalVertexShader =
     "#version 410 core\n"
     "layout (location = 0) in vec3 aPos;\n"
     "uniform mat4 mModelViewProjection;\n"
@@ -15,7 +31,7 @@ const char *CubeMapOpenGLShader::internalVertexShader =
     "   localPos = aPos\n;"
     "}\n";
 
-const char *CubeMapOpenGLShader::internalFragmentShader =
+const std::string CubeMapOpenGLShader::internalFragmentShader =
     "#version 410 core\n"
     "layout (location = 0) out vec4 gAlbedo;"
     "layout (location = 1) out vec4 gNormal;"
@@ -42,19 +58,3 @@ const char *CubeMapOpenGLShader::internalFragmentShader =
     "   gPosition = Normal * 1024.0;\n"
     "   gEmission = vec4(Color, 1.0);\n"
     "}\n";
-
-CubeMapOpenGLShader::CubeMapOpenGLShader() : ShaderOpenGL(internalVertexShader, internalFragmentShader)
-{
-    build();
-    locTCubeMap = getUniformLocation("tCubeMap");
-}
-
-void CubeMapOpenGLShader::setCubeMap(Texture *texture)
-{
-    if (texture)
-    {
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, reinterpret_cast<TextureOpengGL*>(texture)->getGLTextureId());
-        glUniform1i(locTCubeMap, 0);
-    }
-}

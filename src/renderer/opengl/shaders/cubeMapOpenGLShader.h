@@ -4,6 +4,7 @@
 #pragma once
 #include "renderer/opengl/shaders/shaderOpenGL.h"
 #include "renderer/texture.h"
+#include <vector>
 
 class CubeMapOpenGLShader : public ShaderOpenGL
 {
@@ -14,6 +15,6 @@ public:
 protected:
     unsigned int locTCubeMap = 0;
 
-    static const char *internalVertexShader;
-    static const char *internalFragmentShader;
+    static const std::string internalVertexShader;
+    static const std::string internalFragmentShader;
 };

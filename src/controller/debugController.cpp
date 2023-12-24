@@ -45,7 +45,7 @@ void DebugController::process(float delta)
             ++entry;
     }
 
-    if (debugFigures.size() > 0)
+    if (!debugFigures.empty())
     {
         auto figure = debugFigures.begin();
         while (figure != debugFigures.end())
@@ -123,7 +123,7 @@ void DebugController::addDebugBox(Vector3 p, float size, float time, Vector3 col
 
 void DebugController::renderAll(Matrix4 *mProjectionView)
 {
-    if (debugFigures.size() > 0)
+    if (!debugFigures.empty())
     {
         for (auto figure = debugFigures.begin(); figure != debugFigures.end(); ++figure)
         {

@@ -94,7 +94,7 @@ bool ShapeGeometry::testRay(const Segment &line, std::vector<RayCollisionPoint> 
         if (testRayAgainstTriangle(&verticies[s], line, distance, point))
             points->push_back({point, distance});
     }
-    return points->size() > 0;
+    return !points->empty();
 }
 
 AABB ShapeGeometry::getAABB()

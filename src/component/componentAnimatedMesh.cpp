@@ -97,6 +97,37 @@ Transformation *ComponentAnimatedMesh::getNodeTransformation(std::string name)
     return nullptr;
 }
 
+Matrix4 ComponentAnimatedMesh::getNodeMatrix(int index, bool includeParents, bool includeAnimation)
+{
+    if (!mesh)
+        return Matrix4(1.0f);
+
+    if (includeParents)
+    {
+        if (includeAnimation)
+        {
+            return *transform.getModelMatrix() * mesh->getAnimatedTransformationMatrixByIndex(index, &cache, animators, meshTransforms);
+        }
+        else
+        {
+            return *transform.getModelMatrix() * mesh->getTransformationMatrixWithParentingByIndex(index);
+        }
+    }
+    else
+    {
+        return *transform.getModelMatrix() * mesh->getTransformationMatrixByIndex(index);
+    }
+}
+
+int ComponentAnimatedMesh::getMeshNodeIndex(const std::string name)
+{
+    if (mesh)
+    {
+        return mesh->getMeshIndex(name);
+    }
+    return -1;
+}
+
 void ComponentAnimatedMesh::deleteTransforms()
 {
     if (meshTransforms)

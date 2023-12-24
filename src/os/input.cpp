@@ -20,7 +20,7 @@ void InputBase::provideInput(InputType type, int deviceIndex, int code, float va
 
 void InputBase::processKeyboard(int code, float value)
 {
-    if (states.size() > 0)
+    if (!states.empty())
     {
         auto it = states.begin();
         while (it != states.end())
@@ -30,7 +30,7 @@ void InputBase::processKeyboard(int code, float value)
                 ++it;
     }
 
-    if (bindings.size() > 0)
+    if (!bindings.empty())
     {
         for (auto it = bindings.begin(); it != bindings.end(); it++)
         {
@@ -47,7 +47,7 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
     if (inputTypeMouse == InputTypeMouse::MOVEMENT)
     {
         // find if we subscribed to this
-        if (bindings.size() > 0)
+        if (!bindings.empty())
         {
             for (auto it = bindings.begin(); it != bindings.end(); it++)
             {
@@ -58,7 +58,7 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
     }
     else
     {
-        if (states.size() > 0)
+        if (!states.empty())
         {
             auto it = states.begin();
             while (it != states.end())
@@ -68,7 +68,7 @@ void InputBase::processMouse(InputTypeMouse inputTypeMouse, int code, float valu
                     ++it;
         }
 
-        if (bindings.size() > 0)
+        if (!bindings.empty())
         {
             for (auto it = bindings.begin(); it != bindings.end(); it++)
             {
@@ -87,7 +87,7 @@ void InputBase::processGamepadAxis(int deviceId, int code, float value)
 {
     value = abs(value) < deadZone ? 0.0f : value;
 
-    if (states.size() > 0)
+    if (!states.empty())
     {
         auto it = states.begin();
         while (it != states.end())
@@ -97,7 +97,7 @@ void InputBase::processGamepadAxis(int deviceId, int code, float value)
                 ++it;
     }
 
-    if (bindings.size() > 0)
+    if (!bindings.empty())
     {
         for (auto it = bindings.begin(); it != bindings.end(); it++)
         {
@@ -111,7 +111,7 @@ void InputBase::processGamepadAxis(int deviceId, int code, float value)
 
 void InputBase::processGamepadButton(int deviceId, int code, float value)
 {
-    if (states.size() > 0)
+    if (!states.empty())
     {
         auto it = states.begin();
         while (it != states.end())
@@ -121,7 +121,7 @@ void InputBase::processGamepadButton(int deviceId, int code, float value)
                 ++it;
     }
 
-    if (bindings.size() > 0)
+    if (!bindings.empty())
     {
         for (auto it = bindings.begin(); it != bindings.end(); it++)
         {
@@ -140,7 +140,7 @@ void InputBase::updateRelativeOutput()
     int deviceIndex = -1;
     int code = -1;
 
-    if (states.size() > 0)
+    if (!states.empty())
         for (auto it = states.begin(); it != states.end(); it++)
             if (abs(it->state) > abs(output))
             {

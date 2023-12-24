@@ -5,7 +5,7 @@
 #include "helpers.h"
 #include <math.h>
 
-extern const char *fragmentBWShader;
+extern const std::string fragmentBWShader;
 
 // Black and wight effect class for screens
 // Fragment shader code is in the end of this file
@@ -176,7 +176,7 @@ APPMAIN
     return 0;
 }
 
-const char *fragmentBWShader = "#version 410 core\n"
+const std::string fragmentBWShader = "#version 410 core\n"
                                "out vec4 fragColor;\n"
                                "in vec2 texCoord;\n"
                                "uniform sampler2D t;\n"

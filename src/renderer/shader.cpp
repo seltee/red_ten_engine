@@ -5,6 +5,10 @@
 
 Shader *Shader::currentShader = nullptr;
 
+Shader::~Shader()
+{
+}
+
 bool Shader::build()
 {
     return false;
@@ -40,4 +44,9 @@ Texture *Shader::getShadowTexture()
 
 void Shader::setUVShiftSize(Vector4 &v)
 {
+}
+
+TextureBinding *Shader::addTextureBinding(const std::string parameterName)
+{
+    return nullptr;
 }

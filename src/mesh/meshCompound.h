@@ -37,6 +37,10 @@ public:
     // -1 if not found
     EXPORT int getMeshIndex(std::string name);
 
+    Matrix4 getTransformationMatrixByIndex(int index);
+    Matrix4 getTransformationMatrixWithParentingByIndex(int index);
+    Matrix4 getAnimatedTransformationMatrixByIndex(int index, MeshCompoundCache *cache, std::vector<Animator *> &animators, Transformation **indexTransformations);
+
 protected:
     MeshCompoundNode *getNodeByMesh(Mesh *mesh);
     MeshCompoundNode *getNodeByName(std::string &name);

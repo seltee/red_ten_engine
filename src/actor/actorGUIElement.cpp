@@ -130,7 +130,7 @@ void ActorGUIElement::addPressID(int id)
 
 int ActorGUIElement::getFirstPressID()
 {
-    if (pressIDStack.size() > 0)
+    if (!pressIDStack.empty())
     {
         int out = pressIDStack.front();
         pressIDStack.pop_front();

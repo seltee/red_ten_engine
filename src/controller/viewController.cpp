@@ -83,7 +83,7 @@ void ViewController::getAvailableResolutions(std::vector<DisplayMode> *modes, bo
         if (ratio == nativeRatio || !onlyNative)
         {
             bool shouldBeAdded = true;
-            if (modes->size() > 0)
+            if (!modes->empty())
                 for (auto it = modes->begin(); it != modes->end(); it++)
                 {
                     if ((*it).width == mode.w && (*it).height == mode.h)
@@ -97,7 +97,7 @@ void ViewController::getAvailableResolutions(std::vector<DisplayMode> *modes, bo
         }
     }
 
-    if (modes->size() > 0)
+    if (!modes->empty())
         std::sort(modes->begin(), modes->end(), [](DisplayMode &a, DisplayMode &b)
                   { return a.width * a.height > b.width * b.height; });
 }
@@ -115,7 +115,7 @@ void ViewController::getAvailableRefreshRates(DisplayMode *mode, std::vector<int
             refreshRates->push_back(nativeMode.refresh_rate);
     }
 
-    if (refreshRates->size() > 0)
+    if (!refreshRates->empty())
         std::sort(refreshRates->begin(), refreshRates->end(), std::greater<int>());
 }
 

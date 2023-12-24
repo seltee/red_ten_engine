@@ -269,7 +269,7 @@ void PhysicsWorld::findCollisions(std::vector<BodyPair> *pairs, CollisionCollect
 
 void PhysicsWorld::solveSollisions(CollisionCollector *collisionCollector)
 {
-    if (collisionCollector->pairs.size() > 0)
+    if (!collisionCollector->pairs.empty())
     {
         int pairsPerThread = collisionCollector->pairs.size() / maxThreads;
         std::vector<CollisionPair>::iterator currentCollisionPair = collisionCollector->pairs.begin();

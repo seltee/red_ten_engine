@@ -99,9 +99,9 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     renderQueue->setEnvHDRRotation(HDRRotation);
 
     // Put elements to queues
-    if (actors.size() > 0)
+    if (!actors.empty())
     {
-        auto actorsList = this->actors;
+        auto &actorsList = this->actors;
         renderQueue->bDone = false;
         core->queueJob([actorsList, renderQueue]
                        {
@@ -177,7 +177,7 @@ bool LayerActors::castRaySingleCollision(const Segment &ray, PhysicsBodyPoint &r
             if (point->distance < resultPoint.distance)
                 resultPoint = *point;
         }
-        return result.size() > 0;
+        return !result.empty();
     }
 
     return false;
@@ -193,7 +193,7 @@ std::vector<PhysicsBodyPoint> LayerActors::castRayCollision(const Segment &ray, 
     if (physicsWorld)
     {
         auto result = physicsWorld->castRay(ray);
-        if (result.size() > 0)
+        if (!result.empty())
         {
             std::sort(result.begin(), result.end(), compareBodyPoints);
 
@@ -230,7 +230,7 @@ std::list<Actor *> LayerActors::getActorsByName(std::string name)
 {
     std::list<Actor *> list;
 
-    if (actors.size() > 0)
+    if (!actors.empty())
     {
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
         {
@@ -248,7 +248,7 @@ std::list<Actor *> LayerActors::getActorsByPartName(std::string partOfName)
 {
     std::list<Actor *> list;
 
-    if (actors.size() > 0)
+    if (!actors.empty())
     {
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
         {
@@ -269,7 +269,7 @@ LayerActors *LayerActors::getActorsLayer(Actor *actor)
 
 void LayerActors::clear()
 {
-    if (actors.size() > 0)
+    if (!actors.empty())
         for (auto actor = actors.begin(); actor != actors.end(); ++actor)
             (*actor)->destroy();
 }
