@@ -75,6 +75,7 @@ void ResourceImage::generateByteMap()
             byteMapSize = 0;
         }
 
+        bytemapData = nullptr;
         if (byteMapSize)
             bytemapData = (unsigned char *)malloc(byteMapSize);
 
@@ -96,7 +97,7 @@ void ResourceImage::generateByteMap()
                         break;
 
                     case ByteMap::Full:
-                        reinterpret_cast<int *>(bytemapData)[(shiftY + ix) << 2] = sourceAddr < sourceSize ? *((int *)(&data[sourceAddr])) : 0;
+                        reinterpret_cast<int *>(bytemapData)[shiftY + ix] = sourceAddr < sourceSize ? *((int *)(&data[sourceAddr])) : 0;
                         break;
                     default:
                         memset(bytemapData, 0, byteMapSize);

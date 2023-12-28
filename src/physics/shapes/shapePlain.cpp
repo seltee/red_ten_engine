@@ -21,7 +21,7 @@ bool ShapePlain::testRay(const Segment &line, std::vector<RayCollisionPoint> *po
     // If t in [0..1] compute and return intersection point
     if (t >= 0.0f && t <= 1.0f)
     {
-        points->push_back({line.a + t * ab, t * glm::length(ab)});
+        points->push_back({line.a + t * ab, normal, t * glm::length(ab)});
         return true;
     }
     // Else no intersection

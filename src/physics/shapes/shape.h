@@ -10,6 +10,7 @@
 struct RayCollisionPoint
 {
     Vector3 point;
+    Vector3 normal;
     float distance;
 };
 

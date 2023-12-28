@@ -80,14 +80,23 @@ bool ShapeCapsule::testRay(const Segment &line, std::vector<RayCollisionPoint> *
     if (t1 < 0.0f)
     {
         if (t2 <= length)
-            points->push_back({line.a + t2 * normal, t2});
+        {
+            Vector3 point = line.a + t2 * normal;
+            points->push_back({point, glm::normalize(point - line.a), t2});
+        }
     }
     else
     {
         if (t1 <= length)
-            points->push_back({line.a + t1 * normal, t1});
+        {
+            Vector3 point = line.a + t1 * normal;
+            points->push_back({point, glm::normalize(point - line.a), t1});
+        }
         if (t2 <= length)
-            points->push_back({line.a + t2 * normal, t2});
+        {
+            Vector3 point = line.a + t2 * normal;
+            points->push_back({line.a + t2 * normal, glm::normalize(point - line.a), t2});
+        }
     }
 
     return true;

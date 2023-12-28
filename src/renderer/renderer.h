@@ -53,6 +53,8 @@ public:
     EXPORT virtual Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode);
     EXPORT virtual Shader *createVulkanShader(const std::string &fragmentCode);
     EXPORT virtual Shader *createVulkanShader(const std::string &vertexCode, const std::string &fragmentCode);
+    
+    EXPORT virtual void destroyShader(Shader *shader);
 
     EXPORT virtual EffectBuffer *createEffectBuffer();
     EXPORT virtual void destroyEffectBuffer(EffectBuffer *effectBuffer);

@@ -321,7 +321,7 @@ void PhysicsBody::castRay(const Segment &ray, std::vector<PhysicsBodyPoint> *poi
     {
         for (auto point = localPoints.begin(); point != localPoints.end(); point++)
         {
-            points->push_back({actor, point->point / simScale, point->distance});
+            points->push_back({actor, point->point / simScale, point->normal, point->distance});
         }
     }
 }

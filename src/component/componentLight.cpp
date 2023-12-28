@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2022 Dmitrii Shashkov
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
 #include "componentLight.h"
@@ -10,11 +10,11 @@ ComponentLight::ComponentLight()
 {
 }
 
-void ComponentLight::setupSunLight(Vector3 color, bool bCastShadows)
+void ComponentLight::setupSunLight(Vector3 color, bool bCastShadows, float affectDistance)
 {
     type = LightType::Sun;
     this->color = color;
-    this->affectDistance = 36.0f;
+    this->affectDistance = affectDistance;
     this->bCastShadows = bCastShadows;
 }
 

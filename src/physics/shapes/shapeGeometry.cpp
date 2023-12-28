@@ -92,7 +92,10 @@ bool ShapeGeometry::testRay(const Segment &line, std::vector<RayCollisionPoint> 
     {
         int s = i * 3;
         if (testRayAgainstTriangle(&verticies[s], line, distance, point))
-            points->push_back({point, distance});
+        {
+            Vector3 normal = getPolygonNormal(verticies[s], verticies[s + 1], verticies[s + 2]);
+            points->push_back({point, normal, distance});
+        }
     }
     return !points->empty();
 }

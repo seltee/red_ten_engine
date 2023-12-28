@@ -488,6 +488,11 @@ Shader *RendererOpenGL::createOpenGLShader(const std::string &vertexCode, const 
     return newShader;
 }
 
+void RendererOpenGL::destroyShader(Shader *shader)
+{
+    delete shader;
+}
+
 EffectBuffer *RendererOpenGL::createEffectBuffer()
 {
     return new EffectBufferOpenGL();

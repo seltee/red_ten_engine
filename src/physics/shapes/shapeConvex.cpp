@@ -61,6 +61,7 @@ bool ShapeConvex::testRay(const Segment &line, std::vector<RayCollisionPoint> *p
     // Set initial interval to being the whole segment.
     float pointfirst = 0.0f;
     float pointlast = 1.0f;
+    Vector3 normalOut = Vector3(0.0f, 1.0f, 0.0f);
 
     // Intersect segment against each polygon
     for (auto polygonIt = hull->polies.begin(); polygonIt != hull->polies.end(); polygonIt++)
@@ -86,14 +87,18 @@ bool ShapeConvex::testRay(const Segment &line, std::vector<RayCollisionPoint> *p
             if (denom < 0.0f)
             {
                 // Entering halfspace
-                if (t > pointfirst)
+                if (t > pointfirst){
+                    normalOut = normal;
                     pointfirst = t;
+                }
             }
             else
             {
                 // Exiting halfspace
-                if (t < pointlast)
+                if (t < pointlast){
+                    normalOut = normal;
                     pointlast = t;
+                }
             }
             // Exit with “no intersection” if intersection becomes empty
             if (pointfirst > pointlast)
@@ -104,8 +109,8 @@ bool ShapeConvex::testRay(const Segment &line, std::vector<RayCollisionPoint> *p
     // The segment intersects the polyhedron, return first and last point
     // For polygedron there are always will be only 2 points
     float length = glm::length(d);
-    points->push_back({line.a + pointfirst * d, pointfirst * length});
-    points->push_back({line.a + pointlast * d, pointlast * length});
+    points->push_back({line.a + pointfirst * d, normalOut, pointfirst * length});
+    points->push_back({line.a + pointlast * d, normalOut, pointlast * length});
     return true;
 }
 

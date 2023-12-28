@@ -43,6 +43,8 @@ public:
 
     EXPORT Shader *createOpenGLShader(const std::string &fragmentCode) override;
     EXPORT Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode) override;
+    
+    EXPORT void destroyShader(Shader *shader) override;
 
     EXPORT EffectBuffer *createEffectBuffer() override;
     EXPORT void destroyEffectBuffer(EffectBuffer *effectBuffer) override;

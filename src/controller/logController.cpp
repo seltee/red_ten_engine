@@ -59,7 +59,7 @@ std::string LogController::formatString(const char *format, va_list arg)
     std::string out = "";
     const char *iterator = format;
     char *s;
-    unsigned int i;
+    int i;
     double f;
 
     for (; *iterator != 0; iterator++)

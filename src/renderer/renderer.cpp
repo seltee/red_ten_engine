@@ -101,6 +101,10 @@ Shader *Renderer::createVulkanShader(const std::string &vertexCode, const std::s
     return nullptr;
 }
 
+void Renderer::destroyShader(Shader *shader)
+{
+}
+
 EffectBuffer *Renderer::createEffectBuffer()
 {
     return nullptr;

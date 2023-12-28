@@ -11,8 +11,10 @@ class Core
 public:
     Core();
 
-    void queueJob(const std::function<void()> &job);
-    bool isBusy();
+    EXPORT void queueJob(const std::function<void()> &job);
+    EXPORT bool isBusy();
+
+    inline int getMaxJobs() { return threads.size(); }
 
 private:
     void stop();
