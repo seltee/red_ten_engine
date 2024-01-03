@@ -172,18 +172,25 @@ std::vector<PhysicsBodyPoint> PhysicsWorld::castRay(const Segment &ray)
     Segment rayLocal = Segment(ray.a * simScale, ray.b * simScale);
     std::vector<PhysicsBody *>::iterator currentBody = bodies.begin();
 
-    for (int i = 0; i < maxThreads; i++)
+    if (core->isBusy())
     {
-        auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
-
-        core->queueJob([currentBody, end, &rayLocal, &points]
-                       { _ray(currentBody, end, rayLocal, &points); });
-
-        currentBody += bodiesPerThread;
+        _ray(currentBody, bodies.end(), rayLocal, &points);
     }
-    while (core->isBusy())
+    else
     {
-    };
+        for (int i = 0; i < maxThreads; i++)
+        {
+            auto end = (i == maxThreads - 1) ? bodies.end() : currentBody + bodiesPerThread;
+
+            core->queueJob([currentBody, end, &rayLocal, &points]
+                           { _ray(currentBody, end, rayLocal, &points); });
+
+            currentBody += bodiesPerThread;
+        }
+        while (core->isBusy())
+        {
+        };
+    }
     return points;
 }
 

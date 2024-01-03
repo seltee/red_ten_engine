@@ -1,5 +1,6 @@
 #pragma once
 #include "common/utils.h"
+#include "core/safePointer.h"
 #include <mutex>
 #include <thread>
 #include <vector>

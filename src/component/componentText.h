@@ -36,6 +36,8 @@ public:
 
     EXPORT Matrix4 getLocalspaceMatrix() override;
 
+    EXPORT inline bool isDirty() { return isStringDirty; }
+
 protected:
     unsigned char r = 255, g = 255, b = 255;
     std::string string = "";

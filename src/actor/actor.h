@@ -14,6 +14,7 @@
 #include "physics/shapes/shape.h"
 #include "physics/physicsWorld.h"
 #include "renderer/renderQueue.h"
+#include "core/safePointer.h"
 #include <string>
 #include <list>
 #include <vector>

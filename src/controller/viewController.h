@@ -47,6 +47,10 @@ public:
     EXPORT int getPrimaryScreenWidth();
     EXPORT int getPrimaryScreenHeight();
 
+    EXPORT void hideCursor();
+    EXPORT void showCursor();
+    EXPORT bool isCursorShown();
+
 protected:
     void checkConfig();
 
@@ -54,6 +58,7 @@ protected:
     View *mainView = nullptr;
     std::vector<GamepadDevice> gamePads;
     bool isExitIntended = false;
+    bool bIsCursorShown = true;
     Config *config = nullptr;
     static InputController *inputController;
 };

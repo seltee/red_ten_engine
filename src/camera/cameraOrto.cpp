@@ -107,7 +107,7 @@ PointWithDirection CameraOrto::screenToWorld(float x, float y)
 
 float CameraOrto::getLineThickness()
 {
-    return 1.2f;
+    return getWidth() / 1000.0f + 0.0002f;
 }
 
 CameraType CameraOrto::getCameraType()

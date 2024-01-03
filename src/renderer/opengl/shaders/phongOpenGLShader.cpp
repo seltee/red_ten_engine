@@ -63,6 +63,7 @@ bool PhongOpenGLShader::build()
     locTEmission = glGetUniformLocation(programm, "TextureEmission");
     locTRoughness = glGetUniformLocation(programm, "TextureRoughness");
     locUVControl = glGetUniformLocation(programm, "uvControl");
+    locOpacity = glGetUniformLocation(programm, "fOpacity");
 
     tBlack = reinterpret_cast<TextureOpengGL *>(CommonTextures::getBlackTexture())->getGLTextureId();
     tGrey = reinterpret_cast<TextureOpengGL *>(CommonTextures::getGreyTexture())->getGLTextureId();
@@ -118,6 +119,7 @@ bool PhongOpenGLShader::use(Matrix4 &mModel, Matrix4 &mModelViewProjection)
     glUniformMatrix4fv(locMNormal, 1, GL_FALSE, value_ptr(mnMatrix));
     Vector4 defUV = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
     glUniform4fv(locUVControl, 1, value_ptr(defUV));
+    glUniform1f(locOpacity, opacity);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tAlbedo ? tAlbedo : tGrey);
@@ -207,7 +209,7 @@ const char *gShaderVertexCode =
 
 const char *gShaderFragmentCode =
     "#version 410 core\n"
-    "layout (location = 0) out vec4 gAlbedoSpec;\n"
+    "layout (location = 0) out vec4 gAlbedo;\n"
     "layout (location = 1) out vec4 gNormal;\n"
     "layout (location = 2) out vec3 gPosition;\n"
     "layout (location = 3) out vec4 gEmission;\n"
@@ -216,13 +218,16 @@ const char *gShaderFragmentCode =
     "uniform sampler2D TextureNormal;\n"
     "uniform sampler2D TextureSpecular;\n"
     "uniform sampler2D TextureRoughness;\n"
+    "uniform float fOpacity;\n"
     "in vec2 TexCoords;\n"
     "in vec3 FragPos;\n"
     "in mat3 mTBN;\n"
     "void main() {\n"
-    "   gAlbedoSpec = texture(TextureDefuse, TexCoords);\n"
+    "   gAlbedo = texture(TextureDefuse, TexCoords);\n"
+    "   gAlbedo.a *= fOpacity;\n"
     "   gPosition = FragPos;\n"
     "   gNormal.rgb = normalize(mTBN * (texture(TextureNormal, TexCoords).rgb * 2.0 - 1.0));\n"
     "   gNormal.a = texture(TextureRoughness, TexCoords).r;\n"
     "   gEmission.rgba = texture(TextureEmission, TexCoords).rgba;\n"
+    "   gEmission.a *= fOpacity;\n"
     "}\n";

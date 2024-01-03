@@ -33,6 +33,7 @@ protected:
     int locMNormal = 0;
     int locTDefuse = 0;
     int locTNormal = 0;
+    int locOpacity = 0;
     int locTEmission = 0;
     int locTRoughness = 0;
     int locUVControl = 0;

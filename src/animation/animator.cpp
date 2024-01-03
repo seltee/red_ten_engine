@@ -16,8 +16,8 @@ void Animator::process(float delta)
         time += delta * speed;
 
         if (time > timeLength)
-        {
             time -= timeLength;
-        }
+        if (time < 0.0)
+            time += timeLength;
     }
 }

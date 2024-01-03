@@ -240,6 +240,23 @@ int ViewController::getPrimaryScreenHeight()
     return DM.h;
 }
 
+void ViewController::hideCursor()
+{
+    bIsCursorShown = false;
+    SDL_ShowCursor(SDL_DISABLE);
+}
+
+void ViewController::showCursor()
+{
+    bIsCursorShown = true;
+    SDL_ShowCursor(SDL_ENABLE);
+}
+
+bool ViewController::isCursorShown()
+{
+    return bIsCursorShown;
+}
+
 void ViewController::checkConfig()
 {
     if (config)
