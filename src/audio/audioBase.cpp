@@ -95,11 +95,10 @@ bool AudioBase::setup(std::string deviceName)
         channels = have.channels;
         format = have.format;
         bufferSize = have.size;
+        buffer = new unsigned char[bufferSize];
 
         logger->logff("Audio info: %s, channels: %i, frequency: %i, format: %i, buffer size: %i", deviceName.c_str(), channels, freq, format, bufferSize);
         SDL_PauseAudioDevice(deviceId, 0);
-
-        buffer = new unsigned char[bufferSize];
 
         return true;
     }
@@ -114,10 +113,9 @@ void AudioBase::setPosition(Vector3 vPosition)
     this->vPosition = vPosition;
 }
 
-void AudioBase::setOrientation(Quat qOrientation)
+void AudioBase::setDirection(Vector3 vDirection)
 {
-    Vector3 v = Vector3(0.0f, 0.0f, 1.0f);
-    vDirection = glm::normalize(glm::toMat3(qOrientation) * v);
+    this->vDirection = glm::length2(vDirection) != 0.0f ? vDirection : Vector3(0.0f, 0.0f, 1.0f);
 }
 
 AudioSource *AudioBase::createSource()
@@ -143,6 +141,12 @@ void audioCallback(void *userdata, unsigned char *stream, int len)
         auto fillBuffer = base->getBuffer();
         float *nativeFillBuffer = reinterpret_cast<float *>(base->getBuffer());
 
+        if (!fillBuffer || !nativeFillBuffer || sources->size() == 0)
+            return;
+
+        Vector3 basePosition = base->getPosition();
+        Vector3 baseDirection = base->getDirection();
+
         for (auto &it : *sources)
         {
             if (it->getState() == AudioSourceState::Playing)
@@ -150,7 +154,7 @@ void audioCallback(void *userdata, unsigned char *stream, int len)
                 if (it->is3dPositionable())
                 {
                     // Check if source is in sound range
-                    Vector3 localPosition = it->getPosition() - base->getPosition();
+                    Vector3 localPosition = it->getPosition() - basePosition;
                     float maxDistance = it->getMaxDistance();
                     float distance = glm::length(localPosition);
 
@@ -158,20 +162,20 @@ void audioCallback(void *userdata, unsigned char *stream, int len)
                         continue;
 
                     // Calc left/right relations
-                    Vector3 baseSide = glm::cross(base->getDirection(), vUpDirection);
+                    Vector3 baseSide = glm::cross(baseDirection, vUpDirection);
 
                     float sideProjection = glm::dot(baseSide, glm::normalize(localPosition));
-                    float main = 1.0f - fabsf(sideProjection);
+                    float mainValue = 1.0f - fabsf(sideProjection);
                     float lVolume, rVolume;
                     if (sideProjection < 0.0f)
                     {
-                        lVolume = main;
-                        rVolume = main + fabsf(sideProjection);
+                        lVolume = mainValue;
+                        rVolume = mainValue + fabsf(sideProjection);
                     }
                     else
                     {
-                        lVolume = main + fabsf(sideProjection);
-                        rVolume = main;
+                        lVolume = mainValue + fabsf(sideProjection);
+                        rVolume = mainValue;
                     }
 
                     // Volume based on distance

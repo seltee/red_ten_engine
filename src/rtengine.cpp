@@ -144,6 +144,11 @@ InputController *RTEngine::getInputController()
     return inputController;
 }
 
+AudioController *RTEngine::getAudioController()
+{
+    return audioController;
+}
+
 LogController *RTEngine::getLogController()
 {
     return logController;

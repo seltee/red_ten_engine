@@ -80,8 +80,11 @@ void CameraOrto::setHeightBasedResolution(float height)
 PointWithDirection CameraOrto::screenToWorld(float x, float y)
 {
     PointWithDirection out;
-    if (!renderTarget)
+    if (!renderTarget){
+        out.vDirection = Vector3(0.0f, 0.0f, 1.0f);
+        out.vPosition = Vector3(0.0f, 0.0f, 0.0f);
         return out;
+    }
 
     float halfWidth = renderTarget->getWidth() / 2.0f;
     float halfHeight = renderTarget->getHeight() / 2.0f;

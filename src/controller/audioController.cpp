@@ -37,10 +37,6 @@ AudioController::~AudioController()
     delete audioBase;
 }
 
-void AudioController::update()
-{
-}
-
 void AudioController::process(float delta)
 {
     profiler->startTracking(audioProcessingTrackerId);

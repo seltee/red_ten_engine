@@ -17,13 +17,13 @@ public:
     ~AudioBase();
     void process(float delta);
 
-    void getDevicesList(std::vector<std::string> *list);
+    EXPORT void getDevicesList(std::vector<std::string> *list);
     bool setup(std::string deviceName);
 
-    void setPosition(Vector3 vPosition);
+    EXPORT void setPosition(Vector3 vPosition);
     inline Vector3 getPosition() { return vPosition; }
 
-    void setOrientation(Quat qOrientation);
+    EXPORT void setDirection(Vector3 vDirection);
     inline Vector3 getDirection() { return vDirection; }
 
     AudioSource *createSource();
@@ -49,8 +49,8 @@ protected:
 
     unsigned char *buffer = nullptr;
 
-    Vector3 vPosition;
-    Vector3 vDirection;
+    Vector3 vPosition = Vector3(0.0f, 0.0f, 0.0f);
+    Vector3 vDirection = Vector3(0.0f, 0.0f, 1.0f);
 
     std::string defaultAudioName;
 };

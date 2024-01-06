@@ -59,7 +59,6 @@ protected:
     AudioSourceState state = AudioSourceState::Stopped;
     ResourceSound *sound = nullptr;
 
-    unsigned int sourceID;
     static std::vector<unsigned int> buffers;
 
     SoundStream *soundStream = nullptr;

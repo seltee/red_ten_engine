@@ -13,7 +13,6 @@ Config *ConfigController::getConfig()
 void ConfigController::applyConfig()
 {
     viewController->update();
-    audioController->update();
 }
 
 void ConfigController::setViewController(ViewController *viewController)

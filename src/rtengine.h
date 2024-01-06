@@ -106,6 +106,7 @@ public:
     EXPORT static StageController *getStageController();
     EXPORT static ResourceController *getResourceController();
     EXPORT static InputController *getInputController();
+    EXPORT static AudioController *getAudioController();
     EXPORT static LogController *getLogController();
     EXPORT static ConfigController *getConfigController();
     EXPORT static DebugController *getDebugController();

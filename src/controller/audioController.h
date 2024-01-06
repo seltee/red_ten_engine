@@ -18,14 +18,12 @@ public:
     AudioController(Config *config);
     ~AudioController();
 
-    void update();
-
     void process(float delta);
 
-    AudioBase *getAudioBase();
+    EXPORT AudioBase *getAudioBase();
 
-    void setListenerCamera(void *listenerCamera);
-    void *getListenerCamera();
+    EXPORT void setListenerCamera(void *listenerCamera);
+    EXPORT void *getListenerCamera();
 
 protected:
     Config *config;
