@@ -12,7 +12,7 @@ public:
     static void setCurrentRenderer(Renderer *renderer);
 
 protected:
-    EXPORT  Renderer *getRenderer();
+    EXPORT static Renderer *getRenderer();
 
 private:
     static Renderer *rendererStatic;

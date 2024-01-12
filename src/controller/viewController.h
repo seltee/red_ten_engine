@@ -10,6 +10,13 @@
 #include "controller/inputController.h"
 #include <list>
 
+enum class CursorType
+{
+    Default,
+    Hand,
+    IBeam
+};
+
 struct DisplayMode
 {
     int width;
@@ -28,7 +35,7 @@ class ViewController : public WithLogger
 public:
     ViewController(Config *config);
 
-    EXPORT View *createView(std::string name);
+    EXPORT View *createView(std::string name, unsigned int flags = VIEW_CREATION_FLAG_NONE);
     EXPORT RenderTarget *createRenderTarget(int width, int height, RenderQuality renderQuality);
     EXPORT void destroyRenderTarget(RenderTarget *renderTarget);
     EXPORT void update();
@@ -50,6 +57,10 @@ public:
     EXPORT void hideCursor();
     EXPORT void showCursor();
     EXPORT bool isCursorShown();
+    EXPORT void setCursorType(CursorType type);
+    EXPORT CursorType getCursorType();
+
+    EXPORT float getDPIZoom();
 
 protected:
     void checkConfig();
@@ -61,4 +72,11 @@ protected:
     bool bIsCursorShown = true;
     Config *config = nullptr;
     static InputController *inputController;
+
+    float DPIZoom = 1.0f;
+
+    CursorType cursorType = CursorType::Default;
+    void *cursorDataArrow = nullptr;
+    void *cursorDataHand = nullptr;
+    void *cursorDataIBeam = nullptr;
 };

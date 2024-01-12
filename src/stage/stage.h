@@ -8,6 +8,7 @@
 #include "stage/layer.h"
 #include "stage/layerActors.h"
 #include "stage/layerEffects.h"
+#include "stage/layerUI.h"
 #include "stage/layerDebug.h"
 #include "os/view.h"
 #include "controller/debugController.h"
@@ -21,10 +22,11 @@ public:
 
     EXPORT LayerActors *createLayerActors(std::string name, int index);
     EXPORT LayerEffects *createLayerEffects(std::string name, int index);
+    EXPORT LayerUI *createLayerUI(std::string name, int index);
 
     EXPORT void process(float delta);
     EXPORT void present(View *view);
-    EXPORT void present(Renderer* renderer, RenderTarget *renderTarget);
+    EXPORT void present(Renderer *renderer, RenderTarget *renderTarget);
 
     EXPORT void setClearColor(Color color)
     {

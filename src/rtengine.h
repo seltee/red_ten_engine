@@ -63,6 +63,7 @@
 #ifdef _WIN32
 #include <shellscalingapi.h>
 #include <windows.h>
+#undef DELETE
 #endif
 
 #ifdef _WIN32

@@ -5,6 +5,7 @@
 #include "common/utils.h"
 #include "common/keyboard.h"
 #include "common/gamepad.h"
+#include <string>
 #include <vector>
 
 enum class InputType
@@ -13,7 +14,8 @@ enum class InputType
     KEYBOARD = 1,
     MOUSE = 2,
     GAMEPAD_BUTTON = 3,
-    GAMEPAD_AXIS = 4
+    GAMEPAD_AXIS = 4,
+    TEXT = 5,
 };
 
 enum class InputTypeMouse
@@ -24,7 +26,7 @@ enum class InputTypeMouse
     RIGHT_BUTTON = 3,
     BACK_BUTTON = 4,
     FRONT_BUTTON = 5,
-    MOVEMENT = 6
+    MOVEMENT = 6,
 };
 
 enum class InputTypeMouseMove
@@ -32,7 +34,7 @@ enum class InputTypeMouseMove
     MOVE = 0,
     MOVE_HORIZONTAL = 1,
     MOVE_VERTICAL = 2,
-    MOVE_WHEEL = 3
+    MOVE_WHEEL_VERTICAL = 3
 };
 
 struct Binding
@@ -57,6 +59,7 @@ public:
     EXPORT virtual ~InputBase(){};
 
     EXPORT void provideInput(InputType type, int deviceIndex, int code, float value);
+    EXPORT void provideTextInput(std::string text);
 
     EXPORT float getAxisState() { return axisState; }
     EXPORT bool getButtonState() { return axisState > 0.5f; }
@@ -92,6 +95,7 @@ public:
     EXPORT float getDeadZone() { return deadZone; }
 
     EXPORT virtual void setOutputState(InputType type, int deviceIndex, int code, float value){};
+    EXPORT virtual void setOutputText(std::string text){};
 
 protected:
     float axisState = 0.0f;
@@ -108,11 +112,13 @@ public:
     EXPORT Input(
         void *owner,
         void (T::*callbackAsAxis)(InputType, int, int, float),
-        void (T::*callbackAsButton)(InputType, int, int, bool))
+        void (T::*callbackAsButton)(InputType, int, int, bool),
+        void (T::*callbackAsText)(std::string))
     {
         this->owner = owner;
         this->callbackAsAxis = callbackAsAxis;
         this->callbackAsButton = callbackAsButton;
+        this->callbackAsText = callbackAsText;
     }
 
     EXPORT void setOutputState(InputType type, int deviceIndex, int code, float value)
@@ -122,6 +128,12 @@ public:
             (((T *)owner)->*(callbackAsAxis))(type, deviceIndex, code, axisState);
         if (callbackAsButton)
             (((T *)owner)->*(callbackAsButton))(type, deviceIndex, code, axisState > 0.5f);
+    }
+
+    EXPORT void setOutputText(std::string text)
+    {
+        if (callbackAsText)
+            (((T *)owner)->*(callbackAsText))(text);
     }
 
     /*
@@ -179,4 +191,5 @@ public:
 protected:
     void (T::*callbackAsAxis)(InputType, int, int, float);
     void (T::*callbackAsButton)(InputType, int, int, bool);
+    void (T::*callbackAsText)(std::string);
 };

@@ -9,10 +9,14 @@
 #include "renderer/renderer.h"
 #include <string>
 
+#define VIEW_CREATION_FLAG_NONE 0
+#define VIEW_CREATION_FLAG_RESIZABLE 1
+#define VIEW_CREATION_FLAG_NO_TOP_BAR 2
+
 class View : public WithLogger
 {
 public:
-    View(Config *config);
+    View(Config *config, unsigned int flags);
 
     bool makeWindow();
     bool changeMode();
@@ -26,12 +30,18 @@ public:
     inline int getRefreshRate() { return refreshRate; }
     inline float getHWProportion() { return (float)height / (float)width; }
     inline bool isFullscreen() { return bIsFullscreen; }
-
+    inline bool isResizable() { return bIsResizable; }
+    inline bool hasTopBar() { return bHasTopBar; }
     inline Renderer *getRenderer() { return renderer; }
 
     EXPORT void minimize();
 
+    EXPORT float getDPIZoom();
+
     EXPORT RenderTarget *getRenderTarget();
+    
+    // called when resizable window is resized not for external use
+    EXPORT void updateSize(int width, int height);
 
     std::string windowName = "unnamed";
 
@@ -52,4 +62,7 @@ protected:
     Config *config = nullptr;
 
     Renderer *renderer = nullptr;
+
+    bool bIsResizable = false;
+    bool bHasTopBar = true;
 };

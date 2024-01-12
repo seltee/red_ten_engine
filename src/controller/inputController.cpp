@@ -22,6 +22,15 @@ void InputController::provideInput(InputType type, int deviceIndex, int scancode
     }
 }
 
+void InputController::provideInputText(std::string text)
+{
+    auto inputs = Pawn::getInputs();
+    for (auto it = inputs->begin(); it != inputs->end(); it++)
+    {
+        (*it)->provideTextInput(text);
+    }
+}
+
 bool InputController::deviceRumble(int deviceIndex, unsigned short lowFreq, unsigned short highFreq, unsigned int durationMS)
 {
     int amount = SDL_NumJoysticks();

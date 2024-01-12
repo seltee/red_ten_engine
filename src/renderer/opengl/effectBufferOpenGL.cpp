@@ -49,7 +49,7 @@ void EffectBufferOpenGL::render(Renderer *renderer, RenderTarget *renderTarget, 
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    Matrix4 m;
+    Matrix4 m(1.0f);
 
     effect->shader->use(m, m);
     glActiveTexture(GL_TEXTURE0);

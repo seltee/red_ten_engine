@@ -32,6 +32,14 @@ LayerEffects *Stage::createLayerEffects(std::string name, int index)
     return newLayerEffects;
 }
 
+LayerUI *Stage::createLayerUI(std::string name, int index)
+{
+    auto newLayerUI = new LayerUI(name, index);
+    layers.push_back(newLayerUI);
+    sortLayers();
+    return newLayerUI;
+}
+
 void Stage::process(float delta)
 {
     for (auto it = layers.begin(); it != layers.end(); ++it)

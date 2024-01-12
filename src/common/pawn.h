@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
+// SPDX-License-Identifier: MIT
+
 #pragma once
 #include "os/input.h"
 
@@ -16,7 +19,7 @@ public:
     template <class T, typename std::enable_if<std::is_base_of<Pawn, T>::value>::type * = nullptr>
     EXPORT Input<Pawn> *registerAxisCallback(void (T::*callback)(InputType, int, int, float))
     {
-        Input<Pawn> *input = new Input<Pawn>(selfPointer, (void(Pawn::*)(InputType, int, int, float))callback, nullptr);
+        Input<Pawn> *input = new Input<Pawn>(selfPointer, (void(Pawn::*)(InputType, int, int, float))callback, nullptr, nullptr);
         addInput(input);
         return input;
     }
@@ -24,7 +27,15 @@ public:
     template <class T, typename std::enable_if<std::is_base_of<Pawn, T>::value>::type * = nullptr>
     EXPORT Input<Pawn> *registerButtonCallback(void (T::*callback)(InputType, int, int, bool))
     {
-        Input<Pawn> *input = new Input<Pawn>(selfPointer, nullptr, (void(Pawn::*)(InputType, int, int, bool))callback);
+        Input<Pawn> *input = new Input<Pawn>(selfPointer, nullptr, (void(Pawn::*)(InputType, int, int, bool))callback, nullptr);
+        addInput(input);
+        return input;
+    }
+
+    template <class T, typename std::enable_if<std::is_base_of<Pawn, T>::value>::type * = nullptr>
+    EXPORT Input<Pawn> *registerTextCallback(void (T::*callback)(std::string))
+    {
+        Input<Pawn> *input = new Input<Pawn>(selfPointer, nullptr, nullptr, (void(Pawn::*)(std::string))callback);
         addInput(input);
         return input;
     }

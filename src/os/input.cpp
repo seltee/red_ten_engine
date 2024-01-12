@@ -18,6 +18,11 @@ void InputBase::provideInput(InputType type, int deviceIndex, int code, float va
         processGamepadButton(deviceIndex, code, value);
 }
 
+void InputBase::provideTextInput(std::string text)
+{
+    setOutputText(text);
+}
+
 void InputBase::processKeyboard(int code, float value)
 {
     if (!states.empty())

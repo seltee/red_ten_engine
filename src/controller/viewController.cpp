@@ -20,12 +20,16 @@ ViewController::ViewController(Config *config)
         else
             gamePads.push_back(GamepadDevice({i, gGameController}));
     }
+
+    cursorDataArrow = SDL_CreateSystemCursor(SDL_SystemCursor::SDL_SYSTEM_CURSOR_ARROW);
+    cursorDataHand = SDL_CreateSystemCursor(SDL_SystemCursor::SDL_SYSTEM_CURSOR_HAND);
+    cursorDataIBeam = SDL_CreateSystemCursor(SDL_SystemCursor::SDL_SYSTEM_CURSOR_IBEAM);
 }
 
-View *ViewController::createView(std::string name)
+View *ViewController::createView(std::string name, unsigned int flags)
 {
     checkConfig();
-    View *view = new View(config);
+    View *view = new View(config, flags);
 
     view->windowName = name;
     if (view->makeWindow())
@@ -40,6 +44,8 @@ View *ViewController::createView(std::string name)
 
         if (!mainView)
             mainView = view;
+
+        DPIZoom = mainView->getDPIZoom();
 
         return view;
     }
@@ -156,6 +162,10 @@ void ViewController::processEvents()
                 inputController->provideInput(InputType::KEYBOARD, -1, event.key.keysym.scancode, 1.0f);
                 break;
 
+            case SDL_TEXTINPUT:
+                inputController->provideInputText(event.text.text);
+                break;
+
             case SDL_KEYUP:
                 // printf("Key release detected %i\n", event.key.keysym.scancode);
                 inputController->provideInput(InputType::KEYBOARD, -1, event.key.keysym.scancode, 0.0f);
@@ -211,6 +221,20 @@ void ViewController::processEvents()
                 inputController->provideInput(InputType::MOUSE, (int)InputTypeMouse::MOVEMENT, (int)InputTypeMouseMove::MOVE_HORIZONTAL, event.motion.x);
                 inputController->provideInput(InputType::MOUSE, (int)InputTypeMouse::MOVEMENT, (int)InputTypeMouseMove::MOVE_VERTICAL, event.motion.y);
                 break;
+
+            case SDL_WINDOWEVENT:
+                if (event.window.event == SDL_WINDOWEVENT_RESIZED)
+                {
+                    for (auto &view : views)
+                    {
+                        view->updateSize(event.window.data1, event.window.data2);
+                    }
+                }
+                break;
+
+            case SDL_MOUSEWHEEL:
+                inputController->provideInput(InputType::MOUSE, (int)InputTypeMouse::MOVEMENT, (int)InputTypeMouseMove::MOVE_WHEEL_VERTICAL, event.wheel.preciseY);
+                break;
             }
         }
     }
@@ -255,6 +279,33 @@ void ViewController::showCursor()
 bool ViewController::isCursorShown()
 {
     return bIsCursorShown;
+}
+
+void ViewController::setCursorType(CursorType type)
+{
+    SDL_Cursor *cursor = nullptr;
+    if (type == CursorType::Default)
+        cursor = reinterpret_cast<SDL_Cursor *>(cursorDataArrow);
+    if (type == CursorType::Hand)
+        cursor = reinterpret_cast<SDL_Cursor *>(cursorDataHand);
+    if (type == CursorType::IBeam)
+        cursor = reinterpret_cast<SDL_Cursor *>(cursorDataIBeam);
+
+    if (cursor)
+    {
+        SDL_SetCursor(cursor);
+        cursorType = type;
+    }
+}
+
+CursorType ViewController::getCursorType()
+{
+    return cursorType;
+}
+
+float ViewController::getDPIZoom()
+{
+    return DPIZoom;
 }
 
 void ViewController::checkConfig()

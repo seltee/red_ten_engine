@@ -7,13 +7,19 @@
 #include "connector/withRenderer.h"
 #include <SDL.h>
 
-View::View(Config *config)
+View::View(Config *config, unsigned int flags)
 {
     this->config = config;
     this->width = config->getWindowWidth();
     this->height = config->getWindowHeight();
     this->refreshRate = config->getRefreshRate();
     this->bIsFullscreen = config->isFullscreen();
+
+    if (flags & VIEW_CREATION_FLAG_RESIZABLE)
+        bIsResizable = true;
+    if (flags & VIEW_CREATION_FLAG_NO_TOP_BAR)
+        bHasTopBar = false;
+
     updateSuitableDisplayMode();
 }
 
@@ -34,7 +40,11 @@ bool View::makeWindow()
                                       SDL_WINDOWPOS_CENTERED,
                                       SDL_WINDOWPOS_CENTERED,
                                       width, height,
-                                      (bIsFullscreen ? SDL_WINDOW_FULLSCREEN : 0) | SDL_WINDOW_ALLOW_HIGHDPI | renderer->getWindowFlags());
+                                      (bIsFullscreen ? SDL_WINDOW_FULLSCREEN : 0) |
+                                          SDL_WINDOW_ALLOW_HIGHDPI |
+                                          renderer->getWindowFlags() |
+                                          (bHasTopBar ? 0 : SDL_WINDOW_BORDERLESS) |
+                                          (bIsResizable ? SDL_WINDOW_RESIZABLE : 0));
 
     if (newWindow)
     {
@@ -146,9 +156,34 @@ void View::minimize()
         SDL_MinimizeWindow((SDL_Window *)window);
 }
 
+float View::getDPIZoom()
+{
+    if (window)
+    {
+        int displayIndex = SDL_GetWindowDisplayIndex((SDL_Window *)window);
+        float ddpi, hdpi, vdpi;
+        SDL_GetDisplayDPI(displayIndex, &ddpi, &hdpi, &vdpi);
+
+        return ddpi / 92.0f;
+    }
+    return 1.0f;
+}
+
 RenderTarget *View::getRenderTarget()
 {
     return renderTarget;
+}
+
+void View::updateSize(int width, int height)
+{
+    if (this->width != width || this->height != height)
+    {
+        this->width = width;
+        this->height = height;
+
+        SDL_GL_GetDrawableSize((SDL_Window *)window, &drawableWidth, &drawableHeight);
+        updateFrameBuffer();
+    }
 }
 
 void View::updateSuitableDisplayMode()

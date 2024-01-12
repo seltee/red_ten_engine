@@ -470,9 +470,10 @@ Shader *RendererOpenGL::createOpenGLShader(const std::string &fragmentCode)
         "#version 410 core\n"
         "layout (location = 0) in vec3 aPos;\n"
         "layout (location = 1) in vec2 aTexCoord;\n"
+        "uniform mat4 mModelViewProjection;\n"
         "out vec2 texCoord;\n"
         "void main() {\n"
-        "   gl_Position = vec4(aPos, 1.0);\n"
+        "   gl_Position = mModelViewProjection * vec4(aPos, 1.0);\n"
         "   texCoord = aTexCoord;\n"
         "}\n";
 

@@ -22,6 +22,7 @@ public:
     InputController();
 
     EXPORT void provideInput(InputType type, int deviceIndex, int scancode, float value);
+    EXPORT void provideInputText(std::string text);
 
     EXPORT bool deviceRumble(int deviceIndex, unsigned short lowFreq, unsigned short highFreq, unsigned int durationMS);
     EXPORT bool deviceRumble(unsigned short lowFreq, unsigned short highFreq, unsigned int durationMS);

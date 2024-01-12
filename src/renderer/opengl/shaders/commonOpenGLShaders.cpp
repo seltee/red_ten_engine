@@ -75,19 +75,17 @@ void CommonOpenGLShaders::build(Renderer *renderer)
 
     logger->logff("compiling shaders ...");
 
-    logger->logff("compiling sprite shader ...");
+    logger->logff("compiling sprite shaders ...");
     spriteShader = new ShaderOpenGL(spriteVertexShader, spriteFragmentShader);
     spriteShader->build();
 
-    logger->logff("compiling framed sprite shader ...");
     spriteFrameShader = new ShaderOpenGL(spriteFramedVertexShader, spriteFragmentShader);
     spriteFrameShader->build();
 
-    logger->logff("compiling sun shader ...");
+    logger->logff("compiling sun shaders ...");
     sunShader = new LightningOpenGLShader(screenVertexShader, sunFragmentCode);
     sunShader->build();
 
-    logger->logff("compiling sun with shadow shader ...");
     sunWithShadowShader = new LightningOpenGLShader(screenVertexShader, sunWithShadowFragmentCode);
     sunWithShadowShader->build();
 
