@@ -4,13 +4,14 @@
 #pragma once
 #include "ui/uiStyle.h"
 #include "ui/uiRenderData.h"
-#include "ui/uiChierarchyElement.h"
+#include "ui/uiRenderElement.h"
 #include "common/destroyable.h"
 #include "renderer/renderer.h"
 #include <vector>
 
 class UINode;
 class UINodeInput;
+class UINodeTreeElement;
 
 enum class UIPointerEvent
 {
@@ -51,6 +52,13 @@ struct UINodePositioning
     float betweenV;
 };
 
+struct UIRenderPositioning
+{
+    float sx;
+    float sy;
+    UIViewport viewport;
+};
+
 class UINode : public Destroyable
 {
 public:
@@ -59,7 +67,7 @@ public:
 
     EXPORT void process(float delta, float zoom);
     EXPORT void recalcSize(float zoom);
-    EXPORT void buildChierarchy(UIChierarchyElement *current, UIChierarchyElement *root);
+    EXPORT void buildChierarchy(UIRenderPositioning positioning, UIRenderSharedData *renderSharedData, UINodeTreeElement *treeElement, UINodeTreeElement *root);
 
     EXPORT virtual void onProcess(float delta, float zoom);
 
@@ -91,8 +99,13 @@ public:
     EXPORT inline float getImageWidth() { return imageWidth; }
     EXPORT inline float getImageHeight() { return imageHeight; }
 
+    EXPORT inline std::vector<UINode *> *getChildren() { return &children; };
+
     UIStyle style;
     bool isHover = false;
+
+    UIRenderData renderData;
+    UIRenderElement renderElement;
 
 protected:
     void recalcFixedSizes();
@@ -101,11 +114,14 @@ protected:
     void recalcImageSize(float zoom);
     void recalcContentDimensions(float zoom);
 
-    UINodePositioning calcPositioning(UIRenderData *renderData);
-    UINodePositioning correctChildPositioning(UINode *child, UINodePositioning &positioning, UIRenderData *renderData);
+    void fillRenderData(UIRenderPositioning &positition, UIRenderSharedData *renderSharedData);
+    UINodePositioning calcPositioning();
+    UINodePositioning correctChildPositioning(UINode *child, UINodePositioning &positioning);
     UINodePositioning shiftInlinePositioning(UINode *child, UINodePositioning &positioning);
 
-    void fillChildRenderData(float posX, float posY, UINode *child, UIRenderData *ownData, UIRenderData *childData);
+
+    float getImageWidth(UINode *child);
+    float getImageHeight(UINode *child);
 
     UINode *parent = nullptr;
     std::vector<UINode *> children;

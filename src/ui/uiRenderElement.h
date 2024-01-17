@@ -27,26 +27,21 @@ struct UIMousePickELement
     float elY;
 };
 
-class UIChierarchyElement : public WithRenderer
+class UIRenderElement : public WithRenderer
 {
 public:
-    UIChierarchyElement();
-    UIChierarchyElement(UINode *node, UIRenderData &renderData);
+    UIRenderElement();
+    UIRenderElement(UINode *node, UIRenderData *renderData);
 
-    UIRenderData renderData;
+    UIRenderData *renderData;
     UINode *node = nullptr;
-    std::vector<UIChierarchyElement> children;
-    std::vector<UIChierarchyElement*> realChildren;
 
-    void render(RenderTarget *renderTarget);
-    bool propagateScroll(float mouseX, float mouseY, float scroll);
-    bool pickPoint(float x, float y, std::vector<UIMousePickELement> *collection);
+    void render(RenderTarget *renderTarget, UIRenderSharedData *sharedData);
 
     static float getTextWidth(int fontSize, std::string text);
     static float getTextHeight(int fontSize, std::string text);
 
 protected:
     static UITextCacheElement *getTextCacheElement(int fontSize, std::string text);
-
     static std::vector<UITextCacheElement> textTexturesCache;
 };

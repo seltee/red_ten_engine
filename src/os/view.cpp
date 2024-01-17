@@ -117,6 +117,8 @@ bool View::changeMode()
                 SDL_DisplayMode mode;
                 SDL_GetDisplayMode(0, displayMode, &mode);
                 SDL_SetWindowDisplayMode((SDL_Window *)window, &mode);
+                SDL_SetWindowSize((SDL_Window *)window, mode.w, mode.h);
+
                 if (bIsFullscreen)
                     SDL_SetWindowFullscreen((SDL_Window *)window, SDL_WINDOW_FULLSCREEN);
                 else

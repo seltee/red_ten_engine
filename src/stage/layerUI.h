@@ -10,6 +10,7 @@
 #include "connector/withRenderer.h"
 #include "ui/uiNode.h"
 #include "ui/uiNodeInput.h"
+#include "ui/UINodeTreeElement.h"
 #include <vector>
 
 class LayerUI : public Layer, public WithProfiler, public WithRenderer, public Pawn
@@ -26,7 +27,7 @@ public:
     EXPORT void render(Renderer *renderer, RenderTarget *renderTarget) override;
 
 protected:
-    void initRenderData(UIRenderData *renderData);
+    void initSharedData();
     void inputMouseMove(InputType type, int deviceIndex, int index, float state);
     void inputMousePressLeft(InputType type, int deviceIndex, int index, bool state);
     void inputMousePressRight(InputType type, int deviceIndex, int index, bool state);
@@ -40,11 +41,13 @@ protected:
 
     Shader *textShader = nullptr;
     ShaderParameter *colorTextShaderParameter = nullptr;
+    ShaderParameter *imageShiftShaderParameter = nullptr;
+    ShaderParameter *imageFrameShaderParameter = nullptr;
 
     float zoom = 1.0f;
     float scroll = 0.0f;
 
-    float mouseX = 10000.0f, mouseY= 10000.0f;
+    float mouseX = 10000.0f, mouseY = 10000.0f;
     bool bMousePressLeft = false, bMousePressRight = false;
     bool bMouseReleaseLeft = false, bMouseReleaseRight = false;
     int screenWidth = 640, screenHeight = 480;
@@ -52,5 +55,6 @@ protected:
     Matrix4 projection;
     std::vector<UINode *> hoveredNodes;
 
-    UIChierarchyElement chierarchyRoot;
+    UIRenderSharedData renderSharedData;
+    UINodeTreeElement treeElement;
 };

@@ -16,7 +16,7 @@ public:
     EXPORT void startSelection();
     EXPORT void setSelectPointStart(float x, float y);
     EXPORT inline float getLineHeight() { return lineHeight; };
-
+    EXPORT inline Text *getText() { return &text; }
     Text text;
 
 protected:

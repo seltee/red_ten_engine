@@ -96,6 +96,8 @@ public:
     EXPORT void setMarginRightPercentage(float amount);
     EXPORT void setMarginBottomPoints(float amount);
     EXPORT void setMarginBottomPercentage(float amount);
+    EXPORT void setMarginPoints(float left, float top, float right, float bottom);
+    EXPORT void setMarginPercentage(float left, float top, float right, float bottom);
     EXPORT void setBackgroundColor(Color color);
     EXPORT void setTextColor(Color color);
     EXPORT void setLayoutDirection(UILayoutDirection direction);
@@ -115,6 +117,10 @@ public:
     EXPORT void setImagePosition(UIImagePositioning imagePosition);
     EXPORT void setImageZoom(float imageZoom);
     EXPORT void setImageAlpha(float imageAlpha);
+    EXPORT void setImageShiftX(float imageShiftX);
+    EXPORT void setImageShiftY(float imageShiftY);
+    EXPORT void setImageFrameWidth(float imageFrameWidth);
+    EXPORT void setImageFrameHeight(float imageFrameHeight);
     EXPORT void setZIndex(int zIndex);
 
     EXPORT inline UIVariableSize getWidth() { return width; }
@@ -148,6 +154,10 @@ public:
     EXPORT inline UIImagePositioning getImagePositioning() { return imagePosition; }
     EXPORT inline float getImageZoom() { return imageZoom; }
     EXPORT inline float getImageAlpha() { return imageAlpha; }
+    EXPORT inline float getImageShiftX() { return imageShiftX; }
+    EXPORT inline float getImageShiftY() { return imageShiftY; }
+    EXPORT inline float getImageFrameWidth() { return imageFrameWidth; }
+    EXPORT inline float getImageFrameHeight() { return imageFrameHeight; }
 
     EXPORT inline int getZIndex() { return zIndex; }
 
@@ -183,6 +193,10 @@ protected:
     UIImagePositioning imagePosition = UIImagePositioning::Place;
     float imageZoom = 1.0f;
     float imageAlpha = 1.0f;
+    float imageShiftX = 0.0f;
+    float imageShiftY = 0.0f;
+    float imageFrameWidth = 0.0f;
+    float imageFrameHeight = 0.0f;
 
     int fontSize = 16;
     int zIndex = 0;

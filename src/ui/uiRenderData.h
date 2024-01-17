@@ -13,6 +13,23 @@ struct UIViewport
     float x, y, endX, endY;
 };
 
+struct UIRenderSharedData
+{
+    Matrix4 *view;
+
+    Shader *imageShader;
+    ShaderParameter *imageShiftShaderParameter;
+    ShaderParameter *imageFrameShaderParameter;
+
+    Shader *colorShader;
+    ShaderParameter *colorShaderParameter;
+
+    Shader *textColorShader;
+    ShaderParameter *colorTextShaderParameter;
+
+    float zoom;
+};
+
 class UIRenderData
 {
 public:
@@ -24,22 +41,10 @@ public:
     // left, top, right, bottom
     float padding[4];
 
-    float zoom;
-
     std::string text;
     Color textColor;
 
     Color background;
-
-    Matrix4 *view;
-
-    Shader *imageShader;
-
-    Shader *colorShader;
-    ShaderParameter *colorShaderParameter;
-
-    Shader *textColorShader;
-    ShaderParameter *colorTextShaderParameter;
 
     UITextAlign textHorizontalAlign;
     UITextAlign textVerticalAlign;
@@ -61,6 +66,9 @@ public:
     float imageAlpha;
     float imageX, imageY;
     float imageWidth, imageHeight;
+
+    float imageShift[2];
+    float imageFrame[2];
 
     int zIndex;
 };

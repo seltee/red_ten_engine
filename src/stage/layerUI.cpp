@@ -8,6 +8,7 @@
 #include <functional>
 #include <vector>
 
+extern const std::string uiVertexCode;
 extern const std::string uiColorFragmentShader;
 extern const std::string uiFontFragmentShader;
 extern const std::string uiSpriteFragmentShader;
@@ -50,26 +51,28 @@ void LayerUI::process(float delta)
     root->style.setPositioning(UIPosition::Inline);
     root->style.setZIndex(-1);
 
-    initRenderData(&chierarchyRoot.renderData);
-    chierarchyRoot.children.clear();
-    chierarchyRoot.node = rootContainer;
+    initSharedData();
 
     rootContainer->process(delta, zoom);
     rootContainer->recalcSize(zoom);
-    rootContainer->buildChierarchy(&chierarchyRoot, &chierarchyRoot);
 
-    std::sort(chierarchyRoot.children.begin(), chierarchyRoot.children.end(), [](UIChierarchyElement a, UIChierarchyElement b)
-              { return a.renderData.zIndex < b.renderData.zIndex; });
+    UIRenderPositioning positioning;
+    positioning.sx = 0.0f;
+    positioning.sy = 0.0f;
+    positioning.viewport = {0.0f, 0.0f, static_cast<float>(screenWidth), static_cast<float>(screenHeight)};
+
+    treeElement.children.clear();
+    rootContainer->buildChierarchy(positioning, &renderSharedData, &treeElement, &treeElement);
 
     std::vector<UIMousePickELement> collection;
     collection.push_back({root, 0.0f, 0.0f});
 
     if (scroll != 0.0f)
     {
-        chierarchyRoot.propagateScroll(static_cast<int>(static_cast<float>(mouseX) / zoom), static_cast<int>(static_cast<float>(mouseY) / zoom), -scroll / zoom * 80.0f);
+        treeElement.propagateScroll(static_cast<int>(static_cast<float>(mouseX) / zoom), static_cast<int>(static_cast<float>(mouseY) / zoom), zoom, -scroll / zoom * 80.0f);
         scroll = 0.0f;
     }
-    chierarchyRoot.pickPoint(static_cast<int>(static_cast<float>(mouseX) / zoom), static_cast<int>(static_cast<float>(mouseY) / zoom), &collection);
+    treeElement.pickPoint(static_cast<int>(static_cast<float>(mouseX) / zoom), static_cast<int>(static_cast<float>(mouseY) / zoom), zoom, &collection);
 
     UICursor cursor = UICursor::Default;
 
@@ -177,6 +180,29 @@ void LayerUI::process(float delta)
 
 void LayerUI::render(Renderer *renderer, RenderTarget *renderTarget)
 {
+    screenWidth = renderTarget->getWidth();
+    screenHeight = renderTarget->getHeight();
+
+    renderTarget->useResultBuffer();
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+
+    UINodeAbsolutePosition node;
+    node.node = rootContainer;
+
+    glEnable(GL_SCISSOR_TEST);
+    treeElement.render(renderTarget, &renderSharedData);
+    glDisable(GL_SCISSOR_TEST);
+}
+
+void LayerUI::initSharedData()
+{
+    auto renderer = getRenderer();
+
     if (!colorShader)
     {
         colorShader = renderer->createOpenGLShader(uiColorFragmentShader);
@@ -191,80 +217,28 @@ void LayerUI::render(Renderer *renderer, RenderTarget *renderTarget)
 
     if (!imageShader)
     {
-        imageShader = renderer->createOpenGLShader(uiSpriteFragmentShader);
+        imageShader = renderer->createOpenGLShader(uiVertexCode, uiSpriteFragmentShader);
+        imageShiftShaderParameter = imageShader->createShaderParameter("aTexCoordShift", ShaderParameterType::Float2);
+        imageFrameShaderParameter = imageShader->createShaderParameter("aTexCoordMul", ShaderParameterType::Float2);
     }
 
-    if (!chierarchyRoot.renderData.colorShader)
-        return;
-
-    screenWidth = renderTarget->getWidth();
-    screenHeight = renderTarget->getHeight();
-
-    renderTarget->useResultBuffer();
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-
-    UINodeAbsolutePosition node;
-    initRenderData(&node.renderData);
-    node.node = rootContainer;
-
-    glEnable(GL_SCISSOR_TEST);
-    chierarchyRoot.render(renderTarget);
-    glDisable(GL_SCISSOR_TEST);
-}
-
-void LayerUI::initRenderData(UIRenderData *renderData)
-{
     float width = static_cast<float>(screenWidth) / zoom;
     float height = static_cast<float>(screenHeight) / zoom;
     projection = glm::ortho(0.0f, width, height, 0.0f, 10.0f, -10.0f);
 
-    renderData->width = width;
-    renderData->height = height;
-    renderData->x = 0.0f;
-    renderData->y = 0.0f;
+    renderSharedData.view = &projection;
 
-    renderData->padding[0] = 0.0f;
-    renderData->padding[1] = 0.0f;
-    renderData->padding[2] = 0.0f;
-    renderData->padding[3] = 0.0f;
+    renderSharedData.imageShader = imageShader;
+    renderSharedData.imageShiftShaderParameter = imageShiftShaderParameter;
+    renderSharedData.imageFrameShaderParameter = imageFrameShaderParameter;
 
-    renderData->zoom = zoom;
-    renderData->background = rootContainer->style.getBackgroundColor();
+    renderSharedData.colorShader = colorShader;
+    renderSharedData.colorShaderParameter = colorShaderParameter;
 
-    renderData->view = &projection;
+    renderSharedData.textColorShader = textShader;
+    renderSharedData.colorTextShaderParameter = colorTextShaderParameter;
 
-    renderData->imageShader = imageShader;
-    renderData->image = nullptr;
-    renderData->imageX = 0.0f;
-    renderData->imageY = 0.0f;
-    renderData->imageWidth = 0.0f;
-    renderData->imageHeight = 0.0f;
-    renderData->imageAlpha = 0.0f;
-
-    renderData->colorShader = colorShader;
-    renderData->colorShaderParameter = colorShaderParameter;
-
-    renderData->textColorShader = textShader;
-    renderData->colorTextShaderParameter = colorTextShaderParameter;
-
-    renderData->textHorizontalAlign = UITextAlign::Start;
-    renderData->textVerticalAlign = UITextAlign::Start;
-    renderData->position = UIPosition::Inline;
-
-    renderData->contentHorizontalAlign = UIContentAlign::Start;
-    renderData->contentVerticalAlign = UIContentAlign::Start;
-
-    renderData->viewport = {0.0f, 0.0f, static_cast<float>(screenWidth), static_cast<float>(screenHeight)};
-
-    renderData->text = "";
-    renderData->scroll = UIScroll::None;
-
-    renderData->zIndex = 0;
+    renderSharedData.zoom = zoom;
 }
 
 void LayerUI::inputMouseMove(InputType type, int deviceIndex, int index, float state)
@@ -296,6 +270,19 @@ void LayerUI::inputMouseWheelV(InputType type, int deviceIndex, int index, float
     if (index == (int)InputTypeMouseMove::MOVE_WHEEL_VERTICAL)
         scroll += state;
 }
+
+const std::string uiVertexCode =
+    "#version 410 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "layout (location = 1) in vec2 aTexCoord;\n"
+    "uniform mat4 mModelViewProjection;\n"
+    "uniform vec2 aTexCoordShift;\n"
+    "uniform vec2 aTexCoordMul;\n"
+    "out vec2 texCoord;\n"
+    "void main() {\n"
+    "   gl_Position = mModelViewProjection * vec4(aPos, 1.0);\n"
+    "   texCoord = vec2(aTexCoord.x * aTexCoordMul.x + aTexCoordShift.x, aTexCoord.y * aTexCoordMul.y + aTexCoordShift.y);\n"
+    "}\n";
 
 const std::string uiColorFragmentShader =
     "#version 410 core\n"

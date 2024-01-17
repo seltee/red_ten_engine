@@ -242,7 +242,7 @@ APPMAIN
                     config->setShadowQuality(RenderQuality::SuperFast);
 
                 shadowQualityText->setText(std::string("Shadow quality: ") + Config::qualityToString(config->getShadowQuality()));
-                configController->applyConfig();
+                configController->applyNewConfig(config);
 
                 // Saved configuration will be automatically loaded on next run of the engine
                 // In this case it will load the quality of shadows

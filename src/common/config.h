@@ -41,7 +41,6 @@ public:
     EXPORT void setupByQuality(RenderQuality quality);
 
     EXPORT bool isLoaded();
-    EXPORT bool isDirty();
 
     EXPORT void setCurrentVideoDevice(std::string deviceName);
     EXPORT std::string getCurrentVideoDevice();
@@ -62,6 +61,9 @@ public:
     EXPORT void setAnialiasing(AntiAliasing state);
     EXPORT float getMultisamplingFactor();
 
+    EXPORT bool isSameWith(Config *otherConfig);
+    EXPORT void copyFrom(Config *otherConfig);
+
     EXPORT static std::string qualityToString(RenderQuality quality);
     EXPORT static RenderQuality stringToQuality(std::string quality);
     EXPORT static std::string antialiasingToString(AntiAliasing quality);
@@ -72,7 +74,6 @@ protected:
 
     std::string configFilePath = "./cfg";
     bool bIsLoaded = false;
-    bool bIsDirty = false;
 
     int windowWidth = 0, windowHeight = 0;
     int refreshRate = 0;

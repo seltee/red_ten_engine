@@ -106,11 +106,6 @@ bool Config::isLoaded()
     return bIsLoaded;
 }
 
-bool Config::isDirty()
-{
-    return bIsDirty;
-}
-
 void Config::setCurrentVideoDevice(std::string deviceName)
 {
     this->videoDevice = deviceName;
@@ -139,10 +134,7 @@ int Config::getWindowWidth()
 void Config::setWindowWidth(int width)
 {
     if (this->windowWidth != width)
-    {
         this->windowWidth = width;
-        bIsDirty = true;
-    }
 }
 
 int Config::getWindowHeight()
@@ -153,10 +145,7 @@ int Config::getWindowHeight()
 void Config::setWindowHeight(int height)
 {
     if (this->windowHeight != height)
-    {
         this->windowHeight = height;
-        bIsDirty = true;
-    }
 }
 
 int Config::getRefreshRate()
@@ -187,10 +176,7 @@ RenderQuality Config::getShadowQuality()
 void Config::setShadowQuality(RenderQuality quality)
 {
     if (this->shadowQuality != quality)
-    {
         this->shadowQuality = quality;
-        bIsDirty = true;
-    }
 }
 
 AntiAliasing Config::getAnialiasing()
@@ -201,10 +187,7 @@ AntiAliasing Config::getAnialiasing()
 void Config::setAnialiasing(AntiAliasing state)
 {
     if (this->antialiasing != state)
-    {
         this->antialiasing = state;
-        bIsDirty = true;
-    }
 }
 
 float Config::getMultisamplingFactor()
@@ -222,6 +205,32 @@ float Config::getMultisamplingFactor()
     default:
         return 1.0f;
     }
+}
+
+bool Config::isSameWith(Config *otherConfig)
+{
+    bool same = true;
+    same &= getWindowWidth() == otherConfig->getWindowWidth();
+    same &= getWindowHeight() == otherConfig->getWindowHeight();
+    same &= isFullscreen() == otherConfig->isFullscreen();
+    same &= getRefreshRate() == otherConfig->getRefreshRate();
+    same &= getShadowQuality() == otherConfig->getShadowQuality();
+    same &= getAnialiasing() == otherConfig->getAnialiasing();
+    same &= getCurrentVideoDevice() == otherConfig->getCurrentVideoDevice();
+    same &= getCurrentAudioDevice() == otherConfig->getCurrentAudioDevice();
+    return same;
+}
+
+void Config::copyFrom(Config *otherConfig)
+{
+    setWindowWidth(otherConfig->getWindowWidth());
+    setWindowHeight(otherConfig->getWindowHeight());
+    setFullscreenState(otherConfig->isFullscreen());
+    setRefreshRate(otherConfig->getRefreshRate());
+    setShadowQuality(otherConfig->getShadowQuality());
+    setAnialiasing(otherConfig->getAnialiasing());
+    setCurrentVideoDevice(otherConfig->getCurrentVideoDevice());
+    setCurrentAudioDevice(otherConfig->getCurrentAudioDevice());
 }
 
 std::string Config::qualityToString(RenderQuality quality)

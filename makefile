@@ -97,7 +97,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/core.o ${OBJDIR}/view.o ${OBJDIR}/sta
 			${OBJDIR}/animation.o ${OBJDIR}/animator.o ${OBJDIR}/animationTarget.o \
 			${OBJDIR}/renderer.o ${OBJDIR}/rendererOpenGL.o ${OBJDIR}/rendererVulkan.o ${OBJDIR}/vulkanPhysicalDevice.o ${OBJDIR}/vulkanLogicalDevice.o \
 			${OBJDIR}/renderQueue.o \
-			${OBJDIR}/layerUI.o ${OBJDIR}/uiNode.o ${OBJDIR}/uiNodeInput.o ${OBJDIR}/uiStyle.o ${OBJDIR}/uiChierarchyElement.o \
+			${OBJDIR}/layerUI.o ${OBJDIR}/uiNode.o ${OBJDIR}/uiNodeInput.o ${OBJDIR}/uiStyle.o ${OBJDIR}/uiRenderElement.o ${OBJDIR}/uiNodeTreeElement.o \
 			${OBJDIR}/text.o
 
 
@@ -106,7 +106,7 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
 			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT} \
-			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUINotepad${EXT}
+			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUIElements${EXT} 22-helloUINotepad${EXT}
 
 all: engine examples
 
@@ -507,8 +507,11 @@ ${OBJDIR}/uiNodeInput.o: ${SRCDIR}/ui/uiNodeInput.cpp
 ${OBJDIR}/uiStyle.o: ${SRCDIR}/ui/uiStyle.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/uiStyle.o ${SRCDIR}/ui/uiStyle.cpp
 
-${OBJDIR}/uiChierarchyElement.o: ${SRCDIR}/ui/uiChierarchyElement.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/uiChierarchyElement.o ${SRCDIR}/ui/uiChierarchyElement.cpp
+${OBJDIR}/uiRenderElement.o: ${SRCDIR}/ui/uiRenderElement.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/uiRenderElement.o ${SRCDIR}/ui/uiRenderElement.cpp
+
+${OBJDIR}/uiNodeTreeElement.o: ${SRCDIR}/ui/uiNodeTreeElement.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/uiNodeTreeElement.o ${SRCDIR}/ui/uiNodeTreeElement.cpp
 
 ${OBJDIR}/text.o: ${SRCDIR}/common/text.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/text.o ${SRCDIR}/common/text.cpp
@@ -661,12 +664,19 @@ ${OBJDIR}/20-hello3dSprites.o: ${EXMDIR}/20-hello3dSprites.cpp ${EXMDIR}/helpers
 	$(LD) ${EFLAGS} ${OBJDIR}/20-hello3dSprites.o -o 20-hello3dSprites${EXT}
 	${MOVE} 20-hello3dSprites${EXT} ${BINDIR}/20-hello3dSprites${EXT}
 
-${OBJDIR}/21-helloUINotepad.o: ${EXMDIR}/21-helloUINotepad.cpp ${EXMDIR}/helpers.h
-	$(CC) $(CFLAGS) -o ${OBJDIR}/21-helloUINotepad.o ${EXMDIR}/21-helloUINotepad.cpp
+${OBJDIR}/21-helloUIElements.o: ${EXMDIR}/21-helloUIElements.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/21-helloUIElements.o ${EXMDIR}/21-helloUIElements.cpp
 
-21-helloUINotepad${EXT}: ${OBJDIR}/21-helloUINotepad.o
-	$(LD) ${EFLAGS} ${OBJDIR}/21-helloUINotepad.o -o 21-helloUINotepad${EXT}
-	${MOVE} 21-helloUINotepad${EXT} ${BINDIR}/21-helloUINotepad${EXT}
+21-helloUIElements${EXT}: ${OBJDIR}/21-helloUIElements.o
+	$(LD) ${EFLAGS} ${OBJDIR}/21-helloUIElements.o -o 21-helloUIElements${EXT}
+	${MOVE} 21-helloUIElements${EXT} ${BINDIR}/21-helloUIElements${EXT}
+
+${OBJDIR}/22-helloUINotepad.o: ${EXMDIR}/22-helloUINotepad.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/22-helloUINotepad.o ${EXMDIR}/22-helloUINotepad.cpp
+
+22-helloUINotepad${EXT}: ${OBJDIR}/22-helloUINotepad.o
+	$(LD) ${EFLAGS} ${OBJDIR}/22-helloUINotepad.o -o 22-helloUINotepad${EXT}
+	${MOVE} 22-helloUINotepad${EXT} ${BINDIR}/22-helloUINotepad${EXT}
 
 
 # llvm-objcopy

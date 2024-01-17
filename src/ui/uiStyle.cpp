@@ -151,6 +151,22 @@ void UIStyle::setMarginBottomPercentage(float amount)
     this->marginBottom.bIsUsingPercentage = true;
 }
 
+void UIStyle::setMarginPoints(float left, float top, float right, float bottom)
+{
+    setMarginLeftPoints(left);
+    setMarginTopPoints(top);
+    setMarginRightPoints(right);
+    setMarginBottomPoints(bottom);
+}
+
+void UIStyle::setMarginPercentage(float left, float top, float right, float bottom)
+{
+    setPaddingLeftPercentage(left);
+    setPaddingTopPercentage(top);
+    setPaddingRightPercentage(right);
+    setPaddingBottomPercentage(bottom);
+}
+
 void UIStyle::setBackgroundColor(Color color)
 {
     this->backgroundColor = color;
@@ -244,6 +260,26 @@ void UIStyle::setImageZoom(float imageZoom)
 void UIStyle::setImageAlpha(float imageAlpha)
 {
     this->imageAlpha = imageAlpha;
+}
+
+void UIStyle::setImageShiftX(float imageShiftX)
+{
+    this->imageShiftX = imageShiftX;
+}
+
+void UIStyle::setImageShiftY(float imageShiftY)
+{
+    this->imageShiftY = imageShiftY;
+}
+
+void UIStyle::setImageFrameWidth(float imageFrameWidth)
+{
+    this->imageFrameWidth = imageFrameWidth;
+}
+
+void UIStyle::setImageFrameHeight(float imageFrameHeight)
+{
+    this->imageFrameHeight = imageFrameHeight;
 }
 
 void UIStyle::setZIndex(int zIndex)

@@ -290,7 +290,7 @@ void UINodeInput::onProcess(float delta, float zoom)
         mouseNode->style.setVisibility(cursorBlink < 0.5f ? UIVisibility::Visible : UIVisibility::Hidden);
         mouseNode->style.setBackgroundColor(style.getTextColor());
         mouseNode->style.setMarginTopPoints(lineHeight * text.getCursor().positionV);
-        mouseNode->style.setMarginLeftPoints(UIChierarchyElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, text.getCursor().positionH)) / zoom + 1.0f);
+        mouseNode->style.setMarginLeftPoints(UIRenderElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, text.getCursor().positionH)) / zoom + 1.0f);
     }
 
     // keys repeat for control keys cause SDL provide repeat in usual way only for text input
@@ -360,8 +360,8 @@ void UINodeInput::updateSelection()
                 }
             }
 
-            float shift = UIChierarchyElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, symStart)) / zoom;
-            float width = UIChierarchyElement::getTextWidth(style.getFontSize() * zoom, str->substr(symStart, symEnd - symStart)) / zoom;
+            float shift = UIRenderElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, symStart)) / zoom;
+            float width = UIRenderElement::getTextWidth(style.getFontSize() * zoom, str->substr(symStart, symEnd - symStart)) / zoom;
 
             selectionSubNode->style.setMarginLeftPoints(shift);
             selectionSubNode->style.setWidthPoints(width);
@@ -369,7 +369,7 @@ void UINodeInput::updateSelection()
         else
         {
             std::string *str = text.getStringByNumber(i);
-            float width = UIChierarchyElement::getTextWidth(style.getFontSize() * zoom, *str) / zoom;
+            float width = UIRenderElement::getTextWidth(style.getFontSize() * zoom, *str) / zoom;
             selectionSubNode->style.setWidthPoints(width);
         }
     }
@@ -413,7 +413,7 @@ void UINodeInput::relativeToCursor(float rx, float ry, bool moveSelection)
     for (int i = 0; i <= str->length(); i++)
     {
         std::string substr = str->substr(0, i);
-        float width = static_cast<float>(UIChierarchyElement::getTextWidth(style.getFontSize() * zoom, substr)) / zoom;
+        float width = static_cast<float>(UIRenderElement::getTextWidth(style.getFontSize() * zoom, substr)) / zoom;
         float dist = fabsf(width - rx);
         if (dist < closest)
         {

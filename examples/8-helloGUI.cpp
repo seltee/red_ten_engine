@@ -280,14 +280,14 @@ APPMAIN
                     config->setWindowWidth(1280);
                     config->setWindowHeight(800);
                     config->setFullscreenState(false);
-                    configController->applyConfig();
+                    configController->applyNewConfig(config);
                 }
                 else
                 {
                     config->setWindowWidth(screenWidth);
                     config->setWindowHeight(screenHeight);
                     config->setFullscreenState(true);
-                    configController->applyConfig();
+                    configController->applyNewConfig(config);
                 }
             }
         }
