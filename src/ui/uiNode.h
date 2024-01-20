@@ -23,6 +23,9 @@ enum class UIPointerEvent
     CursorClickLeftRelease,
     CursorClickRightRelease,
     Scroll,
+    TextUpdated,
+    TextFocused,
+    TextBlured
 };
 
 struct PointerCallbackData
@@ -75,7 +78,7 @@ public:
     EXPORT UINodeInput *createChildInputNode();
     EXPORT void clearChildren();
 
-    EXPORT void setText(std::string text);
+    EXPORT virtual void setText(std::string text);
     EXPORT std::string getText();
 
     EXPORT void setPointerCallback(UIPointerCallback callback);
@@ -85,6 +88,7 @@ public:
 
     EXPORT float getScroll();
     EXPORT void doScroll(float scroll, float maxScroll);
+    EXPORT bool isVisible();
 
     EXPORT virtual void beforeRender();
     EXPORT virtual void afterRender();
@@ -118,7 +122,6 @@ protected:
     UINodePositioning calcPositioning();
     UINodePositioning correctChildPositioning(UINode *child, UINodePositioning &positioning);
     UINodePositioning shiftInlinePositioning(UINode *child, UINodePositioning &positioning);
-
 
     float getImageWidth(UINode *child);
     float getImageHeight(UINode *child);

@@ -5,6 +5,8 @@
 #include "rtengine.h"
 #include <SDL.h>
 
+UINodeInput *UINodeInput::focusedText = nullptr;
+
 UINodeInput::UINodeInput(UINode *parent) : UINode(parent), Pawn(this)
 {
     registerTextCallback(&UINodeInput::inputText);
@@ -57,12 +59,12 @@ UINodeInput::UINodeInput(UINode *parent) : UINode(parent), Pawn(this)
     repeatCallbacks[(int)KeyboardCodes::RIGHT] = &UINodeInput::inputKeyboardRight;
 
     selectionNode = createChildNode();
-    selectionNode->style.setPositioning(UIPosition::Absolute);
+    selectionNode->style.setPositioning(UIPosition::Relative);
     selectionNode->style.setLayoutDirection(UILayoutDirection::Vertical);
     selectionNode->style.setHoverCursor(UICursor::IBeam);
 
     textNode = createChildNode();
-    textNode->style.setPositioning(UIPosition::Absolute);
+    textNode->style.setPositioning(UIPosition::Relative);
     textNode->style.setLayoutDirection(UILayoutDirection::Vertical);
     textNode->style.setHoverCursor(UICursor::IBeam);
     textNode->style.setPaddingBottomPoints(lineHeight * 4);
@@ -70,7 +72,7 @@ UINodeInput::UINodeInput(UINode *parent) : UINode(parent), Pawn(this)
 
     mouseNode = createChildNode();
     mouseNode->style.setWidthPoints(1);
-    mouseNode->style.setPositioning(UIPosition::Absolute);
+    mouseNode->style.setPositioning(UIPosition::Relative);
     mouseNode->style.setBackgroundColor(style.getTextColor());
     mouseNode->style.setVisibility(UIVisibility::Hidden);
     mouseNode->style.setHoverCursor(UICursor::IBeam);
@@ -85,15 +87,28 @@ UINodeInput::UINodeInput(UINode *parent) : UINode(parent), Pawn(this)
                         userData->setSelectPointStart(data->globalX - data->relativeX, data->globalY - data->relativeY);
                         userData->setCursorPosition(relativeX, relativeY);
                         userData->startSelection();
+                        userData->focus();
+                        return false;
+                    }
+                    if (data->event == UIPointerEvent::CursorHover){
+                        userData->bHover = true;
+                    }
+                    if (data->event == UIPointerEvent::CursorBlur){
+                        userData->bHover = false;
                     }
                     return true; });
 
     style.setOverflowVisibility(UIVisibility::Hidden);
     style.setWidthPercentage(100);
     style.setHeightPercentage(100);
-    style.setScroll(UIScroll::Enabled);
 
     updateOutput();
+}
+
+UINodeInput::~UINodeInput()
+{
+    if (focusedText == this)
+        focusedText = nullptr;
 }
 
 void UINodeInput::setCursorPosition(float relativeX, float relativeY)
@@ -123,58 +138,133 @@ void UINodeInput::setSelectPointStart(float x, float y)
     selectStartPointY = y;
 }
 
-void UINodeInput::inputText(std::string str)
+std::string UINodeInput::getText()
 {
-    text.removeSelected();
-    text.putAtCursor(str);
+    return text.getAllAsString();
+}
+
+void UINodeInput::setText(std::string str)
+{
+    text.setText(str);
     updateSelection();
     updateOutput();
 }
 
+void UINodeInput::setMultilineEnabled(bool state)
+{
+    bMultilineEnabled = state;
+    bNeedsUpdate = true;
+}
+
+void UINodeInput::setSuperFocus(bool state)
+{
+    bSuperFocus = state;
+}
+
+void UINodeInput::focus()
+{
+    if (focusedText && focusedText != this)
+        focusedText->unfocus();
+    focusedText = this;
+    cursorBlink = 0.0f;
+    bNeedsUpdate = true;
+    if (!bIsFocused)
+    {
+        bIsFocused = true;
+        throwEvent(UIPointerEvent::TextFocused);
+    }
+}
+
+void UINodeInput::unfocus()
+{
+    if (bIsFocused)
+    {
+        bIsFocused = false;
+        text.clearSelection();
+        UIPointerCallback callback = getPointerCallback();
+        throwEvent(UIPointerEvent::TextBlured);
+    }
+    if (focusedText == this)
+        focusedText = nullptr;
+    bNeedsUpdate = true;
+}
+
+UINodeInput *UINodeInput::getCurrentInput()
+{
+    return focusedText;
+}
+
+void UINodeInput::inputText(std::string str)
+{
+    if (bIsFocused)
+    {
+        text.removeSelected();
+        text.putAtCursor(str);
+        updateSelection();
+        updateOutput();
+        throwEvent(UIPointerEvent::TextUpdated);
+    }
+}
+
 void UINodeInput::inputKeyboardBackspace(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
+    if (bIsFocused)
     {
-        text.removeBack();
-        cursorBlink = 0.0f;
-        updateOutput();
-        updateSelection();
+        if (state)
+        {
+            text.removeBack();
+            cursorBlink = 0.0f;
+            updateOutput();
+            updateSelection();
+            throwEvent(UIPointerEvent::TextUpdated);
+        }
+        enableRepeatKey(state, (int)KeyboardCodes::BACKSPACE);
     }
-    enableRepeatKey(state, (int)KeyboardCodes::BACKSPACE);
 }
 
 void UINodeInput::inputKeyboardDelete(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
+    if (bIsFocused)
     {
-        text.removeForward();
-        cursorBlink = 0.0f;
-        updateOutput();
-        updateSelection();
+        if (state)
+        {
+            text.removeForward();
+            cursorBlink = 0.0f;
+            updateOutput();
+            updateSelection();
+            throwEvent(UIPointerEvent::TextUpdated);
+        }
+        enableRepeatKey(state, (int)KeyboardCodes::DELETE);
     }
-    enableRepeatKey(state, (int)KeyboardCodes::DELETE);
 }
 
 void UINodeInput::inputKeyboardReturn(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
+    if (bIsFocused)
     {
-        text.removeSelected();
-        std::string *str = text.getCurrentString();
-        std::string saveStr = str->substr(text.getCursor().positionH, str->length());
-        *str = str->substr(0, text.getCursor().positionH);
-        text.addString(text.getCursor().positionV + 1, saveStr);
-        text.setCursorPosition(text.getCursor().positionV + 1, 0);
-        cursorBlink = 0.0f;
-        updateOutput();
-        updateSelection();
+        if (state)
+        {
+            text.removeSelected();
+            if (bMultilineEnabled)
+            {
+                std::string *str = text.getCurrentString();
+                std::string saveStr = str->substr(text.getCursor().positionH, str->length());
+                *str = str->substr(0, text.getCursor().positionH);
+                text.addString(text.getCursor().positionV + 1, saveStr);
+                text.setCursorPosition(text.getCursor().positionV + 1, 0);
+                throwEvent(UIPointerEvent::TextUpdated);
+            }
+            cursorBlink = 0.0f;
+            updateOutput();
+            updateSelection();
+        }
+        enableRepeatKey(state, (int)KeyboardCodes::RETURN);
     }
-    enableRepeatKey(state, (int)KeyboardCodes::RETURN);
 }
 
 void UINodeInput::inputKeyboardHome(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
+    if (state && bIsFocused)
     {
         setCursorPosition(text.getCursor().positionV, 0);
         cursorBlink = 0.0f;
@@ -183,7 +273,7 @@ void UINodeInput::inputKeyboardHome(InputType type, int deviceIndex, int index, 
 
 void UINodeInput::inputKeyboardEnd(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
+    if (state && bIsFocused)
     {
         std::string *str = text.getCurrentString();
         setCursorPosition(text.getCursor().positionV, str->length());
@@ -193,34 +283,46 @@ void UINodeInput::inputKeyboardEnd(InputType type, int deviceIndex, int index, b
 
 void UINodeInput::inputKeyboardUp(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
-        text.moveCursor(0, -1);
-    updateSelection();
-    enableRepeatKey(state, (int)KeyboardCodes::UP);
+    if (bIsFocused)
+    {
+        if (state)
+            text.moveCursor(0, -1);
+        updateSelection();
+        enableRepeatKey(state, (int)KeyboardCodes::UP);
+    }
 }
 
 void UINodeInput::inputKeyboardDown(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
-        text.moveCursor(0, 1);
-    updateSelection();
-    enableRepeatKey(state, (int)KeyboardCodes::DOWN);
+    if (bIsFocused)
+    {
+        if (state)
+            text.moveCursor(0, 1);
+        updateSelection();
+        enableRepeatKey(state, (int)KeyboardCodes::DOWN);
+    }
 }
 
 void UINodeInput::inputKeyboardLeft(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
-        text.moveCursor(-1, 0);
-    updateSelection();
-    enableRepeatKey(state, (int)KeyboardCodes::LEFT);
+    if (bIsFocused)
+    {
+        if (state)
+            text.moveCursor(-1, 0);
+        updateSelection();
+        enableRepeatKey(state, (int)KeyboardCodes::LEFT);
+    }
 }
 
 void UINodeInput::inputKeyboardRight(InputType type, int deviceIndex, int index, bool state)
 {
-    if (state)
-        text.moveCursor(1, 0);
-    updateSelection();
-    enableRepeatKey(state, (int)KeyboardCodes::RIGHT);
+    if (bIsFocused)
+    {
+        if (state)
+            text.moveCursor(1, 0);
+        updateSelection();
+        enableRepeatKey(state, (int)KeyboardCodes::RIGHT);
+    }
 }
 
 void UINodeInput::inputKeyboardControl(InputType type, int deviceIndex, int index, bool state)
@@ -235,63 +337,99 @@ void UINodeInput::inputKeyboardShift(InputType type, int deviceIndex, int index,
 
 void UINodeInput::inputKeyboardC(InputType type, int deviceIndex, int index, bool state)
 {
-    if (bControlModificator && state)
+    if (bControlModificator && state && bIsFocused)
         copy();
 }
 
 void UINodeInput::inputKeyboardV(InputType type, int deviceIndex, int index, bool state)
 {
-    if (bControlModificator && state)
+    if (bControlModificator && state && bIsFocused)
+    {
         paste();
+        throwEvent(UIPointerEvent::TextUpdated);
+    }
 }
 
 void UINodeInput::inputMouseMove(InputType type, int deviceIndex, int index, float state)
 {
-    if (index == (int)InputTypeMouseMove::MOVE_HORIZONTAL)
-        mouseX = state;
-    if (index == (int)InputTypeMouseMove::MOVE_VERTICAL)
-        mouseY = state;
-
-    if (selectionInProcess && (index == (int)InputTypeMouseMove::MOVE_HORIZONTAL || index == (int)InputTypeMouseMove::MOVE_VERTICAL))
+    if (bIsFocused)
     {
-        float relativeX = mouseX / zoom - selectStartPointX;
-        float relativeY = mouseY / zoom - selectStartPointY;
-        setCursorSelection(relativeX, relativeY);
+        if (index == (int)InputTypeMouseMove::MOVE_HORIZONTAL)
+            mouseX = state;
+        if (index == (int)InputTypeMouseMove::MOVE_VERTICAL)
+            mouseY = state;
+
+        if (selectionInProcess && (index == (int)InputTypeMouseMove::MOVE_HORIZONTAL || index == (int)InputTypeMouseMove::MOVE_VERTICAL))
+        {
+            float relativeX = mouseX / zoom - selectStartPointX;
+            float relativeY = mouseY / zoom - selectStartPointY;
+            setCursorSelection(relativeX, relativeY);
+        }
     }
 }
 
 void UINodeInput::inputMouseButtonLeft(InputType type, int deviceIndex, int index, bool state)
 {
-    if (!state)
+    if (!state && bIsFocused)
         selectionInProcess = false;
+    if (state && !bHover && bIsFocused)
+        unfocus();
 }
 
 void UINodeInput::onProcess(float delta, float zoom)
 {
+    if (bIsFocused)
+        mouseNode->style.setVisibility(UIVisibility::Visible);
+    else
+        mouseNode->style.setVisibility(UIVisibility::Hidden);
+
+    float topShift = 0.0f;
+    if (!bMultilineEnabled)
+    {
+        float lineHeight = UIRenderElement::getTextHeight(style.getFontSize() * zoom, "WFQ") / zoom;
+        if (style.getTextVerticalAlign() == UITextAlign::Middle)
+            topShift += (renderData.height + style.getPadding().top + style.getPadding().bottom - lineHeight * 1.1f) / 2.0f;
+        if (style.getTextVerticalAlign() == UITextAlign::End)
+            topShift += (renderData.height + style.getPadding().top + style.getPadding().bottom - lineHeight * 1.1f);
+    }
+
+    textNode->style.setMarginTopPoints(topShift);
+    selectionNode->style.setMarginTopPoints(topShift);
+
     this->zoom = zoom;
     if (style.getFontSize() + 2 != lineHeight)
     {
         lineHeight = style.getFontSize() + 2;
-        updateOutput();
-        updateSelection();
+        bNeedsUpdate = true;
     }
 
     cursorBlink += delta * 1.1f;
     if (cursorBlink >= 1.0f)
         cursorBlink -= 1.0f;
 
-    mouseNode->style.setHeightPoints(style.getFontSize());
-
     std::string *str = text.getCurrentString();
     std::string cut = str->substr(0, text.getCursor().positionH);
 
-    if (mouseNode)
+    mouseNode->style.setHeightPoints(style.getFontSize());
+    mouseNode->style.setVisibility((cursorBlink < 0.5f && bIsFocused) ? UIVisibility::Visible : UIVisibility::Hidden);
+    mouseNode->style.setBackgroundColor(style.getTextColor());
+    mouseNode->style.setMarginTopPoints(lineHeight * text.getCursor().positionV + topShift);
+    mouseNode->style.setMarginLeftPoints(UIRenderElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, text.getCursor().positionH)) / zoom + 1.0f);
+
+    bool bIsVisible = isVisible();
+    if (bSuperFocus && focusedText == nullptr && bIsVisible)
+        focus();
+    if (bIsFocused && !bIsVisible)
+        unfocus();
+
+    if (bNeedsUpdate)
     {
-        mouseNode->style.setVisibility(cursorBlink < 0.5f ? UIVisibility::Visible : UIVisibility::Hidden);
-        mouseNode->style.setBackgroundColor(style.getTextColor());
-        mouseNode->style.setMarginTopPoints(lineHeight * text.getCursor().positionV);
-        mouseNode->style.setMarginLeftPoints(UIRenderElement::getTextWidth(style.getFontSize() * zoom, str->substr(0, text.getCursor().positionH)) / zoom + 1.0f);
+        bNeedsUpdate = false;
+        updateSelection();
+        updateOutput();
     }
+
+    style.setScroll(bMultilineEnabled ? UIScroll::Enabled : UIScroll::None);
 
     // keys repeat for control keys cause SDL provide repeat in usual way only for text input
     for (int i = 0; i < 256; i++)
@@ -310,7 +448,7 @@ void UINodeInput::onProcess(float delta, float zoom)
 
 void UINodeInput::updateOutput()
 {
-    text.updateCursorBounts();
+    text.updateCursorBounds();
     textNode->clearChildren();
 
     for (int i = 0; i < text.getStringsAmount(); i++)
@@ -391,7 +529,7 @@ void UINodeInput::makeString(UINode *container, int strNumber)
 
 void UINodeInput::enableRepeatKey(bool state, int index)
 {
-    if (index > 0 && index < 256 && keysRepeatPressed[index] != state)
+    if (index > 0 && index < 256 && keysRepeatPressed[index] != state && bIsFocused)
     {
         keysRepeatPressed[index] = state;
         keysRepeatTime[index] = 0.0f;
@@ -437,4 +575,18 @@ void UINodeInput::paste()
     text.putAtCursor(std::string(str));
     updateSelection();
     updateOutput();
+}
+
+void UINodeInput::throwEvent(UIPointerEvent ev)
+{
+    UIPointerCallback callback = getPointerCallback();
+    if (callback)
+    {
+        PointerCallbackData callbackData;
+        memset(&callbackData, 0, sizeof(PointerCallbackData));
+        callbackData.userData = getUserCallbackData();
+        callbackData.zoom = zoom;
+        callbackData.event = ev;
+        callback(&callbackData);
+    }
 }

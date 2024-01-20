@@ -71,10 +71,16 @@ void UINode::buildChierarchy(UIRenderPositioning positioning, UIRenderSharedData
 
             positionData = shiftInlinePositioning(child, positionData);
         }
-        else
+        if (child->style.getPositioning() == UIPosition::Absolute)
         {
             root->children.push_back(UINodeTreeElement());
             UINodeTreeElement *element = &root->children.back();
+            child->buildChierarchy(childPositioning, renderSharedData, element, element);
+        }
+        if (child->style.getPositioning() == UIPosition::Relative)
+        {
+            treeElement->children.push_back(UINodeTreeElement());
+            UINodeTreeElement *element = &treeElement->children.back();
             child->buildChierarchy(childPositioning, renderSharedData, element, element);
         }
     }
@@ -153,6 +159,18 @@ void UINode::doScroll(float scroll, float maxScroll)
     this->maxScroll = maxScroll;
 }
 
+bool UINode::isVisible()
+{
+    UINode *target = this;
+    while (target)
+    {
+        if (target->style.getVisibility() == UIVisibility::Hidden)
+            return false;
+        target = target->parent;
+    }
+    return true;
+}
+
 void UINode::beforeRender()
 {
 }
@@ -169,10 +187,10 @@ void UINode::recalcFixedSizes()
     }
 
     if (!style.getWidth().bIsUsingPercentage && style.getWidth().amount != 0.0f)
-        contentWidth = style.getWidth().amount + style.getPaddingLeft().amount + style.getPaddingRight().amount;
+        contentWidth = style.getWidth().amount + style.getPaddingBorderWidth() + style.getMarginWidth();
 
     if (!style.getHeight().bIsUsingPercentage && style.getHeight().amount != 0.0f)
-        contentHeight = style.getHeight().amount + style.getPaddingTop().amount + style.getPaddingBottom().amount;
+        contentHeight = style.getHeight().amount + style.getPaddingBorderHeight() + style.getMarginHeight();
 }
 
 void UINode::recalcAdaptiveSizes(float zoom)
@@ -190,16 +208,16 @@ void UINode::recalcAdaptiveSizes(float zoom)
             if (child->style.getPositioning() == UIPosition::Inline)
             {
                 if (style.getLayoutDirection() == UILayoutDirection::Horizontal)
-                    contentWidth += child->getContentWidth() + child->style.getMarginLeft().amount + child->style.getMarginRight().amount;
+                    contentWidth += child->getContentWidth();
                 else
-                    contentWidth = max(contentWidth, child->getContentWidth() + child->style.getMarginLeft().amount + child->style.getMarginRight().amount);
+                    contentWidth = max(contentWidth, child->getContentWidth());
             }
         }
         contentWidth = max(contentWidth, UIRenderElement::getTextWidth(static_cast<int>(style.getFontSize() * zoom), text) / zoom);
-        contentWidth += style.getPaddingLeft().amount + style.getPaddingRight().amount;
+        contentWidth += style.getPaddingBorderWidth() + style.getMarginWidth();
 
         if (style.getImage() && style.getImagePositioning() == UIImagePositioning::Place)
-            contentWidth = max(contentWidth, style.getImage()->getWidth() / zoom);
+            contentWidth = max(contentWidth, style.getImage()->getWidth() / zoom + style.getMarginWidth() + style.getPaddingBorderWidth());
     }
 
     if (!style.getHeight().bIsUsingPercentage && style.getHeight().amount == 0.0f)
@@ -210,16 +228,16 @@ void UINode::recalcAdaptiveSizes(float zoom)
             if (child->style.getPositioning() == UIPosition::Inline)
             {
                 if (style.getLayoutDirection() == UILayoutDirection::Vertical)
-                    contentHeight += child->getContentHeight() + child->style.getMarginTop().amount + child->style.getMarginBottom().amount;
+                    contentHeight += child->getContentHeight();
                 else
-                    contentHeight = max(contentHeight, child->getContentHeight() + child->style.getMarginTop().amount + child->style.getMarginBottom().amount);
+                    contentHeight = max(contentHeight, child->getContentHeight());
             }
         }
         contentHeight = max(contentHeight, UIRenderElement::getTextHeight(static_cast<int>(style.getFontSize() * zoom), text) / zoom);
-        contentHeight += style.getPaddingTop().amount + style.getPaddingBottom().amount;
+        contentHeight += style.getPaddingBorderHeight() + style.getMarginHeight();
 
         if (style.getImage() && style.getImagePositioning() == UIImagePositioning::Place)
-            contentHeight = max(contentHeight, style.getImage()->getHeight() / zoom);
+            contentHeight = max(contentHeight, style.getImage()->getHeight() / zoom + style.getMarginHeight() + style.getPaddingBorderHeight());
     }
 }
 
@@ -231,18 +249,18 @@ void UINode::recalcPercentageSizes(float proposedWidth, float proposedHeight)
     float contentStaticHeight = 0.0f;
 
     if (style.getWidth().bIsUsingPercentage)
-        contentWidth = proposedWidth;
+        contentWidth = proposedWidth + style.getPaddingBorderWidth() + style.getMarginWidth();
     if (style.getHeight().bIsUsingPercentage)
-        contentHeight = proposedHeight;
+        contentHeight = proposedHeight + style.getPaddingBorderHeight() + style.getMarginHeight();
 
     for (auto &child : children)
     {
-        if (child->style.getPositioning() == UIPosition::Inline)
+        if (child->style.getPositioning() == UIPosition::Inline && child->style.getVisibility() == UIVisibility::Visible)
         {
             if (child->style.getWidth().bIsUsingPercentage)
             {
                 childrenPercentageWidth += child->style.getWidth().amount / 100.0f;
-                contentStaticWidth += child->style.getPaddingLeft().amount + child->style.getPaddingRight().amount + child->style.getMarginLeft().amount + child->style.getMarginRight().amount;
+                contentStaticWidth += child->style.getMarginWidth() + child->style.getPaddingBorderWidth();
             }
             else
             {
@@ -252,7 +270,7 @@ void UINode::recalcPercentageSizes(float proposedWidth, float proposedHeight)
             if (child->style.getHeight().bIsUsingPercentage)
             {
                 childrenPercentageHeight += child->style.getHeight().amount / 100.0f;
-                contentStaticHeight += child->style.getPaddingTop().amount + child->style.getPaddingBottom().amount + child->style.getMarginTop().amount + child->style.getMarginBottom().amount;
+                contentStaticHeight += child->style.getMarginHeight() + child->style.getPaddingBorderHeight();
             }
             else
             {
@@ -268,13 +286,19 @@ void UINode::recalcPercentageSizes(float proposedWidth, float proposedHeight)
     else
         childrenPercentageWidth = 1.0f;
 
-    float spaceLeftWidth = max(contentWidth - contentStaticWidth, 0);
-    float spaceLeftHeight = max(contentHeight - contentStaticHeight, 0);
+    float spaceLeftWidth = max(contentWidth - style.getMarginWidth() - style.getPaddingBorderWidth() - contentStaticWidth, 0);
+    float spaceLeftHeight = max(contentHeight - style.getMarginHeight() - style.getPaddingBorderHeight() - contentStaticHeight, 0);
+
+    // real bounds of inner elements
+    float innerContentWidth = contentWidth - style.getMarginWidth() - style.getPaddingBorderWidth();
+    float innerContentHeight = contentHeight - style.getMarginHeight() - style.getPaddingBorderHeight();
 
     for (auto &child : children)
     {
-        float sizeWidth = child->getContentWidth();
-        float sizeHeight = child->getContentHeight();
+        if (child->style.getVisibility() == UIVisibility::Hidden)
+            continue;
+        float sizeWidth = child->getContentWidth() - child->style.getMarginWidth() - child->style.getPaddingBorderWidth();
+        float sizeHeight = child->getContentHeight() - child->style.getMarginHeight() - child->style.getPaddingBorderHeight();
         if (child->style.getPositioning() == UIPosition::Inline)
         {
             if (child->style.getWidth().bIsUsingPercentage)
@@ -282,7 +306,7 @@ void UINode::recalcPercentageSizes(float proposedWidth, float proposedHeight)
                 if (style.getLayoutDirection() == UILayoutDirection::Horizontal)
                     sizeWidth = spaceLeftWidth * ((child->style.getWidth().amount / 100.0f) / childrenPercentageWidth);
                 else
-                    sizeWidth = (contentWidth - child->style.getMarginLeft().amount - child->style.getMarginRight().amount) * (child->style.getWidth().amount / 100.0f);
+                    sizeWidth = (innerContentWidth - child->style.getMarginWidth() - child->style.getPaddingBorderWidth()) * (child->style.getWidth().amount / 100.0f);
             }
 
             if (child->style.getHeight().bIsUsingPercentage)
@@ -290,17 +314,17 @@ void UINode::recalcPercentageSizes(float proposedWidth, float proposedHeight)
                 if (style.getLayoutDirection() == UILayoutDirection::Vertical)
                     sizeHeight = spaceLeftHeight * ((child->style.getHeight().amount / 100.0f) / childrenPercentageHeight);
                 else
-                    sizeHeight = (contentHeight - child->style.getMarginTop().amount - child->style.getMarginBottom().amount) * (child->style.getHeight().amount / 100.0f);
+                    sizeHeight = (innerContentHeight - child->style.getMarginHeight() - child->style.getPaddingBorderHeight()) * (child->style.getHeight().amount / 100.0f);
             }
-
             child->recalcPercentageSizes(sizeWidth, sizeHeight);
         }
         else
         {
             if (child->style.getWidth().bIsUsingPercentage)
-                sizeWidth = contentWidth * (child->style.getWidth().amount / 100.0f);
+                sizeWidth = (innerContentWidth - child->style.getMarginWidth() - child->style.getPaddingBorderWidth()) * (child->style.getWidth().amount / 100.0f);
             if (child->style.getHeight().bIsUsingPercentage)
-                sizeHeight = contentHeight * (child->style.getHeight().amount / 100.0f);
+                sizeHeight = (innerContentHeight - child->style.getMarginHeight() - child->style.getPaddingBorderHeight()) * (child->style.getHeight().amount / 100.0f);
+
             child->recalcPercentageSizes(sizeWidth, sizeHeight);
         }
     }
@@ -310,12 +334,15 @@ void UINode::recalcImageSize(float zoom)
 {
     if (style.getImage())
     {
+        float containerWidth = contentWidth - style.getMarginWidth();
+        float containerHeight = contentHeight - style.getMarginHeight();
+
         imageX = 0.0f;
         imageY = 0.0f;
         if (style.getImagePositioning() == UIImagePositioning::Place)
         {
-            imageWidth = contentWidth * style.getImageZoom();
-            imageHeight = contentHeight * style.getImageZoom();
+            imageWidth = containerWidth * style.getImageZoom();
+            imageHeight = containerHeight * style.getImageZoom();
         }
         if (style.getImagePositioning() == UIImagePositioning::PlaceBackground)
         {
@@ -324,31 +351,31 @@ void UINode::recalcImageSize(float zoom)
         }
         if (style.getImagePositioning() == UIImagePositioning::Contain)
         {
-            imageWidth = contentWidth;
-            imageHeight = contentWidth * ((style.getImage()->getHeight() / zoom) / (style.getImage()->getWidth() / zoom));
-            if (imageHeight > contentHeight)
+            imageWidth = containerWidth;
+            imageHeight = containerWidth * ((style.getImage()->getHeight() / zoom) / (style.getImage()->getWidth() / zoom));
+            if (imageHeight > containerHeight)
             {
-                imageHeight = contentHeight;
-                imageWidth = contentHeight * ((style.getImage()->getWidth() / zoom) / (style.getImage()->getHeight() / zoom));
+                imageHeight = containerHeight;
+                imageWidth = containerHeight * ((style.getImage()->getWidth() / zoom) / (style.getImage()->getHeight() / zoom));
             }
             imageWidth *= style.getImageZoom();
             imageHeight *= style.getImageZoom();
-            imageX = (contentWidth - imageWidth) / 2.0f;
-            imageY = (contentHeight - imageHeight) / 2.0f;
+            imageX = (containerWidth - imageWidth) / 2.0f;
+            imageY = (containerHeight - imageHeight) / 2.0f;
         }
         if (style.getImagePositioning() == UIImagePositioning::Cover)
         {
-            imageWidth = contentWidth;
-            imageHeight = contentWidth * ((style.getImage()->getHeight() / zoom) / (style.getImage()->getWidth() / zoom));
-            if (imageHeight < contentHeight)
+            imageWidth = containerWidth;
+            imageHeight = containerWidth * ((style.getImage()->getHeight() / zoom) / (style.getImage()->getWidth() / zoom));
+            if (imageHeight < containerHeight)
             {
-                imageHeight = contentHeight;
-                imageWidth = contentHeight * ((style.getImage()->getWidth() / zoom) / (style.getImage()->getHeight() / zoom));
+                imageHeight = containerHeight;
+                imageWidth = containerHeight * ((style.getImage()->getWidth() / zoom) / (style.getImage()->getHeight() / zoom));
             }
             imageWidth *= style.getImageZoom();
             imageHeight *= style.getImageZoom();
-            imageX = (contentWidth - imageWidth) / 2.0f;
-            imageY = (contentHeight - imageHeight) / 2.0f;
+            imageX = (containerWidth - imageWidth) / 2.0f;
+            imageY = (containerHeight - imageHeight) / 2.0f;
         }
     }
 
@@ -384,10 +411,10 @@ void UINode::recalcContentDimensions(float zoom)
     // size of absolute width & height
     for (auto &child : children)
     {
-        if (child->style.getPositioning() == UIPosition::Absolute)
+        if (child->style.getPositioning() == UIPosition::Absolute || child->style.getPositioning() == UIPosition::Relative)
         {
-            contentDimensionsWidth = max(contentDimensionsWidth, child->getContentWidth() - child->style.getMarginLeft().amount + child->style.getMarginRight().amount);
-            contentDimensionsHeight = max(contentDimensionsHeight, child->getContentHeight() - child->style.getMarginTop().amount + child->style.getMarginBottom().amount);
+            contentDimensionsWidth = max(contentDimensionsWidth, child->getContentWidth() - child->style.getMargin().left + child->style.getMargin().right);
+            contentDimensionsHeight = max(contentDimensionsHeight, child->getContentHeight() - child->style.getMargin().top + child->style.getMargin().bottom);
         }
     }
 
@@ -399,24 +426,30 @@ void UINode::recalcContentDimensions(float zoom)
 
 void UINode::fillRenderData(UIRenderPositioning &positition, UIRenderSharedData *renderSharedData)
 {
-    float marginLeft = style.getMarginLeft().amount;
-    float marginTop = style.getMarginTop().amount;
 
     // Colors
-    renderData.x = positition.sx + marginLeft;
-    renderData.y = positition.sy + marginTop - getScroll();
+    renderData.x = positition.sx;
+    renderData.y = positition.sy - getScroll();
     renderData.text = this->getText();
-    renderData.background = style.getBackgroundColor();
-    renderData.text = getText();
+    renderData.backgroundColor = style.getBackgroundColor();
     renderData.textColor = style.getTextColor();
+    renderData.borderColor = style.getBorderColor();
     renderData.textHorizontalAlign = style.getTextHorizontalAlign();
     renderData.textVerticalAlign = style.getTextVerticalAlign();
-    renderData.padding[0] = style.getPaddingLeft().amount;
-    renderData.padding[1] = style.getPaddingTop().amount;
-    renderData.padding[2] = style.getPaddingRight().amount;
-    renderData.padding[3] = style.getPaddingBottom().amount;
-    renderData.width = getContentWidth();
-    renderData.height = getContentHeight();
+    renderData.margin[0] = style.getMargin().left;
+    renderData.margin[1] = style.getMargin().top;
+    renderData.margin[2] = style.getMargin().right;
+    renderData.margin[3] = style.getMargin().bottom;
+    renderData.padding[0] = style.getPadding().left;
+    renderData.padding[1] = style.getPadding().top;
+    renderData.padding[2] = style.getPadding().right;
+    renderData.padding[3] = style.getPadding().bottom;
+    renderData.border[0] = style.getBorder().left;
+    renderData.border[1] = style.getBorder().top;
+    renderData.border[2] = style.getBorder().right;
+    renderData.border[3] = style.getBorder().bottom;
+    renderData.width = getContentWidth() - style.getMarginWidth() - style.getPaddingBorderWidth();
+    renderData.height = getContentHeight() - style.getMarginHeight() - style.getPaddingBorderHeight();
     renderData.position = style.getPositioning();
     renderData.contentHorizontalAlign = style.getContentHorizontalAlign();
     renderData.contentVerticalAlign = style.getContentVerticalAlign();
@@ -442,10 +475,14 @@ void UINode::fillRenderData(UIRenderPositioning &positition, UIRenderSharedData 
     }
     else
     {
-        renderData.viewport.x = max(positition.viewport.x, renderData.x * renderSharedData->zoom);
-        renderData.viewport.y = max(positition.viewport.y, renderData.y * renderSharedData->zoom);
-        renderData.viewport.endX = min(positition.viewport.endX, (renderData.x + renderData.width) * renderSharedData->zoom);
-        renderData.viewport.endY = min(positition.viewport.endY, (renderData.y + renderData.height + getScroll()) * renderSharedData->zoom);
+        float width = renderData.width + renderData.padding[0] + renderData.padding[2] + renderData.border[0] + renderData.border[2];
+        float height = renderData.height + renderData.padding[1] + renderData.padding[3] + renderData.border[1] + renderData.border[3];
+        float zoom = renderSharedData->zoom;
+
+        renderData.viewport.x = max(positition.viewport.x, (renderData.x + renderData.margin[0]) * zoom);
+        renderData.viewport.y = max(positition.viewport.y, (renderData.y + renderData.margin[1]) * zoom);
+        renderData.viewport.endX = min(positition.viewport.endX, (renderData.x + width + renderData.margin[2]) * zoom);
+        renderData.viewport.endY = min(positition.viewport.endY, (renderData.y + height + renderData.margin[3] + getScroll()) * zoom);
     }
 }
 
@@ -454,8 +491,8 @@ UINodePositioning UINode::calcPositioning()
     UINodePositioning out;
 
     // render data already contains margin, so add only padding for the children elements shifts
-    float sx = renderData.x + style.getPaddingLeft().amount;
-    float sy = renderData.y + style.getPaddingTop().amount;
+    float sx = renderData.x + style.getPadding().left + style.getMargin().left + style.getBorder().left;
+    float sy = renderData.y + style.getPadding().top + style.getMargin().top + style.getBorder().top;
 
     float contentWidth = 0.0f;
     float contentHeight = 0.0f;
@@ -463,17 +500,17 @@ UINodePositioning UINode::calcPositioning()
     {
         if (style.getLayoutDirection() == UILayoutDirection::Horizontal)
         {
-            contentWidth += child->getContentWidth() + child->style.getMarginLeft().amount + child->style.getMarginRight().amount;
+            contentWidth += child->getContentWidth();
             contentHeight = max(contentHeight, child->getContentHeight());
         }
         else
         {
             contentWidth = max(contentWidth, child->getContentWidth());
-            contentHeight += child->getContentHeight() + child->style.getMarginTop().amount + child->style.getMarginBottom().amount;
+            contentHeight += child->getContentHeight();
         }
     }
-    float leftSpaceH = renderData.width - contentWidth - style.getPaddingLeft().amount - style.getPaddingRight().amount;
-    float leftSpaceV = renderData.height - contentHeight - style.getPaddingTop().amount - style.getPaddingBottom().amount;
+    float leftSpaceH = renderData.width - contentWidth;
+    float leftSpaceV = renderData.height - contentHeight;
     float betweenH = 0.0f;
     float betweenV = 0.0f;
     int childrenCount = 0;
@@ -520,9 +557,9 @@ UINodePositioning UINode::correctChildPositioning(UINode *child, UINodePositioni
 {
     UINodePositioning out = positioning;
     if (style.getContentHorizontalAlign() == UIContentAlign::Middle && style.getLayoutDirection() == UILayoutDirection::Vertical)
-        out.sx = renderData.x + style.getPaddingLeft().amount + (renderData.width - child->getContentWidth()) / 2.0f;
+        out.sx = renderData.x + style.getPadding().left + style.getBorder().left + (renderData.width - child->getContentWidth()) / 2.0f;
     if (style.getContentVerticalAlign() == UIContentAlign::Middle && style.getLayoutDirection() == UILayoutDirection::Horizontal)
-        out.sy = renderData.y + style.getPaddingTop().amount + (renderData.height - child->getContentHeight()) / 2.0f;
+        out.sy = renderData.y + style.getPadding().top + style.getBorder().top + style.getMargin().top + (renderData.height + style.getMarginHeight() - child->getContentHeight()) / 2.0f;
     return out;
 }
 
@@ -530,9 +567,9 @@ UINodePositioning UINode::shiftInlinePositioning(UINode *child, UINodePositionin
 {
     UINodePositioning out = positioning;
     if (style.getLayoutDirection() == UILayoutDirection::Horizontal && child->style.getPositioning() == UIPosition::Inline)
-        out.sx += child->getContentWidth() + child->style.getMarginLeft().amount + child->style.getMarginRight().amount + out.betweenH;
+        out.sx += child->getContentWidth() + out.betweenH;
     if (style.getLayoutDirection() == UILayoutDirection::Vertical && child->style.getPositioning() == UIPosition::Inline)
-        out.sy += child->getContentHeight() + child->style.getMarginTop().amount + child->style.getMarginBottom().amount + out.betweenV;
+        out.sy += child->getContentHeight() + out.betweenV;
     return out;
 }
 

@@ -53,6 +53,8 @@ public:
 
     EXPORT void setFiltering(TextureFilter filter) final override;
 
+    EXPORT Texture *clone() final override;
+
 protected:
     unsigned int textureID = 0;
 };

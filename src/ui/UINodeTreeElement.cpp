@@ -8,52 +8,58 @@ bool UINodeTreeElement::propagateScroll(float mouseX, float mouseY, float zoom, 
 {
     if (!element || !element->renderData || !element->node)
         return false;
+    auto renderData = element->renderData;
 
     if (!(
-            mouseX * zoom >= element->renderData->viewport.x &&
-            mouseX * zoom < element->renderData->viewport.endX &&
-            mouseY * zoom >= element->renderData->viewport.y &&
-            mouseY * zoom < element->renderData->viewport.endY))
+            mouseX * zoom >= renderData->viewport.x &&
+            mouseX * zoom < renderData->viewport.endX &&
+            mouseY * zoom >= renderData->viewport.y &&
+            mouseY * zoom < renderData->viewport.endY))
         return false;
 
+    float elWidth = renderData->width + renderData->padding[0] + renderData->padding[2] + renderData->border[0] + renderData->border[2];
+    float elHeight = renderData->height + renderData->padding[1] + renderData->padding[3] + renderData->border[1] + renderData->border[3];
     if (!(
-            mouseX >= element->renderData->x &&
-            mouseX < element->renderData->x + element->renderData->width &&
-            mouseY >= element->renderData->y + element->node->getScroll() &&
-            mouseY < element->renderData->y + element->renderData->height + element->node->getScroll()))
+            mouseX >= renderData->x + renderData->margin[0] &&
+            mouseX < renderData->x + renderData->margin[0] + elWidth &&
+            mouseY >= renderData->y + renderData->margin[1] + element->node->getScroll() &&
+            mouseY < renderData->y + renderData->margin[1] + elHeight + element->node->getScroll()))
         return false;
 
     bool result = false;
     for (auto child = children.rbegin(); child != children.rend(); ++child)
         result = result || child->propagateScroll(mouseX, mouseY, zoom, scroll);
 
-    if (!result && element->renderData->scroll != UIScroll::None)
+    if (!result && renderData->scroll != UIScroll::None)
     {
-        element->node->doScroll(scroll, fmaxf(element->renderData->contentDimensionsHeight - element->renderData->height + element->renderData->padding[1] + element->renderData->padding[3], 0));
+        element->node->doScroll(scroll, fmaxf(renderData->contentDimensionsHeight - renderData->height + renderData->padding[1] + renderData->padding[3], 0));
     }
-    return element->renderData->scroll != UIScroll::None;
+    return renderData->scroll != UIScroll::None;
 }
 
 bool UINodeTreeElement::pickPoint(float x, float y, float zoom, std::vector<UIMousePickELement> *collection)
 {
     if (!element || !element->renderData || !element->node)
         return false;
+    auto renderData = element->renderData;
 
     if (!(
-            x * zoom >= element->renderData->viewport.x &&
-            x * zoom < element->renderData->viewport.endX &&
-            y * zoom >= element->renderData->viewport.y &&
-            y * zoom < element->renderData->viewport.endY))
+            x * zoom >= renderData->viewport.x &&
+            x * zoom < renderData->viewport.endX &&
+            y * zoom >= renderData->viewport.y &&
+            y * zoom < renderData->viewport.endY))
         return false;
 
+    float elWidth = renderData->width + renderData->padding[0] + renderData->padding[2] + renderData->border[0] + renderData->border[2];
+    float elHeight = renderData->height + renderData->padding[1] + renderData->padding[3] + renderData->border[1] + renderData->border[3];
     if (!(
-            x >= element->renderData->x &&
-            x < element->renderData->x + element->renderData->width &&
-            y >= element->renderData->y &&
-            y < element->renderData->y + element->renderData->height))
+            x >= renderData->x + renderData->margin[0] &&
+            x < renderData->x + +renderData->margin[0] + elWidth &&
+            y >= renderData->y + renderData->margin[1] &&
+            y < renderData->y + renderData->margin[1] + elHeight))
         return false;
 
-    collection->push_back({element->node, element->renderData->x, element->renderData->y});
+    collection->push_back({element->node, renderData->x, renderData->y});
 
     for (auto child = children.rbegin(); child != children.rend(); ++child)
     {

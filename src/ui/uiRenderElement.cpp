@@ -33,22 +33,15 @@ void UIRenderElement::render(RenderTarget *renderTarget, UIRenderSharedData *sha
         renderData->viewport.endY - renderData->viewport.y);
 
     // Background
-    if (renderData->background.a != 0.0f)
+    if (renderData->backgroundColor.a != 0.0f)
     {
-        Transformation transform;
-        transform.setPosition(Vector3(renderData->x, renderData->y, 0.0f));
-        transform.setScale(Vector3(renderData->width, renderData->height, 1.0f));
-
-        Matrix4 m = *transform.getModelMatrix();
-        Matrix4 mModelProjection = *sharedData->view * m;
-        sharedData->colorShader->use(m, mModelProjection);
-
-        float color[4] = {renderData->background.r, renderData->background.g, renderData->background.b, renderData->background.a};
-
-        sharedData->colorShaderParameter->set(1, color);
-        sharedData->colorShaderParameter->apply();
-
-        CommonOpenGLShaders::getSpriteMesh()->render();
+        fillRect(
+            sharedData,
+            renderData->x + renderData->margin[0] + renderData->border[0],
+            renderData->y + renderData->margin[1] + renderData->border[1],
+            renderData->width + renderData->padding[0] + renderData->padding[2],
+            renderData->height + renderData->padding[1] + renderData->padding[3],
+            renderData->backgroundColor);
     }
 
     // Image
@@ -57,7 +50,10 @@ void UIRenderElement::render(RenderTarget *renderTarget, UIRenderSharedData *sha
         TextureOpengGL *imageTexture = reinterpret_cast<TextureOpengGL *>(renderData->image);
 
         Transformation transform;
-        transform.setPosition(Vector3(renderData->imageX, renderData->imageY + renderData->imageHeight, 0.0f));
+        transform.setPosition(Vector3(
+            renderData->imageX + renderData->margin[0],
+            renderData->imageY + renderData->margin[1] + renderData->imageHeight,
+            0.0f));
         transform.setScale(Vector3(renderData->imageWidth, -renderData->imageHeight, 1.0f));
 
         Matrix4 m = *transform.getModelMatrix();
@@ -87,17 +83,17 @@ void UIRenderElement::render(RenderTarget *renderTarget, UIRenderSharedData *sha
             float textHeight = cachedText->textureHeight / sharedData->zoom;
 
             Transformation transform;
-            float shiftX = renderData->padding[0];
-            float shiftY = renderData->padding[1];
+            float shiftX = renderData->padding[0] + renderData->margin[0];
+            float shiftY = renderData->padding[1] + renderData->margin[1];
 
             if (renderData->textHorizontalAlign == UITextAlign::Middle)
-                shiftX += (renderData->width - textWidth - renderData->padding[0] - renderData->padding[2]) / 2.0f;
+                shiftX += (renderData->width - textWidth) / 2.0f;
             if (renderData->textHorizontalAlign == UITextAlign::End)
-                shiftX = renderData->width - textWidth - renderData->padding[2];
+                shiftX = renderData->width - textWidth;
             if (renderData->textVerticalAlign == UITextAlign::Middle)
-                shiftY += (renderData->height - textHeight - renderData->padding[1] - renderData->padding[3]) / 2.0f;
+                shiftY += (renderData->height - textHeight) / 2.0f;
             if (renderData->textVerticalAlign == UITextAlign::End)
-                shiftY = renderData->height - textHeight - renderData->padding[3];
+                shiftY = renderData->height - textHeight;
 
             transform.setPosition(Vector3(renderData->x + shiftX, renderData->y + textHeight + shiftY, 0.0f));
             transform.setScale(Vector3(textWidth, -textHeight, 1.0f));
@@ -115,6 +111,54 @@ void UIRenderElement::render(RenderTarget *renderTarget, UIRenderSharedData *sha
 
             CommonOpenGLShaders::getSpriteMesh()->render();
         }
+    }
+
+    // Border Left
+    if (renderData->border[0] > 0.0f)
+    {
+        fillRect(
+            sharedData,
+            renderData->x + renderData->margin[0],
+            renderData->y + renderData->margin[1],
+            renderData->border[0],
+            renderData->height + renderData->padding[1] + renderData->padding[3] + renderData->border[1] + renderData->border[3],
+            renderData->borderColor);
+    }
+
+    // Border Right
+    if (renderData->border[2] > 0.0f)
+    {
+        fillRect(
+            sharedData,
+            renderData->x + renderData->margin[2] + renderData->padding[0] + renderData->padding[2] + renderData->width + renderData->border[0],
+            renderData->y + renderData->margin[1],
+            renderData->border[2],
+            renderData->height + renderData->padding[1] + renderData->padding[3] + renderData->border[1] + renderData->border[3],
+            renderData->borderColor);
+    }
+
+    // Border top
+    if (renderData->border[1] > 0.0f)
+    {
+        fillRect(
+            sharedData,
+            renderData->x + renderData->margin[0],
+            renderData->y + renderData->margin[1],
+            renderData->width + renderData->padding[0] + renderData->padding[2] + renderData->border[0] + renderData->border[2],
+            renderData->border[1],
+            renderData->borderColor);
+    }
+
+    // Border Bottom
+    if (renderData->border[3] > 0.0f)
+    {
+        fillRect(
+            sharedData,
+            renderData->x + renderData->margin[0],
+            renderData->y + renderData->margin[1] + renderData->padding[1] + renderData->padding[3] + renderData->height + renderData->border[1],
+            renderData->width + renderData->padding[0] + renderData->padding[2] + renderData->border[0] + renderData->border[2],
+            renderData->border[3],
+            renderData->borderColor);
     }
 }
 
@@ -146,6 +190,24 @@ float UIRenderElement::getTextHeight(int fontSize, std::string text)
         return static_cast<float>(h);
     }
     return 0.0f;
+}
+
+void UIRenderElement::fillRect(UIRenderSharedData *sharedData, float x, float y, float width, float height, Color &color)
+{
+    Transformation transform;
+    transform.setPosition(Vector3(x, y, 0.0f));
+    transform.setScale(Vector3(width, height, 1.0f));
+
+    Matrix4 m = *transform.getModelMatrix();
+    Matrix4 mModelProjection = *sharedData->view * m;
+    sharedData->colorShader->use(m, mModelProjection);
+
+    float colorData[4] = {color.r, color.g, color.b, color.a};
+
+    sharedData->colorShaderParameter->set(1, colorData);
+    sharedData->colorShaderParameter->apply();
+
+    CommonOpenGLShaders::getSpriteMesh()->render();
 }
 
 UITextCacheElement *UIRenderElement::getTextCacheElement(int fontSize, std::string text)

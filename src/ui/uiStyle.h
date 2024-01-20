@@ -42,10 +42,19 @@ struct UIVariableSize
     bool bIsUsingPercentage;
 };
 
+struct UIAroundSpace
+{
+    float left;
+    float top;
+    float right;
+    float bottom;
+};
+
 enum class UIPosition
 {
     Inline,
-    Absolute
+    Absolute,
+    Relative
 };
 
 enum class UIVisibility
@@ -79,26 +88,22 @@ public:
     EXPORT void setWidthPercentage(float widthPercentage);
     EXPORT void setHeightPercentage(float heightPercentage);
     EXPORT void setPaddingLeftPoints(float amount);
-    EXPORT void setPaddingLeftPercentage(float amount);
     EXPORT void setPaddingTopPoints(float amount);
-    EXPORT void setPaddingTopPercentage(float amount);
     EXPORT void setPaddingRightPoints(float amount);
-    EXPORT void setPaddingRightPercentage(float amount);
     EXPORT void setPaddingBottomPoints(float amount);
-    EXPORT void setPaddingBottomPercentage(float amount);
     EXPORT void setPaddingPoints(float left, float top, float right, float bottom);
-    EXPORT void setPaddingPercentage(float left, float top, float right, float bottom);
     EXPORT void setMarginLeftPoints(float amount);
-    EXPORT void setMarginLeftPercentage(float amount);
     EXPORT void setMarginTopPoints(float amount);
-    EXPORT void setMarginTopPercentage(float amount);
     EXPORT void setMarginRightPoints(float amount);
-    EXPORT void setMarginRightPercentage(float amount);
     EXPORT void setMarginBottomPoints(float amount);
-    EXPORT void setMarginBottomPercentage(float amount);
     EXPORT void setMarginPoints(float left, float top, float right, float bottom);
-    EXPORT void setMarginPercentage(float left, float top, float right, float bottom);
+    EXPORT void setBorderLeftPoints(float amount);
+    EXPORT void setBorderTopPoints(float amount);
+    EXPORT void setBorderRightPoints(float amount);
+    EXPORT void setBorderBottomPoints(float amount);
+    EXPORT void setBorderPoints(float left, float top, float right, float bottom);
     EXPORT void setBackgroundColor(Color color);
+    EXPORT void setBorderColor(Color color);
     EXPORT void setTextColor(Color color);
     EXPORT void setLayoutDirection(UILayoutDirection direction);
     EXPORT void setTextHorizontalAlign(UITextAlign align);
@@ -125,14 +130,9 @@ public:
 
     EXPORT inline UIVariableSize getWidth() { return width; }
     EXPORT inline UIVariableSize getHeight() { return height; }
-    EXPORT inline UIVariableSize getPaddingLeft() { return paddingLeft; }
-    EXPORT inline UIVariableSize getPaddingTop() { return paddingTop; }
-    EXPORT inline UIVariableSize getPaddingRight() { return paddingRight; }
-    EXPORT inline UIVariableSize getPaddingBottom() { return paddingBottom; }
-    EXPORT inline UIVariableSize getMarginLeft() { return marginLeft; }
-    EXPORT inline UIVariableSize getMarginTop() { return marginTop; }
-    EXPORT inline UIVariableSize getMarginRight() { return marginRight; }
-    EXPORT inline UIVariableSize getMarginBottom() { return marginBottom; }
+    EXPORT inline UIAroundSpace getPadding() { return padding; }
+    EXPORT inline UIAroundSpace getMargin() { return margin; }
+    EXPORT inline UIAroundSpace getBorder() { return border; }
 
     EXPORT inline UITextAlign getTextHorizontalAlign() { return textHorizontalAlign; }
     EXPORT inline UITextAlign getTextVerticalAlign() { return textVerticalAlign; }
@@ -146,6 +146,7 @@ public:
     EXPORT inline UILayoutDirection getLayoutDirection() { return direction; }
     EXPORT inline Color getBackgroundColor() { return backgroundColor; }
     EXPORT inline Color getTextColor() { return textColor; }
+    EXPORT inline Color getBorderColor() { return borderColor; }
 
     EXPORT inline UIScroll getScroll() { return scroll; };
     EXPORT inline int getFontSize() { return fontSize; };
@@ -159,21 +160,22 @@ public:
     EXPORT inline float getImageFrameWidth() { return imageFrameWidth; }
     EXPORT inline float getImageFrameHeight() { return imageFrameHeight; }
 
+    EXPORT inline float getPaddingBorderWidth() { return padding.left + padding.right + border.left + border.right; }
+    EXPORT inline float getPaddingBorderHeight() { return padding.top + padding.bottom + border.top + border.bottom; }
+    EXPORT inline float getMarginWidth() { return margin.left + margin.right; }
+    EXPORT inline float getMarginHeight() { return margin.top + margin.bottom; }
+
     EXPORT inline int getZIndex() { return zIndex; }
 
 protected:
     UIVariableSize width = {0.0f, false};
     UIVariableSize height = {0.0f, false};
-    UIVariableSize paddingLeft = {0.0f, false};
-    UIVariableSize paddingTop = {0.0f, false};
-    UIVariableSize paddingRight = {0.0f, false};
-    UIVariableSize paddingBottom = {0.0f, false};
-    UIVariableSize marginLeft = {0.0f, false};
-    UIVariableSize marginTop = {0.0f, false};
-    UIVariableSize marginRight = {0.0f, false};
-    UIVariableSize marginBottom = {0.0f, false};
+    UIAroundSpace margin = {0.0f, 0.0f, 0.0f, 0.0f};
+    UIAroundSpace padding = {0.0f, 0.0f, 0.0f, 0.0f};
+    UIAroundSpace border = {0.0f, 0.0f, 0.0f, 0.0f};
 
     Color backgroundColor = Color(0.0f, 0.0f, 0.0f, 0.0f);
+    Color borderColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
     Color textColor = Color(0.0f, 0.0f, 0.0f, 1.0f);
     UILayoutDirection direction = UILayoutDirection::Horizontal;
     UITextAlign textHorizontalAlign = UITextAlign::Start;

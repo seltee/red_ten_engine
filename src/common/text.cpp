@@ -252,14 +252,14 @@ std::string *Text::getCurrentString()
     return getStringByNumber(cursor.positionV);
 }
 
-void Text::updateCursorBounts()
+void Text::updateCursorBounds()
 {
     bool bIsSelected = isSelected();
 
     if (cursor.positionV < 0)
         cursor.positionV = 0;
     if (cursor.positionV >= strings.size())
-        cursor.positionV = strings.size() - 1;
+        cursor.positionV = max(strings.size() - 1, 0);
 
     std::string *str = getCurrentString();
     if (cursor.positionH > str->length())
@@ -339,4 +339,24 @@ std::string Text::getSelectionAsString()
     }
 
     return out;
+}
+
+std::string Text::getAllAsString()
+{
+    int strStart = 0;
+    int strEnd = strings.size() - 1;
+    std::string out;
+    for (int i = strStart; i <= strEnd; i++)
+        out += strings.at(i);
+    return out;
+}
+
+void Text::setText(std::string text)
+{
+    clearSelection();
+    strings.clear();
+    strings.push_back("");
+    updateCursorBounds();
+    setCursorPosition(0, 0, true);
+    putAtCursor(text);
 }

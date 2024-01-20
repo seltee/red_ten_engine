@@ -22,6 +22,8 @@ public:
     EXPORT virtual ~Texture();
 
     EXPORT virtual void setFiltering(TextureFilter filter);
+    EXPORT virtual Texture *clone();
+
     inline TextureFilter getFiltering() { return filter; };
 
     inline int getWidth() { return width; }

@@ -77,37 +77,38 @@ public:
         createTitle(leftPanel, "Left");
         UINode *panel1 = createPanel(leftPanel);
         panel1->style.setContentHorizontalAlign(UIContentAlign::Start);
-        createTitle(panel1, "[]");
-        createTitle(panel1, "[]");
-        createTitle(panel1, "[]");
+
+        createTitle(panel1, "[]", 0.0f);
+        createTitle(panel1, "[]", 0.0f);
+        createTitle(panel1, "[]", 0.0f);
 
         createTitle(leftPanel, "Middle");
         UINode *panel2 = createPanel(leftPanel);
         panel2->style.setContentHorizontalAlign(UIContentAlign::Middle);
-        createTitle(panel2, "[]");
-        createTitle(panel2, "[]");
-        createTitle(panel2, "[]");
+        createTitle(panel2, "[]", 0.0f);
+        createTitle(panel2, "[]", 0.0f);
+        createTitle(panel2, "[]", 0.0f);
 
         createTitle(leftPanel, "Right");
         UINode *panel3 = createPanel(leftPanel);
         panel3->style.setContentHorizontalAlign(UIContentAlign::End);
-        createTitle(panel3, "[]");
-        createTitle(panel3, "[]");
-        createTitle(panel3, "[]");
+        createTitle(panel3, "[]", 0.0f);
+        createTitle(panel3, "[]", 0.0f);
+        createTitle(panel3, "[]", 0.0f);
 
         createTitle(leftPanel, "Between");
         UINode *panel4 = createPanel(leftPanel);
         panel4->style.setContentHorizontalAlign(UIContentAlign::SpaceBetween);
-        createTitle(panel4, "[]");
-        createTitle(panel4, "[]");
-        createTitle(panel4, "[]");
+        createTitle(panel4, "[]", 0.0f);
+        createTitle(panel4, "[]", 0.0f);
+        createTitle(panel4, "[]", 0.0f);
 
         createTitle(leftPanel, "Around");
         UINode *panel5 = createPanel(leftPanel);
         panel5->style.setContentHorizontalAlign(UIContentAlign::SpaceAround);
-        createTitle(panel5, "[]");
-        createTitle(panel5, "[]");
-        createTitle(panel5, "[]");
+        createTitle(panel5, "[]", 0.0f);
+        createTitle(panel5, "[]", 0.0f);
+        createTitle(panel5, "[]", 0.0f);
 
         UINode *quads = createPanel(leftPanel);
         quads->style.setHeightPoints(20);
@@ -115,7 +116,9 @@ public:
         quad1->style.setZIndex(10);
         UINode *quad2 = createQuad(quad1, 40, 10, Color(0.1f, 0.6f, 0.1f, 1.0f));
         UINode *quad3 = createQuad(quad2, 40, 10, Color(0.1f, 0.1f, 0.6f, 1.0f));
-        UINode *quad4 = createQuad(quad3, 40, 10, Color(0.7f, 0.7f, 0.7f, 1.0f));
+        createQuad(quad3, 40, 10, Color(0.7f, 0.7f, 0.7f, 1.0f));
+
+        createPanel(leftPanel);
 
         quads = createPanel(leftPanel);
         quads->style.setHeightPoints(20);
@@ -123,7 +126,13 @@ public:
         quad2 = createQuad(quad1, 40, 10, Color(0.1f, 0.8f, 0.1f, 1.0f));
         quad3 = createQuad(quad2, 40, 10, Color(0.1f, 0.1f, 0.8f, 1.0f));
         quad3->style.setZIndex(10);
-        quad4 = createQuad(quad3, 40, 10, Color(0.8f, 0.8f, 0.8f, 1.0f));
+        createQuad(quad3, 40, 10, Color(0.8f, 0.8f, 0.8f, 1.0f));
+
+        UINode *inputs = createPanel(leftPanel);
+        inputs->style.setLayoutDirection(UILayoutDirection::Vertical);
+        createInput(inputs, UITextAlign::Start);
+        createInput(inputs, UITextAlign::Middle);
+        createInput(inputs, UITextAlign::End);
 
         // Right side
         auto rightPanel = this->layer->getRootNode()->createChildNode();
@@ -178,15 +187,17 @@ protected:
         panel->style.setWidthPercentage(100);
         panel->style.setBackgroundColor(Color(0.8f, 0.8f, 0.8f, 1.0f));
         panel->style.setTextColor(Color(0.9f, 0.9f, 0.9f, 1.0f));
+        panel->style.setBorderPoints(2, 2, 2, 2);
+        panel->style.setBorderColor(Color(0.4f, 0.4f, 0.4f, 1.0f));
         return panel;
     }
 
-    UINode *createTitle(UINode *parent, std::string title)
+    UINode *createTitle(UINode *parent, std::string title, float margin = 4.0f)
     {
         auto text = parent->createChildNode();
         text->style.setFontSize(16);
         text->style.setTextColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
-        text->style.setMarginLeftPoints(4);
+        text->style.setMarginLeftPoints(margin);
         text->setText(title);
         return text;
     }
@@ -199,7 +210,24 @@ protected:
         quad->style.setPositioning(UIPosition::Absolute);
         quad->style.setBackgroundColor(color);
         quad->style.setMarginPoints(margin, margin, margin, margin);
+        quad->style.setHoverCursor(UICursor::Default);
         return quad;
+    }
+
+    UINode *createInput(UINode *parent, UITextAlign align)
+    {
+        auto input = parent->createChildInputNode();
+        input->style.setWidthPercentage(100);
+        input->style.setHeightPoints(28);
+        input->style.setBackgroundColor(Color(0.2f, 0.2f, 0.2f, 1.0f));
+        input->style.setPaddingPoints(4, 4, 4, 4);
+        input->style.setMarginPoints(4, 4, 4, 4);
+        input->style.setFontSize(20);
+        input->style.setTextColor(Color(0.9f, 0.9f, 0.9f, 1.0f));
+        input->style.setTextVerticalAlign(align);
+        input->style.setBorderPoints(2, 2, 2, 2);
+        input->style.setBorderColor(Color(0.7f, 0.3f, 0.3f, 1));
+        return input;
     }
 
     LayerUI *layer;

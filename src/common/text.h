@@ -29,9 +29,11 @@ public:
     EXPORT std::string *getStringByNumber(int number);
     EXPORT std::string *getCurrentString();
     EXPORT inline int getStringsAmount() { return strings.size(); }
-    EXPORT void updateCursorBounts();
+    EXPORT void updateCursorBounds();
     EXPORT void getSelection(int *strStart, int *strEnd, int *symStart, int *symEnd);
     EXPORT std::string getSelectionAsString();
+    EXPORT std::string getAllAsString();
+    EXPORT void setText(std::string text);
 
     EXPORT inline CursorPosition getCursor() { return cursor; }
     EXPORT inline CursorPosition getSelection() { return selection; }

@@ -81,9 +81,7 @@ void LayerUI::process(float delta)
     {
         auto node = element->node;
         if (node->style.getHoverCursor() != UICursor::None)
-        {
             cursor = node->style.getHoverCursor();
-        }
 
         UIPointerCallback callback = node->getPointerCallback();
         if (callback)

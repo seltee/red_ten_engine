@@ -16,3 +16,8 @@ void Texture::setFiltering(TextureFilter filter)
 {
     this->filter = filter;
 }
+
+Texture *Texture::clone()
+{
+    return nullptr;
+}

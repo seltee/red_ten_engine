@@ -39,12 +39,15 @@ public:
     float y;
 
     // left, top, right, bottom
+    float margin[4];
     float padding[4];
+    float border[4];
 
     std::string text;
-    Color textColor;
 
-    Color background;
+    Color textColor;
+    Color backgroundColor;
+    Color borderColor;
 
     UITextAlign textHorizontalAlign;
     UITextAlign textVerticalAlign;

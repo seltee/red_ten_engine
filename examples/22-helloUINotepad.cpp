@@ -148,6 +148,8 @@ public:
         text->style.setHeightPercentage(100.0f);
         text->style.setTextColor(TextColor);
         text->style.setFontSize(16);
+        text->setMultilineEnabled(true);
+        text->setSuperFocus(true);
 
         root->setPointerCallback([](PointerCallbackData *data) -> bool
                                  {

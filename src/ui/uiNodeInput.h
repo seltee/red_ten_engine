@@ -10,14 +10,28 @@ class UINodeInput : public UINode, public Pawn
 {
 public:
     EXPORT UINodeInput(UINode *parent);
+    EXPORT ~UINodeInput();
 
     EXPORT void setCursorPosition(float relativeX, float relativeY);
     EXPORT void setCursorSelection(float relativeX, float relativeY);
     EXPORT void startSelection();
     EXPORT void setSelectPointStart(float x, float y);
     EXPORT inline float getLineHeight() { return lineHeight; };
-    EXPORT inline Text *getText() { return &text; }
+
+    EXPORT std::string getText();
+    EXPORT void setText(std::string str) override;
+
+    EXPORT void setMultilineEnabled(bool state);
+    EXPORT void setSuperFocus(bool state);
+
+    EXPORT void focus();
+    EXPORT void unfocus();
+
+    EXPORT static UINodeInput *getCurrentInput();
+
     Text text;
+
+    bool bHover = false;
 
 protected:
     struct UINodeInputPosition
@@ -52,6 +66,7 @@ protected:
     void relativeToCursor(float rx, float ry, bool moveSelection = true);
     void copy();
     void paste();
+    void throwEvent(UIPointerEvent ev);
 
     float cursorBlink = 0.0f;
 
@@ -77,4 +92,11 @@ protected:
 
     bool bControlModificator = false;
     bool bShiftModificator = false;
+
+    bool bMultilineEnabled = false;
+    bool bSuperFocus = false;
+    bool bIsFocused = false;
+    bool bNeedsUpdate = false;
+
+    static UINodeInput *focusedText;
 };

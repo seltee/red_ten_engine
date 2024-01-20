@@ -42,6 +42,7 @@ public:
     static float getTextHeight(int fontSize, std::string text);
 
 protected:
+    void fillRect(UIRenderSharedData *sharedData, float x, float y, float width, float height, Color &color);
     static UITextCacheElement *getTextCacheElement(int fontSize, std::string text);
     static std::vector<UITextCacheElement> textTexturesCache;
 };

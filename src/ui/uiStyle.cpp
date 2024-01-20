@@ -41,135 +41,87 @@ void UIStyle::setHeightPercentage(float heightPercentage)
 
 void UIStyle::setPaddingLeftPoints(float amount)
 {
-    this->paddingLeft.amount = amount;
-    this->paddingLeft.bIsUsingPercentage = false;
-}
-
-void UIStyle::setPaddingLeftPercentage(float amount)
-{
-    this->paddingLeft.amount = amount;
-    this->paddingLeft.bIsUsingPercentage = true;
+    this->padding.left = amount;
 }
 
 void UIStyle::setPaddingTopPoints(float amount)
 {
-    this->paddingTop.amount = amount;
-    this->paddingTop.bIsUsingPercentage = false;
-}
-
-void UIStyle::setPaddingTopPercentage(float amount)
-{
-    this->paddingTop.amount = amount;
-    this->paddingTop.bIsUsingPercentage = true;
+    this->padding.top = amount;
 }
 
 void UIStyle::setPaddingRightPoints(float amount)
 {
-    this->paddingRight.amount = amount;
-    this->paddingRight.bIsUsingPercentage = false;
-}
-
-void UIStyle::setPaddingRightPercentage(float amount)
-{
-    this->paddingRight.amount = amount;
-    this->paddingRight.bIsUsingPercentage = true;
+    this->padding.right = amount;
 }
 
 void UIStyle::setPaddingBottomPoints(float amount)
 {
-    this->paddingBottom.amount = amount;
-    this->paddingBottom.bIsUsingPercentage = false;
-}
-
-void UIStyle::setPaddingBottomPercentage(float amount)
-{
-    this->paddingBottom.amount = amount;
-    this->paddingBottom.bIsUsingPercentage = true;
+    this->padding.bottom = amount;
 }
 
 void UIStyle::setPaddingPoints(float left, float top, float right, float bottom)
 {
-    setPaddingLeftPoints(left);
-    setPaddingTopPoints(top);
-    setPaddingRightPoints(right);
-    setPaddingBottomPoints(bottom);
-}
-
-void UIStyle::setPaddingPercentage(float left, float top, float right, float bottom)
-{
-    setPaddingLeftPercentage(left);
-    setPaddingTopPercentage(top);
-    setPaddingRightPercentage(right);
-    setPaddingBottomPercentage(bottom);
+    this->padding = {left, top, right, bottom};
 }
 
 void UIStyle::setMarginLeftPoints(float amount)
 {
-    this->marginLeft.amount = amount;
-    this->marginLeft.bIsUsingPercentage = false;
-}
-
-void UIStyle::setMarginLeftPercentage(float amount)
-{
-    this->marginLeft.amount = amount;
-    this->marginLeft.bIsUsingPercentage = true;
+    this->margin.left = amount;
 }
 
 void UIStyle::setMarginTopPoints(float amount)
 {
-    this->marginTop.amount = amount;
-    this->marginTop.bIsUsingPercentage = false;
-}
-
-void UIStyle::setMarginTopPercentage(float amount)
-{
-    this->marginTop.amount = amount;
-    this->marginTop.bIsUsingPercentage = true;
+    this->margin.top = amount;
 }
 
 void UIStyle::setMarginRightPoints(float amount)
 {
-    this->marginRight.amount = amount;
-    this->marginRight.bIsUsingPercentage = false;
-}
-
-void UIStyle::setMarginRightPercentage(float amount)
-{
-    this->marginRight.amount = amount;
-    this->marginRight.bIsUsingPercentage = true;
+    this->margin.right = amount;
 }
 
 void UIStyle::setMarginBottomPoints(float amount)
 {
-    this->marginBottom.amount = amount;
-    this->marginBottom.bIsUsingPercentage = false;
-}
-
-void UIStyle::setMarginBottomPercentage(float amount)
-{
-    this->marginBottom.amount = amount;
-    this->marginBottom.bIsUsingPercentage = true;
+    this->margin.bottom = amount;
 }
 
 void UIStyle::setMarginPoints(float left, float top, float right, float bottom)
 {
-    setMarginLeftPoints(left);
-    setMarginTopPoints(top);
-    setMarginRightPoints(right);
-    setMarginBottomPoints(bottom);
+    this->margin = {left, top, right, bottom};
 }
 
-void UIStyle::setMarginPercentage(float left, float top, float right, float bottom)
+void UIStyle::setBorderLeftPoints(float amount)
 {
-    setPaddingLeftPercentage(left);
-    setPaddingTopPercentage(top);
-    setPaddingRightPercentage(right);
-    setPaddingBottomPercentage(bottom);
+    this->border.left = amount;
+}
+
+void UIStyle::setBorderTopPoints(float amount)
+{
+    this->border.top = amount;
+}
+
+void UIStyle::setBorderRightPoints(float amount)
+{
+    this->border.right = amount;
+}
+
+void UIStyle::setBorderBottomPoints(float amount)
+{
+    this->border.bottom = amount;
+}
+
+void UIStyle::setBorderPoints(float left, float top, float right, float bottom)
+{
+    this->border = {left, top, right, bottom};
 }
 
 void UIStyle::setBackgroundColor(Color color)
 {
     this->backgroundColor = color;
+}
+
+void UIStyle::setBorderColor(Color color)
+{
+    this->borderColor = color;
 }
 
 void UIStyle::setTextColor(Color color)
