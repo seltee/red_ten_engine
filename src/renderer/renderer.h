@@ -28,6 +28,7 @@ public:
     EXPORT virtual void presentToScreen(RenderTarget *renderTarget);
 
     EXPORT virtual Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) = 0;
+    EXPORT virtual Texture *createTextureEditable(int width, int height) = 0;
     EXPORT virtual void destroyTexture(Texture *texture) = 0;
 
     EXPORT virtual MeshStatic *createStaticMesh();

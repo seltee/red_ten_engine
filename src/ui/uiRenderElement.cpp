@@ -130,7 +130,7 @@ void UIRenderElement::render(RenderTarget *renderTarget, UIRenderSharedData *sha
     {
         fillRect(
             sharedData,
-            renderData->x + renderData->margin[2] + renderData->padding[0] + renderData->padding[2] + renderData->width + renderData->border[0],
+            renderData->x + renderData->margin[0] + renderData->padding[0] + renderData->padding[2] + renderData->width + renderData->border[0],
             renderData->y + renderData->margin[1],
             renderData->border[2],
             renderData->height + renderData->padding[1] + renderData->padding[3] + renderData->border[1] + renderData->border[3],

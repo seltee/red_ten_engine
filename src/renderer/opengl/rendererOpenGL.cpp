@@ -93,6 +93,11 @@ Texture *RendererOpenGL::createTexture(int width, int height, int bytesPerPixel,
     return new TextureOpengGL(textureID);
 }
 
+Texture *RendererOpenGL::createTextureEditable(int width, int height)
+{
+    return new TextureEditableOpenGL(width, height);
+}
+
 void RendererOpenGL::destroyTexture(Texture *texture)
 {
     delete texture;

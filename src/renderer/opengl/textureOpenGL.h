@@ -44,6 +44,7 @@ class TextureOpengGL : public Texture
 {
 public:
     EXPORT TextureOpengGL(unsigned int textureID);
+    EXPORT TextureOpengGL(int width, int height);
     EXPORT ~TextureOpengGL();
 
     EXPORT void bind();

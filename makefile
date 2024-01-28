@@ -71,7 +71,7 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/core.o ${OBJDIR}/view.o ${OBJDIR}/sta
 			${OBJDIR}/actor.o  ${OBJDIR}/actorPawn.o ${OBJDIR}/actorGUIElement.o ${OBJDIR}/actorCamera.o \
 			${OBJDIR}/resource.o ${OBJDIR}/resourceSound.o ${OBJDIR}/resourceImage.o ${OBJDIR}/resourceHDR.o ${OBJDIR}/resourceFont.o ${OBJDIR}/resourceMesh.o \
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
-			${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o ${OBJDIR}/textureBinding.o ${OBJDIR}/textureBindingOpenGL.o \
+			${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o ${OBJDIR}/textureEditableOpenGL.o ${OBJDIR}/textureBinding.o ${OBJDIR}/textureBindingOpenGL.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
 			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
@@ -106,7 +106,7 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
 			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT} \
-			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUIElements${EXT} 22-helloUINotepad${EXT}
+			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUIElements${EXT} 22-helloUINotepad${EXT} 23-helloTextureDrawing${EXT}
 
 all: engine examples
 
@@ -359,6 +359,9 @@ ${OBJDIR}/texture.o: ${SRCDIR}/renderer/texture.cpp
 
 ${OBJDIR}/textureOpenGL.o: ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/textureOpenGL.o ${SRCDIR}/renderer/opengl/textureOpenGL.cpp
+
+${OBJDIR}/textureEditableOpenGL.o: ${SRCDIR}/renderer/opengl/textureEditableOpenGL.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/textureEditableOpenGL.o ${SRCDIR}/renderer/opengl/textureEditableOpenGL.cpp
 
 ${OBJDIR}/textureBinding.o: ${SRCDIR}/renderer/textureBinding.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/textureBinding.o ${SRCDIR}/renderer/textureBinding.cpp
@@ -678,6 +681,12 @@ ${OBJDIR}/22-helloUINotepad.o: ${EXMDIR}/22-helloUINotepad.cpp ${EXMDIR}/helpers
 	$(LD) ${EFLAGS} ${OBJDIR}/22-helloUINotepad.o -o 22-helloUINotepad${EXT}
 	${MOVE} 22-helloUINotepad${EXT} ${BINDIR}/22-helloUINotepad${EXT}
 
+${OBJDIR}/23-helloTextureDrawing.o: ${EXMDIR}/23-helloTextureDrawing.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/23-helloTextureDrawing.o ${EXMDIR}/23-helloTextureDrawing.cpp
+
+23-helloTextureDrawing${EXT}: ${OBJDIR}/23-helloTextureDrawing.o
+	$(LD) ${EFLAGS} ${OBJDIR}/23-helloTextureDrawing.o -o 23-helloTextureDrawing${EXT}
+	${MOVE} 23-helloTextureDrawing${EXT} ${BINDIR}/23-helloTextureDrawing${EXT}
 
 # llvm-objcopy
 clean:

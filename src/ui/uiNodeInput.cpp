@@ -181,7 +181,6 @@ void UINodeInput::unfocus()
     {
         bIsFocused = false;
         text.clearSelection();
-        UIPointerCallback callback = getPointerCallback();
         throwEvent(UIPointerEvent::TextBlured);
     }
     if (focusedText == this)

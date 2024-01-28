@@ -3,6 +3,7 @@
 
 #pragma once
 #include "renderer/renderer.h"
+#include "renderer/opengl/textureEditableOpenGL.h"
 #include "connector/withLogger.h"
 #include "connector/withDebug.h"
 #include "connector/withCore.h"
@@ -23,6 +24,7 @@ public:
     EXPORT void presentToScreen(RenderTarget *renderTarget) final override;
 
     EXPORT Texture *createTexture(int width, int height, int bytesPerPixel, const void *data, bool bCreateMipmaps) final override;
+    EXPORT Texture *createTextureEditable(int width, int height) final override;
     EXPORT void destroyTexture(Texture *texture) override;
 
     EXPORT unsigned int getWindowFlags() final override;
