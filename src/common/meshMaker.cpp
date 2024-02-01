@@ -26,21 +26,40 @@ MeshStatic *MeshMaker::createBox(Vector3 dimensions)
     return newMesh;
 }
 
-MeshStatic *MeshMaker::createPlane(Vector2 dimensions, float UVScale)
+MeshStatic *MeshMaker::createPlane(Vector2 dimensions, float UVScale, int subdivision)
 {
-    float data[8 * 6];
-    memcpy(data, meshMakerPlainData, (8 * 6) * sizeof(float));
-    for (int i = 0; i < 6; i++)
+    int dataAmount = 8 * 6 * subdivision * subdivision;
+    float data[dataAmount];
+
+    float plotSizeX = (dimensions.x / static_cast<float>(subdivision));
+    float plotSizeY = (dimensions.y / static_cast<float>(subdivision));
+
+    for (int iy = 0; iy < subdivision; iy++)
     {
-        int index = i * 8;
-        data[index] *= dimensions.x;
-        data[index + 2] *= dimensions.y;
-        data[index + 6] *= UVScale;
-        data[index + 7] *= UVScale;
+        for (int ix = 0; ix < subdivision; ix++)
+        {
+            int polyShift = ix * 6 * 8 + iy * 6 * 8 * subdivision;
+            memcpy(&data[polyShift], meshMakerPlainData, 8 * 6 * sizeof(float));
+            for (int i = 0; i < 6; i++)
+            {
+                int index = polyShift + i * 8;
+                data[index] *= plotSizeX;
+                data[index] += plotSizeX * static_cast<float>(ix);
+                data[index] -= dimensions.x / 2.0f;
+                data[index + 2] *= plotSizeY;
+                data[index + 2] += plotSizeY * static_cast<float>(iy);
+                data[index + 2] -= dimensions.y / 2.0f;
+                data[index + 6] *= UVScale / static_cast<float>(subdivision);
+                data[index + 7] *= UVScale / static_cast<float>(subdivision);
+                data[index + 6] += UVScale / static_cast<float>(subdivision) * static_cast<float>(ix);
+                data[index + 7] += UVScale / static_cast<float>(subdivision) * static_cast<float>(iy);
+            }
+        }
     }
+
     auto newMesh = getRenderer()->createStaticMesh();
     int attributeSizes[3] = {3, 3, 2};
-    newMesh->setupFloatsArray(data, 6, 3, attributeSizes, true);
+    newMesh->setupFloatsArray(data, 6 * subdivision * subdivision, 3, attributeSizes, true);
     return newMesh;
 }
 
@@ -88,9 +107,9 @@ const float meshMakerCubeData[] = {
     0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 const float meshMakerPlainData[] = {
-    -0.5f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-    0.5f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    -0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-    0.5f, 0.0f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-    0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    -0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f};
+    0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+    1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f};

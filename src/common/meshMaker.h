@@ -4,9 +4,9 @@
 #include "math/math.h"
 #include "connector/withRenderer.h"
 
-class MeshMaker : public WithRenderer
+class MeshMaker : public WithRenderer, WithLogger
 {
 public:
     EXPORT MeshStatic *createBox(Vector3 dimensions);
-    EXPORT MeshStatic *createPlane(Vector2 dimensions, float UVScale = 1.0f);
+    EXPORT MeshStatic *createPlane(Vector2 dimensions, float UVScale = 1.0f, int subdivision = 1);
 };

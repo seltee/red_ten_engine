@@ -73,7 +73,8 @@ OBJ_FILES = ${OBJDIR}/rtengine.o ${OBJDIR}/core.o ${OBJDIR}/view.o ${OBJDIR}/sta
 			${OBJDIR}/component.o ${OBJDIR}/componentSoundPlayer.o \
 			${OBJDIR}/texture.o ${OBJDIR}/textureOpenGL.o ${OBJDIR}/textureEditableOpenGL.o ${OBJDIR}/textureBinding.o ${OBJDIR}/textureBindingOpenGL.o \
 			${OBJDIR}/componentText.o ${OBJDIR}/componentLight.o ${OBJDIR}/color.o \
-			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
+			${OBJDIR}/componentMesh.o ${OBJDIR}/componentAnimatedMesh.o ${OBJDIR}/componentMeshShell.o \
+			${OBJDIR}/meshDescriptor.o ${OBJDIR}/renderTarget.o \
 			${OBJDIR}/componentSprite.o ${OBJDIR}/componentFramedSprite.o \
 			${OBJDIR}/componentCameraOrto.o ${OBJDIR}/componentCameraPerspective.o \
 			${OBJDIR}/stb_image.o ${OBJDIR}/stb_vorbis.o \
@@ -106,7 +107,8 @@ EXAMPLES = 	1-helloWorld${EXT} 2-helloActors${EXT} 3-helloPhysics${EXT} 4-helloS
 			9-helloEffects${EXT} 10-helloAnimation${EXT} 11-helloMusic${EXT} 12-hello3d${EXT} \
 			13-hello3dPhysics${EXT} 14-helloMushrooms${EXT} 15-helloPlainsAndRays${EXT} \
 			16-helloFPV${EXT} 17-helloProfiler${EXT} 18-helloRenderingToTexture${EXT} \
-			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUIElements${EXT} 22-helloUINotepad${EXT} 23-helloTextureDrawing${EXT}
+			19-hello3dAnimation${EXT} 20-hello3dSprites${EXT} 21-helloUIElements${EXT} 22-helloUINotepad${EXT} \
+			23-helloTextureDrawing${EXT} 24-helloGrass${EXT}
 
 all: engine examples
 
@@ -254,6 +256,9 @@ ${OBJDIR}/componentMesh.o: ${SRCDIR}/component/componentMesh.cpp
 
 ${OBJDIR}/componentAnimatedMesh.o: ${SRCDIR}/component/componentAnimatedMesh.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentAnimatedMesh.o ${SRCDIR}/component/componentAnimatedMesh.cpp
+
+${OBJDIR}/componentMeshShell.o: ${SRCDIR}/component/componentMeshShell.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/componentMeshShell.o ${SRCDIR}/component/componentMeshShell.cpp
 
 ${OBJDIR}/componentLight.o: ${SRCDIR}/component/componentLight.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/componentLight.o ${SRCDIR}/component/componentLight.cpp
@@ -687,6 +692,13 @@ ${OBJDIR}/23-helloTextureDrawing.o: ${EXMDIR}/23-helloTextureDrawing.cpp ${EXMDI
 23-helloTextureDrawing${EXT}: ${OBJDIR}/23-helloTextureDrawing.o
 	$(LD) ${EFLAGS} ${OBJDIR}/23-helloTextureDrawing.o -o 23-helloTextureDrawing${EXT}
 	${MOVE} 23-helloTextureDrawing${EXT} ${BINDIR}/23-helloTextureDrawing${EXT}
+
+${OBJDIR}/24-helloGrass.o: ${EXMDIR}/24-helloGrass.cpp ${EXMDIR}/helpers.h
+	$(CC) $(CFLAGS) -o ${OBJDIR}/24-helloGrass.o ${EXMDIR}/24-helloGrass.cpp
+
+24-helloGrass${EXT}: ${OBJDIR}/24-helloGrass.o
+	$(LD) ${EFLAGS} ${OBJDIR}/24-helloGrass.o -o 24-helloGrass${EXT}
+	${MOVE} 24-helloGrass${EXT} ${BINDIR}/24-helloGrass${EXT}
 
 # llvm-objcopy
 clean:
