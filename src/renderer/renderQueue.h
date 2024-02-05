@@ -16,18 +16,11 @@ class Actor;
 #define MAX_LIGHTS 16000
 #define MAX_DEBUG_ELEMENTS 1000
 
-enum class ComponentColorMode
-{
-    Lit = 0,
-    Alpha = 1,
-    Addition = 2,
-};
-
 struct RenderElement
 {
     Matrix4 mModelViewProjection;
     Matrix4 mModel;
-    ComponentColorMode colorMode;
+    ColorMode colorMode;
     Shader *shader;
     Texture *texture;
     MeshStatic *mesh;
@@ -62,9 +55,11 @@ public:
     EXPORT void reset();
     EXPORT inline void setViewProjectionMatrix(Matrix4 &mViewProjection) { this->mViewProjection = mViewProjection; }
     EXPORT inline Matrix4 *getViewProjectionMatrix() { return &mViewProjection; }
+    EXPORT inline void setViewMatrix(Matrix4 &mView) { this->mView = mView; }
+    EXPORT inline Matrix4 *getViewMatrix() { return &mView; }
 
     EXPORT void addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture, MeshStatic *mesh, ShaderParameter **parameters, int parametersAmount);
-    EXPORT void addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode, Shader *shader, Texture *texture, MeshStatic *mesh, float opacity, ShaderParameter **parameters, int parametersAmount);
+    EXPORT void addBlendingPhase(Matrix4 &mModel, ColorMode colorMode, Shader *shader, Texture *texture, MeshStatic *mesh, float opacity, ShaderParameter **parameters, int parametersAmount);
     EXPORT void addShadowCaster(Matrix4 &mModel, MeshStatic *mesh, Texture *texture, Vector4 &uvShiftSize);
     EXPORT void addLight(LightType type, Vector3 position, Vector3 color, float affectDistance, bool bCastShadows);
 
@@ -114,6 +109,9 @@ public:
     inline void setEnvHDRRotation(float rotation) { this->envHDRRotation = rotation; }
     inline float getEnvHDRRotation() { return this->envHDRRotation; }
 
+    inline void setCullingPlanes(Vector4 *cullingPlanes) { this->cullingPlanes = cullingPlanes; }
+    inline Vector4 *getCullingPlanes() { return this->cullingPlanes; }
+
     inline void setUseCameraDirectionForLights(bool state) { this->bUseCameraDirectionForLights = state; }
     inline bool isUsingCameraDirectionForLights() { return this->bUseCameraDirectionForLights; }
 
@@ -121,6 +119,7 @@ public:
 
 protected:
     Matrix4 mViewProjection;
+    Matrix4 mView;
 
     RenderElement renderElements[MAX_RENDER_ELEMENTS];
     std::atomic<int> lastElement = 0;
@@ -151,4 +150,6 @@ protected:
 
     bool bShowEnvHDR = false;
     float envHDRRotation = 0.0f;
+
+    Vector4 *cullingPlanes = nullptr;
 };

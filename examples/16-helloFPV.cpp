@@ -117,7 +117,7 @@ APPMAIN
         Actor *spawn = nullptr;
         int sp = i % 4;
         if (sp == 0)
-            spawn = layerActors->createActor<Sphere>();
+            spawn = layerActors->createActor<SphereActor>();
         if (sp == 1 || sp == 2)
             spawn = layerActors->createActor<Crate>();
         if (sp == 3)

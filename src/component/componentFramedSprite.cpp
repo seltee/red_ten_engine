@@ -12,7 +12,7 @@ ComponentFramedSprite::ComponentFramedSprite() : Component()
     shader = getRenderer()->getDefaultFramedSpriteShader();
     mesh = getRenderer()->getDefaultSpriteMesh();
 
-    colorMode = ComponentColorMode::Alpha;
+    colorMode = ColorMode::Alpha;
 
     shadersParameters[0] = shader->createShaderParameter("aTexCoordShift", ShaderParameterType::Float2);
     shadersParameters[1] = shader->createShaderParameter("aTexCoordMul", ShaderParameterType::Float2);
@@ -35,7 +35,7 @@ void ComponentFramedSprite::onRenderQueue(RenderQueue *renderQueue)
         shadersParameters[0]->set(1, frameShift);
         shadersParameters[1]->set(1, frameRenderSize);
 
-        if (colorMode == ComponentColorMode::Lit)
+        if (colorMode == ColorMode::Lit)
         {
             renderQueue->addMainPhase(mModel, shader, texture, mesh, parametersList, parametersAmount);
         }

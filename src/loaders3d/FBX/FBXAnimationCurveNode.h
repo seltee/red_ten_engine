@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
-#include "FBXNode.h"
-#include "loaders3d/FBXAnimationCurve.h"
+#include "loaders3d/FBX/FBXNode.h"
+#include "loaders3d/FBX/FBXAnimationCurve.h"
 #include "math/math.h"
 #include <vector>
 #include <string>

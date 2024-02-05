@@ -4,10 +4,10 @@
 #include "../src/rtengine.h"
 #include <math.h>
 
-class Sphere : public Actor, public WithRepository, public WithRenderer
+class SphereActor : public Actor, public WithRepository, public WithRenderer
 {
 public:
-    Sphere() : Actor()
+    SphereActor() : Actor()
     {
         registerClassName("Sphere");
     }
@@ -48,7 +48,7 @@ public:
     static PhongShader *sphereShader;
     bool autoremove = true;
 };
-PhongShader *Sphere::sphereShader = nullptr;
+PhongShader *SphereActor::sphereShader = nullptr;
 
 class Crate : public Actor, public WithMeshMaker, public WithRepository, public WithRenderer
 {

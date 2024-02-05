@@ -25,7 +25,7 @@ public:
     EXPORT void setRootTexture(Texture *texture);
     EXPORT void setTipTexture(Texture *texture);
 
-    EXPORT void setProperties(int layersAmount, float layerHeight, float distorsionSpeed);
+    EXPORT void setParameters(int layersAmount, float layerHeight, float distorsionSpeed, float distorsionPower);
 
     EXPORT Matrix4 getLocalspaceMatrix() override;
 
@@ -58,12 +58,14 @@ protected:
     int layersAmount = 0;
     float layerHeight = 0.0f;
     float distorsionSpeed = 0.01f;
+    float distorsionPower = 0.01f;
 
     ShaderParameter ***parametersList = nullptr;
     int parametersListAmount = 0;
     float *heights = nullptr;
     float *layerHeights = nullptr;
     float *alphaCheck = nullptr;
+
     Vector3 *color = nullptr;
     float time = 0.0f;
 

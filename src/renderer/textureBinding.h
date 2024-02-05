@@ -4,5 +4,10 @@
 class TextureBinding
 {
 public:
-    virtual void setTexture(Texture *texture);
+    EXPORT void setTexture(Texture *texture);
+    EXPORT Texture *getTexture();
+
+protected:
+    virtual void onTextureChange();
+    Texture *texture;
 };

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "mesh/mesh.h"
+#include "math/sphere.h"
 
 // Don't delete the main mesh if you have instances of it
 class MeshStatic : public Mesh
@@ -14,13 +15,14 @@ protected:
 public:
     EXPORT ~MeshStatic();
 
-    EXPORT virtual Geometry *getGeometry();
+    EXPORT virtual Geometry *getGeometry() override;
 
     EXPORT float *getVertexData();
 
     EXPORT int getVertexAmount();
     EXPORT int getFloatsPerVertex();
     EXPORT int getAttributesAmount();
+    EXPORT bool isRendarable() override;
 
     // Make original mesh by transfering geometry data to it
     EXPORT virtual void setupFloatsArray(const float *data, int vertexAmount, int attributesAmount, int *attributeSize, bool buildTangents = false);
@@ -36,9 +38,14 @@ public:
 
     EXPORT virtual void useVertexArray();
 
-    EXPORT virtual MeshStatic *getAsStatic();
+    EXPORT virtual MeshStatic *getAsStatic() override;
+
+    EXPORT void setBoundVolumeSphere(Vector3 &center, float radius);
+    EXPORT inline Sphere *getBoundVolumeSphere() { return &boundVolume; }
 
 protected:
+    Sphere boundVolume;
+
     int vertexAmount = 0;
     int floatsPerVertex = 0;
     int attributesAmount = 0;

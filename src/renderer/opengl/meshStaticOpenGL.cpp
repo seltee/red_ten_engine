@@ -4,6 +4,7 @@
 #include "renderer/opengl/meshStaticOpenGL.h"
 #include "renderer/renderer.h"
 #include "math/math.h"
+#include "math/smallestEnclosingSphere.h"
 #include "renderer/opengl/glew.h"
 #include <string.h>
 
@@ -29,7 +30,7 @@ void MeshStaticOpenGL::render()
 Mesh *MeshStaticOpenGL::createInstance()
 {
     MeshStaticOpenGL *newMesh = new MeshStaticOpenGL();
-    newMesh->setupInstance(vao, vbo, vertexAmount, floatsPerVertex, attributesAmount, vertexData);
+    newMesh->setupInstance(vao, vbo, vertexAmount, floatsPerVertex, attributesAmount, vertexData, boundVolume);
     newMesh->setDefaultShader(this->getDefaultShader());
     return newMesh;
 }
@@ -48,6 +49,9 @@ void MeshStaticOpenGL::setupFloatsArray(const float *data, int vertexAmount, int
         floatsPerVertex += attributeSize[i];
 
     this->vertexAmount = vertexAmount;
+
+    Sphere volumeSphere = makeSmallestSphere(data, vertexAmount, floatsPerVertex);
+    setBoundVolumeSphere(volumeSphere.center, volumeSphere.radius);
 
     if (buildTangents)
     {
@@ -112,7 +116,7 @@ void MeshStaticOpenGL::setupFloatsArray(const float *data, int vertexAmount, int
     }
 }
 
-void MeshStaticOpenGL::setupInstance(unsigned int vao, unsigned int vbo, int vertexAmount, int floatsPerVertex, int attributesAmount, float *vertexData)
+void MeshStaticOpenGL::setupInstance(unsigned int vao, unsigned int vbo, int vertexAmount, int floatsPerVertex, int attributesAmount, float *vertexData, Sphere &boundVolume)
 {
     isInstance = true;
     this->vao = vao;
@@ -121,13 +125,14 @@ void MeshStaticOpenGL::setupInstance(unsigned int vao, unsigned int vbo, int ver
     this->floatsPerVertex = floatsPerVertex;
     this->attributesAmount = attributesAmount;
     this->vertexData = vertexData;
+    this->boundVolume = boundVolume;
 }
 
 EXPORT void MeshStaticOpenGL::setOtherMeshAsInstanceOfThis(MeshStatic *mesh)
 {
     if (mesh)
     {
-        reinterpret_cast<MeshStaticOpenGL *>(mesh)->setupInstance(vao, vbo, vertexAmount, floatsPerVertex, attributesAmount, vertexData);
+        reinterpret_cast<MeshStaticOpenGL *>(mesh)->setupInstance(vao, vbo, vertexAmount, floatsPerVertex, attributesAmount, vertexData, boundVolume);
     }
 }
 

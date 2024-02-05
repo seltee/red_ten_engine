@@ -29,12 +29,16 @@ void RenderQueue::addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture
 {
     if (lastElementMainPhase < MAX_RENDER_ELEMENTS && lastElement < MAX_RENDER_ELEMENTS && shader && mesh)
     {
+        Matrix4 mv = mView * mModel;
+        if (!mesh->getBoundVolumeSphere()->isSphereInFrustum(&mv, getCullingPlanes()))
+            return;
+
         RenderElement *element = &renderElements[lastElement];
         mainPhaseElements[lastElementMainPhase] = element;
 
         element->mModel = mModel;
         element->mModelViewProjection = mViewProjection * mModel;
-        element->colorMode = ComponentColorMode::Lit;
+        element->colorMode = ColorMode::Lit;
         element->shader = shader;
         element->texture = texture;
         element->mesh = mesh;
@@ -47,10 +51,14 @@ void RenderQueue::addMainPhase(Matrix4 &mModel, Shader *shader, Texture *texture
     }
 }
 
-void RenderQueue::addBlendingPhase(Matrix4 &mModel, ComponentColorMode colorMode, Shader *shader, Texture *texture, MeshStatic *mesh, float opacity, ShaderParameter **parameters, int parametersAmount)
+void RenderQueue::addBlendingPhase(Matrix4 &mModel, ColorMode colorMode, Shader *shader, Texture *texture, MeshStatic *mesh, float opacity, ShaderParameter **parameters, int parametersAmount)
 {
     if (lastElementMainPhase < MAX_RENDER_ELEMENTS && lastElement < MAX_RENDER_ELEMENTS && shader && mesh)
     {
+        Matrix4 mv = mView * mModel;
+        if (!mesh->getBoundVolumeSphere()->isSphereInFrustum(&mv, getCullingPlanes()))
+            return;
+
         RenderElement *element = &renderElements[lastElement];
         blendPhaseElements[lastElementBlendPhase] = element;
 
@@ -73,16 +81,21 @@ void RenderQueue::addShadowCaster(Matrix4 &mModel, MeshStatic *mesh, Texture *te
 {
     if (lastShadowCasterElement < MAX_RENDER_ELEMENTS && lastElement < MAX_RENDER_ELEMENTS && mesh)
     {
-        RenderElement *element = &renderElements[lastElement];
-        shadowCasterElements[lastShadowCasterElement] = element;
+        // Culling if too far
+        Vector4 position = mModel * Vector4(0.0f, 0.0f, 0.0f, 1.0f);
+        if (glm::length2(cameraPosition - Vector3(position)) < 1200.0f)
+        {
+            RenderElement *element = &renderElements[lastElement];
+            shadowCasterElements[lastShadowCasterElement] = element;
 
-        element->mModel = mModel;
-        element->mesh = mesh;
-        element->texture = texture;
-        element->uvShiftSize = uvShiftSize;
+            element->mModel = mModel;
+            element->mesh = mesh;
+            element->texture = texture;
+            element->uvShiftSize = uvShiftSize;
 
-        lastShadowCasterElement++;
-        lastElement++;
+            lastShadowCasterElement++;
+            lastElement++;
+        }
     }
 }
 

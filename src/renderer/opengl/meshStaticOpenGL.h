@@ -29,7 +29,7 @@ public:
 
     // Trasfer data to this mesh, this mesh becoming an instance
     // Doesn't change the name
-    EXPORT void setupInstance(unsigned int vao, unsigned int vbo, int vertexAmount, int floatsPerVertex, int attributesAmount, float *vertexData);
+    EXPORT void setupInstance(unsigned int vao, unsigned int vbo, int vertexAmount, int floatsPerVertex, int attributesAmount, float *vertexData, Sphere &boundVolume);
 
     // Set VAO, VBO vertex data to the mesh.
     // Target mesh becoming an instance of this mesh

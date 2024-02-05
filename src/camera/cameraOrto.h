@@ -20,6 +20,8 @@ public:
     EXPORT void setWidthBasedResolution(float width);
     EXPORT void setHeightBasedResolution(float height);
 
+    EXPORT void recalcCullingPlanes() override;
+
     EXPORT PointWithDirection screenToWorld(float x, float y) override;
 
     EXPORT float getLineThickness() override;
@@ -30,4 +32,7 @@ protected:
     Layer *layer;
     bool useWidthBasedProportion = true;
     float mainLine = 320.0f;
+
+    // Define the boundaries of the viewing volume
+    float top, bottom, right, left, near, far;
 };

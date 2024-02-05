@@ -237,9 +237,10 @@ APPMAIN
     layerActors->setHDRTextures(HDR->getAsTexture(), HDR->getAsRadianceTexture());
     layerActors->setHDRRotation(CONST_PI / 2.0f);
 
+    const int groundsAmount = 16;
     // Floor is repeated to feel as endless road
     std::vector<Ground *> grounds;
-    for (int i = 0; i < 16; i++)
+    for (int i = 0; i < groundsAmount; i++)
     {
         auto ground = layerActors->createActor<Ground>();
         grounds.push_back(ground);

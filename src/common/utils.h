@@ -26,6 +26,13 @@ enum LightType
     Omni
 };
 
+enum class ColorMode
+{
+    Lit = 0,
+    Alpha = 1,
+    Addition = 2,
+};
+
 EXPORT float randf();
 EXPORT float randf(float from, float to);
 

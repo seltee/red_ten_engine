@@ -458,23 +458,23 @@ ${OBJDIR}/meshStaticOpenGL.o: ${SRCDIR}/renderer/opengl/meshStaticOpenGL.cpp
 ${OBJDIR}/loader3d.o: ${SRCDIR}/loaders3d/loader3d.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/loader3d.o ${SRCDIR}/loaders3d/loader3d.cpp
 
-${OBJDIR}/loaderFBX.o: ${SRCDIR}/loaders3d/loaderFBX.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/loaderFBX.o ${SRCDIR}/loaders3d/loaderFBX.cpp
+${OBJDIR}/loaderFBX.o: ${SRCDIR}/loaders3d/FBX/loaderFBX.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/loaderFBX.o ${SRCDIR}/loaders3d/FBX/loaderFBX.cpp
 
-${OBJDIR}/FBXNode.o: ${SRCDIR}/loaders3d/FBXNode.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXNode.o ${SRCDIR}/loaders3d/FBXNode.cpp
+${OBJDIR}/FBXNode.o: ${SRCDIR}/loaders3d/FBX/FBXNode.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXNode.o ${SRCDIR}/loaders3d/FBX/FBXNode.cpp
 
-${OBJDIR}/FBXAnimationStack.o: ${SRCDIR}/loaders3d/FBXAnimationStack.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationStack.o ${SRCDIR}/loaders3d/FBXAnimationStack.cpp
+${OBJDIR}/FBXAnimationStack.o: ${SRCDIR}/loaders3d/FBX/FBXAnimationStack.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationStack.o ${SRCDIR}/loaders3d/FBX/FBXAnimationStack.cpp
 
-${OBJDIR}/FBXAnimationCurveNode.o: ${SRCDIR}/loaders3d/FBXAnimationCurveNode.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurveNode.o ${SRCDIR}/loaders3d/FBXAnimationCurveNode.cpp
+${OBJDIR}/FBXAnimationCurveNode.o: ${SRCDIR}/loaders3d/FBX/FBXAnimationCurveNode.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurveNode.o ${SRCDIR}/loaders3d/FBX/FBXAnimationCurveNode.cpp
 
-${OBJDIR}/FBXAnimationCurve.o: ${SRCDIR}/loaders3d/FBXAnimationCurve.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurve.o ${SRCDIR}/loaders3d/FBXAnimationCurve.cpp
+${OBJDIR}/FBXAnimationCurve.o: ${SRCDIR}/loaders3d/FBX/FBXAnimationCurve.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationCurve.o ${SRCDIR}/loaders3d/FBX/FBXAnimationCurve.cpp
 
-${OBJDIR}/FBXAnimationLayer.o: ${SRCDIR}/loaders3d/FBXAnimationLayer.cpp
-	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationLayer.o ${SRCDIR}/loaders3d/FBXAnimationLayer.cpp
+${OBJDIR}/FBXAnimationLayer.o: ${SRCDIR}/loaders3d/FBX/FBXAnimationLayer.cpp
+	$(CC) $(CFLAGS) -o ${OBJDIR}/FBXAnimationLayer.o ${SRCDIR}/loaders3d/FBX/FBXAnimationLayer.cpp
 
 ${OBJDIR}/animation.o: ${SRCDIR}/animation/animation.cpp
 	$(CC) $(CFLAGS) -o ${OBJDIR}/animation.o ${SRCDIR}/animation/animation.cpp

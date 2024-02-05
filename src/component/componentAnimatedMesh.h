@@ -39,6 +39,7 @@ public:
     EXPORT inline void disableShadowCasting() { bCastShadows = false; };
     EXPORT inline bool isShadowCasting() { return bCastShadows; }
 
+    EXPORT void renderDebugVolume(Renderer *renderer, Matrix4 *mProjectionView, float thickness, Vector3 color) override;
 protected:
     void deleteTransforms();
 

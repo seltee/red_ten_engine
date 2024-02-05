@@ -93,8 +93,9 @@ APPMAIN
     auto boxShader = view->getRenderer()->createPhongShader();
     boxShader->setTexture(TextureType::Albedo, boxTexture);
 
+    const int boxAmount = 7;
     std::vector<Actor *> boxes;
-    for (int i = 0; i < 7; i++)
+    for (int i = 0; i < boxAmount; i++)
     {
         auto box = layerActors->createActor<Actor>();
         componentMesh = box->createComponent<ComponentMesh>();
@@ -115,7 +116,7 @@ APPMAIN
     float angleBetween = CONST_PI2 / (float)screensAmount;
     float screenDistance = 8.5f;
     std::vector<Actor *> screens;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < screensAmount; i++)
     {
         auto screen = layerActors->createActor<Actor>();
         componentMesh = screen->createComponent<ComponentMesh>();

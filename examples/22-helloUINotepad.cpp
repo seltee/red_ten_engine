@@ -341,8 +341,6 @@ APPMAIN
     // View setup
     auto viewController = engine->getViewController();
     auto view = viewController->createView("Example \"22. Hello UI Notepad\"", VIEW_CREATION_FLAG_RESIZABLE);
-    int screenWidth = viewController->getPrimaryScreenWidth();
-    int screenHeight = viewController->getPrimaryScreenHeight();
 
     // Stage setup
     auto stageController = engine->getStageController();

@@ -44,6 +44,8 @@ public:
     EXPORT inline void setShadowShiftSize(Vector4 &uvShadowShiftSize) { this->uvShadowShiftSize = uvShadowShiftSize; }
     EXPORT inline Vector4 getShadowShiftSize() { return this->uvShadowShiftSize; }
 
+    EXPORT void renderDebugVolume(Renderer *renderer, Matrix4 *mProjectionView, float thickness, Vector3 color) override;
+
 protected:
     Mesh *mesh = nullptr;
     Shader *shader = nullptr;

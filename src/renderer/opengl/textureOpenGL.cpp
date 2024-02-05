@@ -18,8 +18,6 @@ TextureOpengGL::TextureOpengGL(unsigned int textureID)
 
 TextureOpengGL::TextureOpengGL(int width, int height)
 {
-    printf("CREATE %i %i\n", width, height);
-
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
 

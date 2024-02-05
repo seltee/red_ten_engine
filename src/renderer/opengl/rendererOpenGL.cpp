@@ -292,13 +292,13 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
 
             switch (element->colorMode)
             {
-            case ComponentColorMode::Lit:
+            case ColorMode::Lit:
                 glBlendFunc(GL_ONE, GL_ZERO);
                 break;
-            case ComponentColorMode::Alpha:
+            case ColorMode::Alpha:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 break;
-            case ComponentColorMode::Addition:
+            case ColorMode::Addition:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
                 break;
             }
@@ -355,6 +355,13 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
                         renderDebugLine(vts3, vts3 + nr * 0.1f, &mViewProjection, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
                     }
                 }
+            }
+        }
+        if (element->actor && element->actor->isBoundingVolumeShown())
+        {
+            for (auto &component : *element->actor->getComponents())
+            {
+                component->renderDebugVolume(this, &mViewProjection, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
             }
         }
     }

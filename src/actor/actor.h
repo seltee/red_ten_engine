@@ -69,9 +69,11 @@ public:
     EXPORT inline bool hasDebugView() { return bShowBoundingBox || bShowNormals; }
     EXPORT inline void showBoundingBox(bool state) { bShowBoundingBox = state; }
     EXPORT inline void showNormals(bool state) { bShowNormals = state; }
+    EXPORT inline void showBoundingVolume(bool state) { bShowBoundingVolume = state; }
 
     inline bool isBoundingBoxShown() { return bShowBoundingBox; }
     inline bool isNormalsShown() { return bShowNormals; }
+    inline bool isBoundingVolumeShown() { return bShowBoundingVolume; }
 
     EXPORT void childUpdated();
 
@@ -84,8 +86,10 @@ protected:
     bool bIsZRotationLocked = false;
     bool bIsVisible = true;
     bool bPhysicsNeedsToBeRebuild = false;
+
     bool bShowBoundingBox = false;
     bool bShowNormals = false;
+    bool bShowBoundingVolume = false;
 
     MotionType motionType = MotionType::Static;
     PhysicsWorld *physicsWorld = nullptr;

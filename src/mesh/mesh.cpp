@@ -30,3 +30,8 @@ MeshStatic *Mesh::getAsStatic()
 {
     return nullptr;
 }
+
+bool Mesh::isRendarable()
+{
+    return false;
+}

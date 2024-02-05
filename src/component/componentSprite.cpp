@@ -10,7 +10,7 @@ ComponentSprite::ComponentSprite() : Component()
 {
     mAnchor = Matrix4(1.0f);
     setAnchor(0.5f, 0.5f);
-    colorMode = ComponentColorMode::Alpha;
+    colorMode = ColorMode::Alpha;
     shader = getRenderer()->getDefaultSpriteShader();
     mesh = getRenderer()->getDefaultSpriteMesh();
 }
@@ -20,7 +20,7 @@ void ComponentSprite::onRenderQueue(RenderQueue *renderQueue)
     if (texture && owner)
     {
         Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix() * mAnchor;
-        if (colorMode == ComponentColorMode::Lit)
+        if (colorMode == ColorMode::Lit)
         {
             renderQueue->addMainPhase(mModel, shader, texture, mesh, parametersList, parametersAmount);
         }

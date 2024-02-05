@@ -38,6 +38,11 @@ int MeshStatic::getAttributesAmount()
     return attributesAmount;
 }
 
+bool MeshStatic::isRendarable()
+{
+    return vertexAmount > 0;
+}
+
 void MeshStatic::setupFloatsArray(const float *data, int vertexAmount, int attributesAmount, int *attributeSize, bool buildTangents)
 {
 }
@@ -57,4 +62,9 @@ void MeshStatic::useVertexArray()
 MeshStatic *MeshStatic::getAsStatic()
 {
     return this;
+}
+
+void MeshStatic::setBoundVolumeSphere(Vector3 &center, float radius)
+{
+    this->boundVolume.setup(center, radius);
 }

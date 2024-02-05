@@ -29,7 +29,7 @@ public:
         expComponent->setMesh(spriteMesh);
         expComponent->setShader(shader);
         expComponent->transform.setRotation(Vector3(CONST_PI / 2.0f, CONST_PI, 0.0f));
-        expComponent->colorMode = ComponentColorMode::Alpha;
+        expComponent->colorMode = ColorMode::Alpha;
         expComponent->disableShadowCasting();
 
         uvParameter = shader->createShaderUVParameter();
@@ -42,7 +42,7 @@ public:
         shadowExpComponent = createComponent<ComponentMesh>();
         shadowExpComponent->setMesh(spriteMesh);
         shadowExpComponent->setShader(shader);
-        shadowExpComponent->colorMode = ComponentColorMode::Alpha;
+        shadowExpComponent->colorMode = ColorMode::Alpha;
 
         shadowExpComponent->setShaderParameters(uvParameters, 1);
         shadowExpComponent->disableShapeCasting();

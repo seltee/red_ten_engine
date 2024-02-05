@@ -10,17 +10,18 @@ void CameraOrto::prepareToRender(RenderTarget *renderTarget)
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
 
-    float r = targetWidth / 2.0f;
-    float l = -r;
-    float b = -targetHeight / 2.0f;
-    float t = -b;
-    float f = 1400.0f;
-    float n = -1400.0f;
+    right = targetWidth / 2.0f;
+    left = -right;
+    bottom = -targetHeight / 2.0f;
+    top = -bottom;
+    far = 1400.0f;
+    near = -1400.0f;
 
-    projectionMatrix = glm::ortho(l, r, b, t, n, f);
+    projectionMatrix = glm::ortho(left, right, bottom, top, near, far);
     this->renderTarget = renderTarget;
 
     viewMatrix = glm::inverse(getWorldModelMatrix());
+    recalcCullingPlanes();
 }
 
 void CameraOrto::finishRender()
@@ -77,10 +78,26 @@ void CameraOrto::setHeightBasedResolution(float height)
     mainLine = height;
 }
 
+void CameraOrto::recalcCullingPlanes()
+{
+    // Near and far planes
+    cullingPlanes[0] = Vector4(0, 0, -1, -near); // Near
+    cullingPlanes[1] = Vector4(0, 0, 1, far);    // Far
+
+    // Left and right planes
+    cullingPlanes[2] = Vector4(1, 0, 0, -left); // Left
+    cullingPlanes[3] = Vector4(-1, 0, 0, right); // Right
+
+    // Bottom and top planes
+    cullingPlanes[4] = Vector4(0, 1, 0, top);     // Top
+    cullingPlanes[5] = Vector4(0, -1, 0, -bottom); // Bottom
+}
+
 PointWithDirection CameraOrto::screenToWorld(float x, float y)
 {
     PointWithDirection out;
-    if (!renderTarget){
+    if (!renderTarget)
+    {
         out.vDirection = Vector3(0.0f, 0.0f, 1.0f);
         out.vPosition = Vector3(0.0f, 0.0f, 0.0f);
         return out;

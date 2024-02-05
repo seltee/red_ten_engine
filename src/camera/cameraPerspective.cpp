@@ -3,6 +3,8 @@
 
 #include "camera/cameraPerspective.h"
 #include "math/glm/gtc/type_ptr.hpp"
+#include "math/glm/gtc/matrix_transform.hpp"
+#include "math/glm/ext.hpp"
 
 void CameraPerspective::prepareToRender(RenderTarget *renderTarget)
 {
@@ -10,10 +12,11 @@ void CameraPerspective::prepareToRender(RenderTarget *renderTarget)
     float targetWidth = useWidthBasedProportion ? mainLine : mainLine * aspect;
     float targetHeight = useWidthBasedProportion ? mainLine / aspect : mainLine;
 
-    projectionMatrix = glm::perspective(distance, (float)targetWidth / (float)targetHeight, nearDistance, farDistance);
+    projectionMatrix = glm::perspective(fov, (float)targetWidth / (float)targetHeight, nearDistance, farDistance);
     this->renderTarget = renderTarget;
 
     viewMatrix = glm::inverse(getWorldModelMatrix());
+    recalcCullingPlanes();
 }
 
 void CameraPerspective::finishRender()
@@ -79,6 +82,22 @@ void CameraPerspective::setNearDistance(float nearDistance)
 void CameraPerspective::setFov(float fov)
 {
     this->fov = fov;
+}
+
+void CameraPerspective::recalcCullingPlanes()
+{
+    cullingPlanes[0] = glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 2); // Near
+    cullingPlanes[1] = glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 2); // Far
+    cullingPlanes[2] = glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 0); // Left
+    cullingPlanes[3] = glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 0); // Right
+    cullingPlanes[4] = glm::row(projectionMatrix, 3) - glm::row(projectionMatrix, 1); // Top
+    cullingPlanes[5] = glm::row(projectionMatrix, 3) + glm::row(projectionMatrix, 1); // Bottom
+
+    // Normalize the planes
+    for (int i = 0; i < 6; ++i)
+    {
+        cullingPlanes[i] /= length(Vector3(cullingPlanes[i]));
+    }
 }
 
 PointWithDirection CameraPerspective::screenToWorld(float x, float y)

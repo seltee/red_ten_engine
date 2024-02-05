@@ -89,7 +89,7 @@ APPMAIN
     componentShell->setDistorsionTexture(resourceController->addImage("./data/distorsion.jpg")->getAsTexture());
     componentShell->setRootTexture(resourceController->addImage("./data/grass_root.jpg")->getAsTexture());
     componentShell->setTipTexture(resourceController->addImage("./data/grass_tip.jpg")->getAsTexture());
-    componentShell->setProperties(12, 0.0035f, 0.03f);
+    componentShell->setParameters(12, 0.0035f, 0.03f, 0.02f);
 
     while (!engine->isTerminationIntended())
     {

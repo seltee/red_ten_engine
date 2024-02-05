@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "loaders3d/FBXAnimationCurveNode.h"
-#include "loaders3d/loaderFBX.h"
+#include "loaders3d/FBX/FBXAnimationCurveNode.h"
+#include "loaders3d/FBX/loaderFBX.h"
 
 FBXAnimationCurveNode::FBXAnimationCurveNode(FBXNode *node)
 {

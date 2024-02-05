@@ -34,11 +34,11 @@ public:
     inline int getWidth() { return width; }
     inline int getHeight() { return height; }
 
-    EXPORT virtual void drawImage(Texture *texture, Vector2 position);
-    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale);
-    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale, Vector2 alignPoint, float rotation);
-    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale, float rotation);
-    EXPORT virtual void drawImage(Texture *texture, Matrix4 *model, Shader *shader);
+    EXPORT virtual void drawImage(Texture *texture, Vector2 position, ColorMode colorMode = ColorMode::Alpha);
+    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale, ColorMode colorMode = ColorMode::Alpha);
+    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale, Vector2 alignPoint, float rotation, ColorMode colorMode = ColorMode::Alpha);
+    EXPORT virtual void drawImage(Texture *texture, Vector2 position, Vector2 Scale, float rotation, ColorMode colorMode = ColorMode::Alpha);
+    EXPORT virtual void drawImage(Texture *texture, Matrix4 *model, Shader *shader, ColorMode colorMode = ColorMode::Alpha);
     EXPORT virtual void recreateMipMaps();
 
 protected:

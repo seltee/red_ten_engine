@@ -4,11 +4,11 @@
 #pragma once
 
 #include "loaders3d/loader3d.h"
-#include "loaders3d/FBXNode.h"
-#include "loaders3d/FBXAnimationStack.h"
-#include "loaders3d/FBXAnimationCurveNode.h"
-#include "loaders3d/FBXAnimationCurve.h"
-#include "loaders3d/FBXAnimationLayer.h"
+#include "loaders3d/FBX/FBXNode.h"
+#include "loaders3d/FBX/FBXAnimationStack.h"
+#include "loaders3d/FBX/FBXAnimationCurveNode.h"
+#include "loaders3d/FBX/FBXAnimationCurve.h"
+#include "loaders3d/FBX/FBXAnimationLayer.h"
 #include "connector/withLogger.h"
 #include "connector/withRenderer.h"
 #include "animation/animation.h"

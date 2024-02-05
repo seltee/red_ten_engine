@@ -28,6 +28,8 @@ public:
     EXPORT virtual Geometry *getGeometry();
 
     EXPORT virtual MeshStatic *getAsStatic();
+    
+    EXPORT virtual bool isRendarable();
 
     inline void setDefaultShader(Shader *defaultShader) { this->defaultShader = defaultShader; };
     inline Shader *getDefaultShader() { return defaultShader; };

@@ -25,8 +25,8 @@ void ComponentAnimatedMesh::onRenderQueue(RenderQueue *renderQueue)
     if (mesh)
     {
         Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix();
-        mesh->prepareCache(&cache, mModel, animators, meshTransforms);
-        mesh->queueAnimation(renderQueue, shader, &cache, bCastShadows);
+        mesh->prepareCache(&cache, animators, meshTransforms);
+        mesh->queueAnimation(renderQueue, mModel, shader, &cache, bCastShadows);
     }
 }
 
@@ -126,6 +126,46 @@ int ComponentAnimatedMesh::getMeshNodeIndex(const std::string name)
         return mesh->getMeshIndex(name);
     }
     return -1;
+}
+
+void ComponentAnimatedMesh::renderDebugVolume(Renderer *renderer, Matrix4 *mProjectionView, float thickness, Vector3 color)
+{
+    if (mesh && mesh->isRendarable())
+    {
+        Matrix4 mModel = *owner->transform.getModelMatrix() * *transform.getModelMatrix();
+
+        for (int i = 0; i < mesh->getMeshAmount(); i++)
+        {
+            auto nodeMesh = mesh->getMeshByIndex(i);
+            Matrix4 mNode = mesh->getAnimatedTransformationMatrixByIndex(i, &cache, animators, meshTransforms);
+            Matrix4 fullNodeTransform = mModel * mNode;
+
+            auto volume = nodeMesh->getAsStatic()->getBoundVolumeSphere();
+            float radius = volume->recalcRadius(&fullNodeTransform);
+            Vector3 absoluteCenter = fullNodeTransform * Vector4(volume->center, 1.0f);
+
+            for (int i = 0; i < 16; i++)
+            {
+                float lA = (float)i / 16.0f * CONST_PI * 2.0f;
+                float lB = (float)(i + 1) / 16.0f * CONST_PI * 2.0f;
+
+                renderer->renderDebugLine(
+                    (absoluteCenter + Vector3(radius * sinf(lA), radius * cosf(lA), 0.0f)),
+                    (absoluteCenter + Vector3(radius * sinf(lB), radius * cosf(lB), 0.0f)),
+                    mProjectionView, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
+
+                renderer->renderDebugLine(
+                    (absoluteCenter + Vector3(0.0f, radius * sinf(lA), radius * cosf(lA))),
+                    (absoluteCenter + Vector3(0.0f, radius * sinf(lB), radius * cosf(lB))),
+                    mProjectionView, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
+
+                renderer->renderDebugLine(
+                    (absoluteCenter + Vector3(radius * cosf(lA), 0.0f, radius * sinf(lA))),
+                    (absoluteCenter + Vector3(radius * cosf(lB), 0.0f, radius * sinf(lB))),
+                    mProjectionView, 0.01f, Vector3(0.2f, 0.9f, 0.2f));
+            }
+        }
+    }
 }
 
 void ComponentAnimatedMesh::deleteTransforms()

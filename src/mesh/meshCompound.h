@@ -20,22 +20,25 @@ public:
     EXPORT MeshCompound();
     EXPORT ~MeshCompound();
 
-    EXPORT void render();
-    EXPORT void prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators, Transformation **indexTransformations);
-    EXPORT void queueAnimation(RenderQueue *renderQueue, Shader *shader, MeshCompoundCache *cache, bool bCastShadows);
+    EXPORT void queueAnimation(RenderQueue *renderQueue, Matrix4 &modelMatrix, Shader *shader, MeshCompoundCache *cache, bool bCastShadows);
 
-    EXPORT Mesh *createInstance();
+    EXPORT void prepareCache(MeshCompoundCache *cache, std::vector<Animator *> animators, Transformation **indexTransformations);
+    EXPORT void processNodeEntry(MeshCompoundCache *cache, MeshCompoundCacheEntry *nodeEntry, std::vector<Animator *> &animators, Transformation **indexTransformations);
+
+    EXPORT Mesh *createInstance() override;
 
     EXPORT MeshCompoundNode *addMesh(MeshStatic *mesh);
     EXPORT bool setParent(Mesh *child, Mesh *parent);
     EXPORT bool setParent(std::string &child, std::string &parent);
 
-    EXPORT MeshStatic *getAsStatic();
+    EXPORT MeshStatic *getAsStatic() override;
+    EXPORT bool isRendarable() override;
 
     EXPORT inline int getMeshAmount() { return static_cast<int>(nodes.size()); }
 
     // -1 if not found
     EXPORT int getMeshIndex(std::string name);
+    EXPORT MeshStatic *getMeshByIndex(int index);
 
     Matrix4 getTransformationMatrixByIndex(int index);
     Matrix4 getTransformationMatrixWithParentingByIndex(int index);
@@ -45,7 +48,10 @@ protected:
     MeshCompoundNode *getNodeByMesh(Mesh *mesh);
     MeshCompoundNode *getNodeByName(std::string &name);
     Matrix4 getTransformationMatrix(MeshCompoundNode *node);
+    // with parenting
     Matrix4 getAnimatedTransformationMatrix(MeshCompoundCache *cache, MeshCompoundNode *node, std::vector<Animator *> &animators, Transformation **indexTransformations);
+    // without parenting
+    Matrix4 getLocalTransformationMatrix(MeshCompoundNode *node, std::vector<Animator *> &animators, Transformation **indexTransformations);
 
     std::vector<MeshCompoundNode *> nodes;
     MeshStatic *meshStatic = nullptr;

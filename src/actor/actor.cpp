@@ -182,7 +182,7 @@ void Actor::onRenderQueue(RenderQueue *renderQueue)
     {
         renderQueue->addDebugBody(physicsBody, physicsWorld->getSimScale(), layer->getActiveCamera()->getLineThickness());
     }
-    if (bShowNormals && layer && layer->getActiveCamera())
+    if ((bShowNormals || bShowBoundingVolume) && layer && layer->getActiveCamera())
     {
         renderQueue->addDebugActor(this, layer->getActiveCamera()->getLineThickness());
     }

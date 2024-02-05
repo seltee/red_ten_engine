@@ -24,6 +24,8 @@ public:
     EXPORT void setNearDistance(float nearDistance);
     EXPORT void setFov(float fov);
 
+    EXPORT void recalcCullingPlanes() override;
+
     EXPORT PointWithDirection screenToWorld(float x, float y) override;
 
     EXPORT float getLineThickness() override;
@@ -37,5 +39,4 @@ protected:
     float farDistance = 400.0f;
     float nearDistance = 0.1f;
     float fov = 45.0f;
-    float distance = 45.0f;
 };

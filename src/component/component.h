@@ -18,6 +18,7 @@
 #include <list>
 
 class Camera;
+class Renderer;
 
 class Component : public Destroyable
 {
@@ -49,6 +50,7 @@ public:
     EXPORT Matrix4 getWorldModelMatrix();
 
     EXPORT virtual MeshStatic *getStaticMesh();
+    EXPORT virtual void renderDebugVolume(Renderer *renderer, Matrix4 *mProjectionView, float thickness, Vector3 color);
 
     EXPORT inline void setVisibility(bool state) { bIsVisible = state; }
     EXPORT inline bool isVisible() { return bIsVisible; }
@@ -58,7 +60,7 @@ public:
     std::list<Shape *> shapes;
     Transformation transform;
 
-    ComponentColorMode colorMode = ComponentColorMode::Lit;
+    ColorMode colorMode = ColorMode::Lit;
 
 protected:
     bool bIsVisible = true;

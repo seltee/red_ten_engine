@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "renderer/renderer.h"
-#include "loaders3d/loaderFBX.h"
+#include "loaders3d/FBX/loaderFBX.h"
 #include "loaders/stb_image.h"
 #include "common/meshDescriptor.h"
 #include "mesh/meshStatic.h"

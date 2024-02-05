@@ -6,7 +6,7 @@
 
 const int spawnPerSecond = 10;
 
-class Sphere : public Actor
+class SphereActor : public Actor
 {
 public:
     void onProcess(float delta)
@@ -42,7 +42,7 @@ public:
 
     Actor *spawnSphere(float x, float y, float z)
     {
-        Actor *sphere = layer->createActor<Sphere>();
+        Actor *sphere = layer->createActor<SphereActor>();
 
         auto sphereComponent = sphere->createComponent<ComponentMesh>();
         sphereComponent->setMesh(sphereMesh);

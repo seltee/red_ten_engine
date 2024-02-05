@@ -3,7 +3,7 @@
 
 #include "resource/resourceMesh.h"
 #include "math/math.h"
-#include "loaders3d/loaderFBX.h"
+#include "loaders3d/FBX/loaderFBX.h"
 #include <string.h>
 
 // number of floats in one polygon

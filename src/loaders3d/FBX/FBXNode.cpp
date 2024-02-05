@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Dmitrii Shashkov
 // SPDX-License-Identifier: MIT
 
-#include "loaders3d/FBXNode.h"
+#include "loaders3d/FBX/FBXNode.h"
 #include "loaders/stb_image.h"
 
 FBXNode::FBXNode(int level, FILE *file)

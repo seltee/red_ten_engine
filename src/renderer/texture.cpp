@@ -27,23 +27,23 @@ bool Texture::isEditable()
     return false;
 }
 
-void Texture::drawImage(Texture *texture, Vector2 position)
+void Texture::drawImage(Texture *texture, Vector2 position, ColorMode colorMode)
 {
 }
 
-void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale)
+void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale, ColorMode colorMode)
 {
 }
 
-void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale, Vector2 alignPoint, float rotation)
+void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale, Vector2 alignPoint, float rotation, ColorMode colorMode)
 {
 }
 
-void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale, float rotation)
+void Texture::drawImage(Texture *texture, Vector2 position, Vector2 Scale, float rotation, ColorMode colorMode)
 {
 }
 
-void Texture::drawImage(Texture *texture, Matrix4 *model, Shader *shader)
+void Texture::drawImage(Texture *texture, Matrix4 *model, Shader *shader, ColorMode colorMode)
 {
 }
 

@@ -182,6 +182,10 @@ MeshStatic *Component::getStaticMesh()
     return nullptr;
 }
 
+void Component::renderDebugVolume(Renderer *renderer, Matrix4 *mProjectionView, float thickness, Vector3 color)
+{
+}
+
 void Component::setShaderParameters(ShaderParameter **parametersList, int parametersAmount)
 {
     this->parametersList = parametersList;

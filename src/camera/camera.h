@@ -9,6 +9,7 @@
 #include "controller/audioController.h"
 #include "connector/withAudio.h"
 #include "math/transformation.h"
+#include "math/sphere.h"
 #include <list>
 
 class Component;
@@ -50,7 +51,11 @@ public:
 
     RenderTarget *renderTarget = nullptr;
 
+    EXPORT virtual void recalcCullingPlanes();
+    EXPORT inline Vector4 *getCullingPlanes() { return cullingPlanes; };
+
 protected:
+    Vector4 cullingPlanes[6];
     Matrix4 projectionMatrix;
     Matrix4 viewMatrix;
     Component *owner = nullptr;

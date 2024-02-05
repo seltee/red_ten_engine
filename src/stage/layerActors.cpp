@@ -81,6 +81,7 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     RenderQueue *renderQueue = renderer->getRenderQueue();
 
     renderQueue->reset();
+    renderQueue->setViewMatrix(mView);
     renderQueue->setViewProjectionMatrix(mProjectionView);
     renderQueue->setAmbientLight(ambientColor);
     renderQueue->setCameraPosition(cmPosition);
@@ -89,6 +90,7 @@ void LayerActors::render(Renderer *renderer, RenderTarget *renderTarget)
     renderQueue->setHDRRadianceTexture(HDRRadianceTexture);
     renderQueue->setGamma(gamma);
     renderQueue->setUseCameraDirectionForLights(activeCamera->getCameraType() == CameraType::Orto);
+    renderQueue->setCullingPlanes(activeCamera->getCullingPlanes());
 
     if (bUseSorting)
         renderQueue->enableSorting();

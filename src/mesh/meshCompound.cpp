@@ -13,39 +13,55 @@ MeshCompound::~MeshCompound()
 {
 }
 
-void MeshCompound::render()
+void MeshCompound::queueAnimation(RenderQueue *renderQueue, Matrix4 &modelMatrix, Shader *shader, MeshCompoundCache *cache, bool bCastShadows)
 {
-    /*
-    for (auto &node : nodes)
+    for (auto &entry : cache->entriesToRender)
     {
-        Matrix4 local = modelMatrix * getTransformationMatrix(node);
-        node->mesh->render(shader, vpMatrix, local);
-    }
-    */
-}
+        MeshStatic *mesh = entry.node->mesh->getAsStatic();
+        Matrix4 mNodeModel = modelMatrix * entry.model;
 
-void MeshCompound::queueAnimation(RenderQueue *renderQueue, Shader *shader, MeshCompoundCache *cache, bool bCastShadows)
-{
-    for (auto &container : cache->entriesToRender)
-    {
-        renderQueue->addMainPhase(container.model, shader, nullptr, container.node->mesh->getAsStatic(), nullptr, 0);
+        renderQueue->addMainPhase(mNodeModel, shader, nullptr, mesh, nullptr, 0);
         if (bCastShadows)
-            renderQueue->addShadowCaster(container.model, container.node->mesh->getAsStatic(), nullptr, uvShiftSize);
+            renderQueue->addShadowCaster(mNodeModel, mesh, nullptr, uvShiftSize);
     }
 }
 
-void MeshCompound::prepareCache(MeshCompoundCache *cache, Matrix4 &modelMatrix, std::vector<Animator *> animators, Transformation **indexTransformations)
+void MeshCompound::prepareCache(MeshCompoundCache *cache, std::vector<Animator *> animators, Transformation **indexTransformations)
 {
-    cache->clear();
+    cache->makeDirty();
     for (auto node : nodes)
     {
-        // printf("Node %s\n", node->mesh->getName().c_str());
-        // printf("%f %f %f\n", node->transform.getPosition().x, node->transform.getPosition().y, node->transform.getPosition().z);
-        // printf("%f %f %f\n", node->transform.getScale().x, node->transform.getScale().y, node->transform.getScale().z);
+        if (node->mesh->isRendarable())
+        {
+            auto nodeEntry = cache->getEntryByNode(node);
+            if (!nodeEntry)
+            {
+                nodeEntry = cache->addEntry(node);
+            }
 
-        Matrix4 local = modelMatrix * getAnimatedTransformationMatrix(cache, node, animators, indexTransformations);
-        cache->addEntry(node, local);
+            if (nodeEntry->isDirty)
+                processNodeEntry(cache, nodeEntry, animators, indexTransformations);
+        }
     }
+}
+
+void MeshCompound::processNodeEntry(MeshCompoundCache *cache, MeshCompoundCacheEntry *nodeEntry, std::vector<Animator *> &animators, Transformation **indexTransformations)
+{
+    nodeEntry->model = getLocalTransformationMatrix(nodeEntry->node, animators, indexTransformations);
+
+    if (nodeEntry->node->parent)
+    {
+        auto parentEntry = cache->getEntryByNode(nodeEntry->node->parent);
+        if (!parentEntry)
+            parentEntry = cache->addEntry(nodeEntry->node->parent);
+
+        if (parentEntry->isDirty)
+            processNodeEntry(cache, parentEntry, animators, indexTransformations);
+
+        nodeEntry->model = parentEntry->model * nodeEntry->model;
+    }
+
+    nodeEntry->isDirty = false;
 }
 
 Mesh *MeshCompound::createInstance()
@@ -156,6 +172,11 @@ MeshStatic *MeshCompound::getAsStatic()
     return meshStatic;
 }
 
+bool MeshCompound::isRendarable()
+{
+    return nodes.size() > 0;
+}
+
 int MeshCompound::getMeshIndex(std::string name)
 {
     int i = 0;
@@ -166,6 +187,17 @@ int MeshCompound::getMeshIndex(std::string name)
         i++;
     }
     return -1;
+}
+
+MeshStatic *MeshCompound::getMeshByIndex(int index)
+{
+    if (index >= 0 && index < nodes.size())
+    {
+        MeshCompoundNode *node = nodes.at(index);
+        if (node)
+            return node->mesh;
+    }
+    return nullptr;
 }
 
 Matrix4 MeshCompound::getTransformationMatrixByIndex(int index)
@@ -322,4 +354,54 @@ Matrix4 MeshCompound::getAnimatedTransformationMatrix(MeshCompoundCache *cache, 
             return parentTransformation * *transformation.getModelMatrix();
         }
     }
+}
+
+Matrix4 MeshCompound::getLocalTransformationMatrix(MeshCompoundNode *node, std::vector<Animator *> &animators, Transformation **indexTransformations)
+{
+    AnimationTarget *target = nullptr;
+    Animator *animator = nullptr;
+    for (auto anim : animators)
+    {
+        auto animation = anim->getAnimation();
+        if (animation)
+        {
+            target = animation->getTargetByName(node->mesh->getName());
+            if (target)
+            {
+                animator = anim;
+                break;
+            }
+        }
+    }
+
+    if (!target || !animator)
+    {
+        if (indexTransformations)
+        {
+            Matrix4 local = *node->transform.getModelMatrix();
+            if (indexTransformations[node->index])
+                local *= *indexTransformations[node->index]->getModelMatrix();
+            return local;
+        }
+        else
+        {
+            return *node->transform.getModelMatrix();
+        }
+    }
+
+    Transformation transformation;
+    target->getTransformByTime(animator->time, &transformation);
+    if (indexTransformations)
+    {
+        Matrix4 local = *transformation.getModelMatrix();
+        if (indexTransformations[node->index])
+            local *= *indexTransformations[node->index]->getModelMatrix();
+        return local;
+    }
+    else
+    {
+        return *transformation.getModelMatrix();
+    }
+
+    return Matrix4(1.0f);
 }
