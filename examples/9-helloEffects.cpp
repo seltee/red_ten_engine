@@ -182,16 +182,16 @@ APPMAIN
     // Then it renders it back to the main buffer
     // Since renderer may use different graphic APIs be sure to check the current API and use shader for this API
     auto effectLayer = stage->createLayerEffects("Hello Effects Layer", 2);
-    auto effectJoJo = view->getRenderer()->createOpenGLShader(fragmentJoJoShader);
+    auto effectJoJo = view->getRenderer()->createShader(fragmentJoJoShader);
     effectJoJo->setOpacity(0.0f);
     effectLayer->addEffect(effectJoJo);
-    auto effectInverse = view->getRenderer()->createOpenGLShader(fragmentInverseShader);
+    auto effectInverse = view->getRenderer()->createShader(fragmentInverseShader);
     effectInverse->setOpacity(0.0f);
     effectLayer->addEffect(effectInverse);
-    auto effectBW = view->getRenderer()->createOpenGLShader(fragmentBWShader);
+    auto effectBW = view->getRenderer()->createShader(fragmentBWShader);
     effectBW->setOpacity(0.0f);
     effectLayer->addEffect(effectBW);
-    auto effectShift = view->getRenderer()->createOpenGLShader(fragmentShiftShader);
+    auto effectShift = view->getRenderer()->createShader(fragmentShiftShader);
     effectShift->setOpacity(0.0f);
     effectLayer->addEffect(effectShift);
 

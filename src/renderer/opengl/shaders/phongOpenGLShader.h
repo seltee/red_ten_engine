@@ -9,7 +9,7 @@ class PhongOpenGLShader : public PhongShader
 {
 public:
     EXPORT PhongOpenGLShader();
-    EXPORT PhongOpenGLShader(const char *vertexCode, const char *fragCode);
+    EXPORT PhongOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode);
     EXPORT bool build() override;
     EXPORT void setTexture(TextureType type, Texture *texture) override;
     EXPORT bool use(Matrix4 &mModel, Matrix4 &mModelViewProjection) override;
@@ -23,10 +23,10 @@ public:
 
 protected:
     EXPORT bool compile(unsigned short type, const char *code, unsigned int *shader) override;
-    EXPORT void setShaderCode(const char *vertexCode, const char *fragCode);
+    EXPORT void setShaderCode(const std::string &vertexCode, const std::string &fragmentCode);
 
-    const char *vertexCode = nullptr;
-    const char *fragCode = nullptr;
+    std::string vertexCode;
+    std::string fragCode;
 
     int locMModelViewProjection = 0;
     int locMModel = 0;

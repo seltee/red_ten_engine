@@ -78,8 +78,19 @@ void TextureEditableOpenGL::drawImage(Texture *texture, Matrix4 *model, Shader *
     case ColorMode::Addition:
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         break;
+    case ColorMode::Substraction:
+        glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        break;
     }
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    // restore specific functions
+    switch (colorMode)
+    {
+    case ColorMode::Substraction:
+        glBlendEquation(GL_FUNC_ADD);
+    }
 }
 
 void TextureEditableOpenGL::recreateMipMaps()

@@ -23,9 +23,9 @@ PhongOpenGLShader::PhongOpenGLShader()
     bUseOwnShadowShader = true;
 }
 
-PhongOpenGLShader::PhongOpenGLShader(const char *vertexCode, const char *fragCode)
+PhongOpenGLShader::PhongOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode)
 {
-    setShaderCode(vertexCode, fragCode);
+    setShaderCode(vertexCode, fragmentCode);
     build();
     bUseOwnShadowShader = true;
 }
@@ -33,15 +33,15 @@ PhongOpenGLShader::PhongOpenGLShader(const char *vertexCode, const char *fragCod
 bool PhongOpenGLShader::build()
 {
     unsigned int vertexShader = 0, fragmentShader = 0;
-    if (!compile(GL_VERTEX_SHADER, vertexCode, &vertexShader))
+    if (!compile(GL_VERTEX_SHADER, vertexCode.c_str(), &vertexShader))
     {
-        logger->logff("Unable to compile vertex shader:\n%s\n", vertexCode);
+        logger->logff("Unable to compile vertex shader:\n%s\n", vertexCode.c_str());
         return false;
     }
 
-    if (!compile(GL_FRAGMENT_SHADER, fragCode, &fragmentShader))
+    if (!compile(GL_FRAGMENT_SHADER, fragCode.c_str(), &fragmentShader))
     {
-        logger->logff("Unable to compile fragment shader:\n%s\n", fragCode);
+        logger->logff("Unable to compile fragment shader:\n%s\n", fragCode.c_str());
         return false;
     }
 
@@ -176,10 +176,10 @@ bool PhongOpenGLShader::compile(unsigned short type, const char *code, unsigned 
     return true;
 }
 
-void PhongOpenGLShader::setShaderCode(const char *vertexCode, const char *fragCode)
+void PhongOpenGLShader::setShaderCode(const std::string &vertexCode, const std::string &fragmentCode)
 {
     this->vertexCode = vertexCode;
-    this->fragCode = fragCode;
+    this->fragCode = fragmentCode;
 }
 
 // Straight go shader

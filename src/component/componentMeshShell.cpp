@@ -14,7 +14,7 @@ const unsigned char tTipData[4] = {200, 200, 200, 255};
 
 ComponentMeshShell::ComponentMeshShell()
 {
-    shader = getRenderer()->createOpenGLShader(shellVertexCode, shellFragmentCode);
+    shader = getRenderer()->createShader(shellVertexCode, shellFragmentCode);
     shellDataTextureBinding = shader->addTextureBinding("TextureData");
     shellDistorsionTextureBinding = shader->addTextureBinding("TextureDistorsion");
     shellRootTextureBinding = shader->addTextureBinding("TextureRoot");
@@ -44,7 +44,7 @@ void ComponentMeshShell::onRenderQueue(RenderQueue *renderQueue)
         {
             for (int i = 0; i < layersAmount; i++)
             {
-                renderQueue->addMainPhase(mModel, shader, shellDataTextureBinding->getTexture(), mesh->getAsStatic(), parametersList[i], 5);
+                renderQueue->addMainPhase(mModel, shader, shellDataTextureBinding->getTexture(), mesh->getAsStatic(), parametersList[i], 6);
             }
         }
 
@@ -76,6 +76,12 @@ void ComponentMeshShell::setDensityTexture(Texture *texture)
 void ComponentMeshShell::setDistorsionTexture(Texture *texture)
 {
     shellDistorsionTextureBinding->setTexture(texture);
+}
+
+void ComponentMeshShell::setDistorsionUVShift(Vector2 shift)
+{
+    distorsionUVShift[0] = shift.x;
+    distorsionUVShift[1] = shift.y;
 }
 
 void ComponentMeshShell::setRootTexture(Texture *texture)
@@ -157,7 +163,7 @@ void ComponentMeshShell::recreate()
         alphaCheck[i] = static_cast<float>(i) / static_cast<float>(layersAmount) * 0.6f + 0.1f;
         alphaCheck[i] *= alphaCheck[i];
 
-        parametersList[i] = new ShaderParameter *[5];
+        parametersList[i] = new ShaderParameter *[6];
         parametersList[i][0] = shader->createShaderParameter("fDist", ShaderParameterType::Float);
         parametersList[i][0]->set(1, &heights[i]);
         parametersList[i][1] = shader->createShaderParameter("fHeight", ShaderParameterType::Float);
@@ -168,7 +174,8 @@ void ComponentMeshShell::recreate()
         parametersList[i][3]->set(1, &distorsionPower);
         parametersList[i][4] = shader->createShaderParameter("fTime", ShaderParameterType::Float);
         parametersList[i][4]->set(1, &time);
-        
+        parametersList[i][5] = shader->createShaderParameter("v2DistorsionUVShift", ShaderParameterType::Float2);
+        parametersList[i][5]->set(1, distorsionUVShift);
     }
 }
 
@@ -184,6 +191,7 @@ const char *shellVertexCode =
     "uniform mat4 mModel;\n"
     "uniform mat4 mNormal;\n"
     "uniform vec4 uvControl;\n"
+    "uniform vec2 v2DistorsionUVShift;\n"
     "uniform float fDist;\n"
     "uniform float fHeight;\n"
     "uniform float fTime;\n"
@@ -200,7 +208,7 @@ const char *shellVertexCode =
     "   vec3 N = normalize((mNormal * vec4(aNormal,    0.0)).xyz);\n"
     "   mTBN = mat3(T, B, N);\n"
     "   vec3 shift = mTBN * vec3(0, 0, fDist);\n"
-    "   vec3 distorsion = (texture(TextureDistorsion, aTexCoord * 2.0 + vec2(fTime, fTime)).rgb * 2.0 - 1.0) * fHeight * fDistorsionPower;\n"
+    "   vec3 distorsion = (texture(TextureDistorsion, aTexCoord * 0.5 + vec2(fTime, fTime) + v2DistorsionUVShift).rgb * 2.0 - 1.0) * fHeight * fDistorsionPower;\n"
     "   gl_Position = mModelViewProjection * vec4(aPos + shift + distorsion, 1.0);\n"
     "   FragPos = ((mModel * vec4(aPos + shift, 1.0)).xyz) * 0.1;\n"
     "   ffHeight = fHeight;\n"
@@ -222,8 +230,9 @@ const char *shellFragmentCode =
     "in mat3 mTBN;\n"
     "void main() {\n"
     "   vec4 data = texture(TextureData, TexCoords);\n"
-    "   if (data.a < fAlphaCheck * data.r) discard;\n"
+    "   if (ffHeight >= data.r * 2.0 || data.r < 0.2) discard;\n"
     "   gAlbedo.rgba = (1 - ffHeight) * texture(TextureRoot, TexCoords) + ffHeight * texture(TextureTip, TexCoords);\n"
+    "   gAlbedo.rgb *= data.b;\n"
     "   gPosition = FragPos;\n"
     "   gNormal.rgb = normalize(mTBN * vec3(0, 0, 1));\n"
     "   gNormal.a = 0.6;\n"

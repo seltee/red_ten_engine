@@ -49,11 +49,10 @@ public:
     EXPORT virtual MeshStatic *getDefaultCubeMesh();
 
     EXPORT virtual PhongShader *createPhongShader();
+    EXPORT virtual PhongShader *createPhongShader(const std::string &vertexCode, const std::string &fragmentCode);
 
-    EXPORT virtual Shader *createOpenGLShader(const std::string &fragmentCode);
-    EXPORT virtual Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode);
-    EXPORT virtual Shader *createVulkanShader(const std::string &fragmentCode);
-    EXPORT virtual Shader *createVulkanShader(const std::string &vertexCode, const std::string &fragmentCode);
+    EXPORT virtual Shader *createShader(const std::string &fragmentCode);
+    EXPORT virtual Shader *createShader(const std::string &vertexCode, const std::string &fragmentCode);
     
     EXPORT virtual void destroyShader(Shader *shader);
 

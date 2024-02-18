@@ -39,7 +39,7 @@ APPMAIN
 
     // BW effect layer
     auto effectLayer = stage->createLayerEffects("BW Effect Layer", 1);
-    auto effectBW = view->getRenderer()->createOpenGLShader(fragmentBWShader);
+    auto effectBW = view->getRenderer()->createShader(fragmentBWShader);
     auto effectFTime = effectBW->createShaderParameter("fTime", ShaderParameterType::Float);
     effectLayer->addEffect(effectBW, &effectFTime, 1);
 

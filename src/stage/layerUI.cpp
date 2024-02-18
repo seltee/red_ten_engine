@@ -203,19 +203,19 @@ void LayerUI::initSharedData()
 
     if (!colorShader)
     {
-        colorShader = renderer->createOpenGLShader(uiColorFragmentShader);
+        colorShader = renderer->createShader(uiColorFragmentShader);
         colorShaderParameter = colorShader->createShaderParameter("v4color", ShaderParameterType::Float4);
     }
 
     if (!textShader)
     {
-        textShader = renderer->createOpenGLShader(uiFontFragmentShader);
+        textShader = renderer->createShader(uiFontFragmentShader);
         colorTextShaderParameter = textShader->createShaderParameter("v4color", ShaderParameterType::Float4);
     }
 
     if (!imageShader)
     {
-        imageShader = renderer->createOpenGLShader(uiVertexCode, uiSpriteFragmentShader);
+        imageShader = renderer->createShader(uiVertexCode, uiSpriteFragmentShader);
         imageShiftShaderParameter = imageShader->createShaderParameter("aTexCoordShift", ShaderParameterType::Float2);
         imageFrameShaderParameter = imageShader->createShaderParameter("aTexCoordMul", ShaderParameterType::Float2);
     }

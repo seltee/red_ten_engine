@@ -53,16 +53,16 @@ APPMAIN
     unsigned char *grassData = new unsigned char[cellSize * cellSize * 4];
     for (int i = 0; i < cellSize * cellSize; i++)
     {
-        grassData[i * 4 + 0] = 255;
+        grassData[i * 4 + 0] = 0;
         grassData[i * 4 + 1] = 255;
         grassData[i * 4 + 2] = 255;
-        grassData[i * 4 + 3] = 0;
+        grassData[i * 4 + 3] = 255;
     }
 
     // r - height
     // g - cut off
     // b - color shade
-    for (int i = 0; i < 400000; i++)
+    for (int i = 0; i < 800000; i++)
     {
         int x = rand() % cellSize;
         int y = rand() % cellSize;

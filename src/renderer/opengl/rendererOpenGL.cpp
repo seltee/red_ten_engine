@@ -301,6 +301,9 @@ void RendererOpenGL::render(RenderTarget *renderTarget)
             case ColorMode::Addition:
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
                 break;
+            case ColorMode::Substraction:
+                glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_COLOR);
+                break;
             }
 
             if (element->parametersAmount > 0)
@@ -476,7 +479,12 @@ PhongShader *RendererOpenGL::createPhongShader()
     return new PhongOpenGLShader();
 }
 
-Shader *RendererOpenGL::createOpenGLShader(const std::string &fragmentCode)
+PhongShader *RendererOpenGL::createPhongShader(const std::string &vertexCode, const std::string &fragmentCode)
+{
+    return new PhongOpenGLShader(vertexCode, fragmentCode);
+}
+
+Shader *RendererOpenGL::createShader(const std::string &fragmentCode)
 {
     std::string internalScreenVertexCode =
         "#version 410 core\n"
@@ -494,7 +502,7 @@ Shader *RendererOpenGL::createOpenGLShader(const std::string &fragmentCode)
     return newShader;
 }
 
-Shader *RendererOpenGL::createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode)
+Shader *RendererOpenGL::createShader(const std::string &vertexCode, const std::string &fragmentCode)
 {
     ShaderOpenGL *newShader = new ShaderOpenGL(vertexCode, fragmentCode);
     newShader->build();

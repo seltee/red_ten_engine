@@ -22,6 +22,7 @@ public:
     EXPORT void setMesh(Mesh *mesh);
     EXPORT void setDensityTexture(Texture *texture);
     EXPORT void setDistorsionTexture(Texture *texture);
+    EXPORT void setDistorsionUVShift(Vector2 shift);
     EXPORT void setRootTexture(Texture *texture);
     EXPORT void setTipTexture(Texture *texture);
 
@@ -59,6 +60,7 @@ protected:
     float layerHeight = 0.0f;
     float distorsionSpeed = 0.01f;
     float distorsionPower = 0.01f;
+    float distorsionUVShift[2] = {0.0f, 0.0f};
 
     ShaderParameter ***parametersList = nullptr;
     int parametersListAmount = 0;

@@ -81,22 +81,17 @@ PhongShader *Renderer::createPhongShader()
     return nullptr;
 }
 
-Shader *Renderer::createOpenGLShader(const std::string &fragmentCode)
+PhongShader *Renderer::createPhongShader(const std::string &vertexCode, const std::string &fragmentCode)
 {
     return nullptr;
 }
 
-Shader *Renderer::createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode)
+Shader *Renderer::createShader(const std::string &fragmentCode)
 {
     return nullptr;
 }
 
-Shader *Renderer::createVulkanShader(const std::string &fragmentCode)
-{
-    return nullptr;
-}
-
-Shader *Renderer::createVulkanShader(const std::string &vertexCode, const std::string &fragmentCode)
+Shader *Renderer::createShader(const std::string &vertexCode, const std::string &fragmentCode)
 {
     return nullptr;
 }

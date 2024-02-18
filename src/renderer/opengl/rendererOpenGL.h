@@ -42,9 +42,10 @@ public:
     EXPORT virtual MeshStatic *getDefaultCubeMesh() override;
 
     EXPORT PhongShader *createPhongShader() override;
+    EXPORT PhongShader *createPhongShader(const std::string &vertexCode, const std::string &fragmentCode) override;
 
-    EXPORT Shader *createOpenGLShader(const std::string &fragmentCode) override;
-    EXPORT Shader *createOpenGLShader(const std::string &vertexCode, const std::string &fragmentCode) override;
+    EXPORT Shader *createShader(const std::string &fragmentCode) override;
+    EXPORT Shader *createShader(const std::string &vertexCode, const std::string &fragmentCode) override;
     
     EXPORT void destroyShader(Shader *shader) override;
 
